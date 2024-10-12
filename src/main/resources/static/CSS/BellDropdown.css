@@ -1,0 +1,17 @@
+/* Ensuring the dropdown appears on top */
+.dropdown-menu {
+    position: absolute !important;
+    z-index: 1050 !important; /* Ensuring the dropdown is above other elements */
+}
+
+/* Adjusting dropdown menu placement if necessary */
+.dropdown-menu-end {
+    right: 0;
+    left: auto;
+    margin-top: 10px;
+}
+
+/* Optional: Add some padding to the bell icon */
+.nav-item .feather-bell {
+    margin-right: 5px;
+}
