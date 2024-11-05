@@ -1,278 +1,435 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="">
-        <title>Manage Packages · Travel Services Hub</title>
-        <!-- Bootstrap core CSS from CDN -->
-        <link href="../../../static/CSS/bootstrap_theme/bootstrap.css" rel="stylesheet" type="text/css">
-        <link href="../../../static/CSS/dashboard.css" rel="stylesheet">
-        <link href="../../../static/CSS/chartjs.css" rel="stylesheet">
-        <link href="../../../static/CSS/BellDropdown.css" rel="stylesheet">
-        <style>/* Consistent button styling */.btn-custom { background-color: #0abf53; color: white; border: none; } .btn-custom:hover { background-color: #089e45; }</style>
-    </head>
-    <body>
-        <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-            <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">Manage Packages</a>
-            <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span>
-            </button>
-            <!-- Logo Image -->
-            <img src="../../../static/images/logo.png" alt="Company Logo" class="mx-auto d-block" style="height: 100px; width: auto;">
-            <ul class="navbar-nav px-3">
-                <!-- Notification Bell -->
-                <li class="nav-item dropdown text-nowrap"><a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell">
-                            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                        </svg> <span class="badge bg-danger">3</span> </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
-                        <li>
-                            <h6 class="dropdown-header">New Bookings</h6>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="manageBookings.html">John Doe - Luxury Beach Escape <br><small>Booking Date: 2024-09-15</small></a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="manageBookings.html">Jane Smith - Mountain Adventure <br><small>Booking Date: 2024-09-16</small></a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="manageBookings.html">Michael Johnson - City Tour <br><small>Booking Date: 2024-09-17</small></a>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li>
-                            <a class="dropdown-item btn btn-primary btn-custom" href="manageBookings.html">Go to Manage Bookings</a>
-                        </li>
-                    </ul>
+<!-- managePackage.html -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- Meta and Title -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Packages · Travel Services Hub</title>
+
+    <!-- Bootstrap core CSS -->
+    <link th:href="@{/CSS/bootstrap_theme/bootstrap.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/CSS/dashboard.css}" rel="stylesheet">
+    <link th:href="@{/CSS/chartjs.css}" rel="stylesheet">
+    <link th:href="@{/CSS/BellDropdown.css}" rel="stylesheet">
+    <style>
+        .bordered-img {
+            border: 2px solid #0abf53; /* Adjust color and width as needed */
+            padding: 2px; /* Optional: space between the image and border */
+            border-radius: 10%;
+        }
+    </style>
+
+    <style>
+        /* Consistent button styling */
+        .btn-custom {
+            background-color: #0abf53;
+            color: white;
+            border: none;
+        }
+        .btn-custom:hover {
+            background-color: #089e45;
+        }
+    </style>
+</head>
+<body>
+<!-- Header -->
+<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">Manage Packages</a>
+    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button"
+            data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu"
+            aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <!-- Logo Image -->
+    <img th:src="@{/images/logo.png}" alt="Company Logo" class="mx-auto d-block" style="height: 100px; width: auto;">
+
+    <ul class="navbar-nav px-3">
+        <!-- Notification Bell -->
+        <li class="nav-item dropdown text-nowrap">
+            <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button"
+               data-bs-toggle="dropdown" aria-expanded="false">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                     stroke-linejoin="round" class="feather feather-bell">
+                    <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                <span class="badge bg-danger" th:text="${notificationCount}">3</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+                <li><h6 class="dropdown-header">New Bookings</h6></li>
+                <li th:each="booking : ${newBookings}">
+                    <a class="dropdown-item" th:href="@{/manageBookings}">
+                        <span th:text="${booking.userName}">User Name</span> -
+                        <span th:text="${booking.packageName}">Package Name</span> <br>
+                        <small th:text="'Booking Date: ' + ${booking.bookingDate}">Booking Date</small>
+                    </a>
                 </li>
-                <li class="nav-item text-nowrap"><a class="nav-link" href="#" onclick="showSignOutModal()">Sign out</a>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item btn btn-primary btn-custom" th:href="@{/manageBookings}">
+                        Go to Manage Bookings
+                    </a>
                 </li>
             </ul>
-        </header>
-        <div class="container-fluid">
+        </li>
+        <!-- Sign Out Link -->
+        <li class="nav-item text-nowrap">
+            <a class="nav-link" href="#" onclick="showSignOutModal()">Sign out</a>
+        </li>
+    </ul>
+</header>
+
+<!-- Main Container -->
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" th:href="@{/provider/dashboard}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/ProviderDashboard}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            Dashboard
+                        </a>
+                    </li>
+                    <!-- Manage Bookings Link in Sidebar -->
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/provider/manageBookings}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            Manage Bookings
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/provider/managePackages}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layers">
+                                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                                <polyline points="2 17 12 22 22 17"></polyline>
+                                <polyline points="2 12 12 17 22 12"></polyline>
+                            </svg>
+                            Manage Packages
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/provider/replyToReviews}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users">
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                            Reviews
+                        </a>
+                    </li>
+                    <!-- Profile Link in Sidebar -->
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/provider/profile}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
+                                <path d="M20.5 18.5a6 6 0 0 0-9 0"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            Profile
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <!-- Page header -->
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Manage Packages</h1>
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#createPackageModal">
+                    Create New Package
+                </button>
+            </div>
+
+            <!-- Success and Error Messages -->
+            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+            <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+            <!-- Package Cards -->
             <div class="row">
-                <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-                    <div class="position-sticky pt-3">
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="#"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home">
-                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                                    </svg> Dashboard </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link " href="dashboard.html"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home">
-                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                                    </svg> Dashboard </a>
-                            </li>
-                            <!-- Manage Bookings Link in Sidebar -->
-                            <li class="nav-item">
-                                <a class="nav-link" href="manageBookings.html"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
-                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                                    </svg> Manage Bookings </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link active" href="managePackages.html"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layers">
-                                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                                        <polyline points="2 17 12 22 22 17"></polyline>
-                                        <polyline points="2 12 12 17 22 12"></polyline>
-                                    </svg> Manage Packages </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="RelyToReviews.html"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users">
-                                        <circle cx="9" cy="7" r="4"></circle>
-                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                    </svg> Reply to Reviews </a>
-                            </li>
-                            <!-- Profile Link in Sidebar -->
-                            <li class="nav-item">
-                                <a class="nav-link" href="Profile.html"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
-                                        <path d="M20.5 18.5a6 6 0 0 0-9 0"></path>
-                                        <circle cx="12" cy="7" r="4"></circle>
-                                    </svg> Profile </a>
-                            </li>
-                        </ul>
-                    </div>
-                </nav>
-                <!-- Main content for managing packages -->
-                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                        <h1 class="h2">Packages</h1>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#createPackageModal">Create New Package</button>
-                    </div>
-                    <!-- List of Packages -->
-                    <div class="row">
-                        <!-- Example Package Card -->
-                        <div class="col-md-4">
-                            <div class="card mb-4 shadow-sm">
-                                <img src="../../../static/images/A%20serene%20beach%20scene%20with%20a%20travelers%20enjoying%20the%20view,.jpg" class="card-img-top" alt="Package Image">
-                                <div class="card-body">
-                                    <h5 class="card-title">Luxury Beach Escape</h5>
-                                    <p class="card-text">Enjoy a 7-day relaxing vacation at a luxury beach resort.</p>
-                                    <p><strong>Price:</strong> $2500</p>
-                                    <p><strong>Provider:</strong> John Doe</p>
-                                    <p><strong>Likes:</strong> 240 | <strong>Dislikes:</strong> 15</p>
-                                    <p><strong>Reviews:</strong> <a href="RelyToReviews.html" style="color: #0abf53;">2</a></p>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editPackageModal">Edit Package</button>
-                                    <button class="btn btn-sm btn-outline-secondary">Deactive</button>
-                                    <button class="btn btn-sm btn-outline-danger">Delete</button>
-                                </div>
-                            </div>
+                <!-- Check if packages list is empty -->
+                <div class="col-12" th:if="${#lists.isEmpty(packageLikeDislikeMap)}">
+                    <p>No packages found.</p>
+                </div>
+
+                <!-- Loop through packages and their like/dislike counts -->
+                <div class="col-md-4 mb-4" th:each="entry : ${packageLikeDislikeMap}" th:unless="${#lists.isEmpty(packageLikeDislikeMap)}">
+                    <div class="card h-100 min-vh-60"
+                         th:attr="data-package-id=${entry.key.id},
+                  data-package-name=${entry.key.name},
+                  data-package-description=${entry.key.description},
+                  data-package-price=${entry.key.price},
+                  data-package-image-url=${entry.key.imageUrl}">
+                        <img th:src="${entry.key.imageUrl}" class="card-img-top h-50" style="min-height: 50px;" alt="Package Image">
+
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${entry.key.name}">Package Name</h5>
+                            <p class="card-text" th:text="${entry.key.description}">Package Description</p>
+                            <p><strong>Price:</strong> $<span th:text="${entry.key.price}">0</span></p>
+                            <p><strong>Likes:</strong> <span th:text="${entry.value['likes']}">0</span></p>
+                            <p><strong>Dislikes:</strong> <span th:text="${entry.value['dislikes']}">0</span></p> <!-- Display dislike count -->
+                            <!-- Edit Button -->
+                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                    th:onclick="'loadPackageData(' + ${entry.key.id} + ')'">
+                                Edit Package
+                            </button>
+                            <!-- View Details Link -->
+                            <a th:href="@{/Package/{id}(id=${entry.key.id})}"></a>
+                            <!-- Delete Button -->
+                            <a th:href="@{/packages/delete/{id}(id=${entry.key.id})}"
+                               class="btn btn-sm btn-outline-danger"
+                               onclick="return confirm('Are you sure you want to delete this package?');">
+                                Delete
+                            </a>
                         </div>
-                        <!-- Second Package (City Tour) -->
-                        <div class="col-md-4">
-                            <div class="card mb-4 shadow-sm">
-                                <img src="../../../static/images/pexels-alexazabache-3214995.jpg" class="card-img-top" alt="Package Image" height="428">
-                                <div class="card-body">
-                                    <h5 class="card-title">City Tour</h5>
-                                    <p class="card-text">Explore the vibrant city with guided tours you won’t forget.</p>
-                                    <p><strong>Price:</strong> $1,200</p>
-                                    <p><strong>Provider:</strong> Michael Johnson</p>
-                                    <p><strong>Likes:</strong> 100 | <strong>Dislikes:</strong> 15</p>
-                                    <p><strong>Reviews:</strong> <a href="RelyToReviews.html" style="color: #0abf53;">2</a></p>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editPackageModal">Edit Package</button>
-                                    <button class="btn btn-sm btn-outline-secondary">Deactive</button>
-                                    <button class="btn btn-sm btn-outline-danger">Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        </div>
-        <!-- Modal for Creating a New Package -->
-        <div class="modal fade" id="createPackageModal" tabindex="-1" aria-labelledby="createPackageModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="createPackageModalLabel">Create New Package</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="createPackageForm">
-                            <div class="mb-3">
-                                <label for="packageName" class="form-label">Package Name</label>
-                                <input type="text" class="form-control" id="packageName" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="packageDescription" class="form-label">Description</label>
-                                <textarea class="form-control" id="packageDescription" rows="3" required></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label for="packagePrice" class="form-label">Price</label>
-                                <input type="number" class="form-control" id="packagePrice" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="packageImage" class="form-label">Upload Image</label>
-                                <input type="file" class="form-control" id="packageImage" required>
-                            </div>
-                            <button type="submit" class="btn btn-sm btn-outline-secondary">Create Package</button>
-                        </form>
                     </div>
                 </div>
             </div>
-        </div>
-        <!-- Modal for Editing a Package -->
-        <div class="modal fade" id="editPackageModal" tabindex="-1" aria-labelledby="editPackageModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editPackageModalLabel">Edit Package</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="editPackageForm">
-                            <div class="mb-3">
-                                <label for="editPackageName" class="form-label">Package Name</label>
-                                <input type="text" class="form-control" id="editPackageName" placeholder="Enter package name">
-                            </div>
-                            <div class="mb-3">
-                                <label for="editPackageDescription" class="form-label">Package Description</label>
-                                <textarea class="form-control" id="editPackageDescription" rows="3" placeholder="Enter package description"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label for="editPackagePrice" class="form-label">Price</label>
-                                <input type="number" class="form-control" id="editPackagePrice" placeholder="Enter price">
-                            </div>
-                            <div class="mb-3">
-                                <label for="editPackageImage" class="form-label">Upload Package Image</label>
-                                <input type="file" class="form-control" id="editPackageImage">
-                            </div>
-                            <button type="submit" class="btn btn-sm btn-outline-secondary">Save Changes</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Sign Out Confirmation Modal -->
-        <div class="modal fade" id="signOutModal" tabindex="-1" aria-labelledby="signOutModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="signOutModalLabel">Confirm Sign Out</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        Are you sure you want to sign out?
+        </main>
+    </div>
 </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                        <button type="button" class="btn btn-danger" id="confirmSignOutButton">Yes</button>
+
+<!-- Modal for Creating a New Package -->
+<div class="modal fade" id="createPackageModal" tabindex="-1" aria-labelledby="createPackageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="createPackageForm" action="/packages/create" method="post" enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createPackageModalLabel">Create New Package</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="clearCreateForm()"></button>
+                </div>
+                <div class="modal-body">
+
+
+                    <!-- Form Fields -->
+                    <div class="mb-3">
+                        <label for="createPackageName" class="form-label">Package Name</label>
+                        <input type="text" class="form-control" id="createPackageName" name="name" placeholder="Enter package name" >
+                    </div>
+                    <div class="mb-3">
+                        <label for="createPackageDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="createPackageDescription" name="description" rows="3"
+                                  placeholder="Enter description" ></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="createPackagePrice" class="form-label">Price</label>
+                        <input type="number" step="0.01" class="form-control" id="createPackagePrice" name="price"
+                               placeholder="Enter price" >
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPackageImage" class="form-label">Upload Package Image</label>
+                        <input type="file" class="form-control" id="createPackageImage" name="imageUrl" accept=".jpeg, .jpg, .png">
+                        <small class="form-text text-muted">Only JPEG, JPG, and PNG files are allowed.</small>
+                    </div>
+                    <!-- New Image Preview (hidden initially) -->
+                    <div class="mb-3" id="newImagePreviewContainer1" style="display: none;">
+                        <label class="form-label">Preview:</label>
+                        <img id="newImagePreview1" src="" alt="New Image Preview" class="img-fluid bordered-img" style="max-height: 200px; max-width: 200px; min-height: 200px; min-width: 200px; object-fit: cover;">
                     </div>
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="clearCreateForm()">Cancel</button>
+                    <button type="submit" class="btn btn-custom">Create Package</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Editing a Package -->
+<div class="modal fade" id="editPackageModal" tabindex="-1" aria-labelledby="editPackageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- Ensure action points to the correct endpoint and method is POST -->
+            <form id="editPackageForm" th:action="@{/packages/update}" method="post" enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editPackageModalLabel">Edit Package</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="clearEditForm()"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editPackageId" name="id" />
+                    <div class="mb-3">
+                        <label for="editPackageName" class="form-label">Package Name</label>
+                        <input type="text" class="form-control" id="editPackageName" name="name" placeholder="Enter package name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPackageDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="editPackageDescription" name="description" rows="3"
+                                  placeholder="Enter description" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPackagePrice" class="form-label">Price</label>
+                        <input type="number" step="0.01" class="form-control" id="editPackagePrice" name="price"
+                               placeholder="Enter price" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPackageImage" class="form-label">Upload Package Image</label>
+                        <input type="file" class="form-control" id="editPackageImage" name="imageUrl" accept=".jpeg, .jpg, .png">
+                        <small class="form-text text-muted">Only JPEG, JPG, and PNG files are allowed.</small>
+                    </div>
+                    <!-- New Image Preview (hidden initially) -->
+                    <div class="mb-3" id="newImagePreviewContainer" style="display: none;">
+                        <label class="form-label">Preview:</label>
+                        <img id="newImagePreview" src="" alt="New Image Preview" class="img-fluid bordered-img" style="max-height: 200px; max-width: 200px; min-height: 200px; min-width: 200px; object-fit: cover;">
+                    </div>
+                    <!-- Current Image Display -->
+                    <div class="mb-3">
+                        <label class="form-label">Current:</label>
+                        <img id="currentPackageImage" src="" alt="Current Package Image" class="img-fluid bordered-img" style="max-height: 200px; max-width: 200px; min-height: 200px; min-width: 200px; object-fit: cover;">
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="clearEditForm()">Cancel</button>
+                    <!-- Update button to submit the form -->
+                    <button type="submit" class="btn btn-custom">Update Package</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Sign Out Confirmation Modal -->
+<div class="modal fade" id="signOutModal" tabindex="-1" aria-labelledby="signOutModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="signOutModalLabel">Confirm Sign Out</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to sign out?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                <a href="#" class="btn btn-danger" id="confirmSignOutButton">Yes</a>
             </div>
         </div>
-        <!-- Bootstrap JS (including Popper.js) -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js"></script>
-        <script>
-            feather.replace();
-        </script>
-        <!-- Script to handle form submissions -->
-        <script>
-    // Handle package creation
-    document.getElementById('createPackageForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        alert('Package created successfully!');
-        var createPackageModal = bootstrap.Modal.getInstance(document.getElementById('createPackageModal'));
-        createPackageModal.hide();
-    });
+    </div>
+</div>
 
-    // Handle package editing
-    document.getElementById('editPackageForm').addEventListener('submit', function(event) {
-        event.preventDefault();
+<!-- JavaScript Dependencies -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Bootstrap Bundle JS (includes Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Feather icons -->
+<script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js"></script>
+<script th:inline="javascript">
+    /* Initialize Feather Icons */
+    feather.replace();
 
-        // Get form values
-        var packageName = document.getElementById("editPackageName").value.trim();
-        var packageDescription = document.getElementById("editPackageDescription").value.trim();
-        var packagePrice = document.getElementById("editPackagePrice").value.trim();
-        var packageImage = document.getElementById("editPackageImage").files.length;
+    /* JavaScript Functions */
 
-        // Check if any value is entered
-        if (packageName === "" && packageDescription === "" && packagePrice === "" && packageImage === 0) {
-            var editPackageModal = bootstrap.Modal.getInstance(document.getElementById('editPackageModal'));
-            editPackageModal.hide(); // Close the modal if no input is provided
+    function loadPackageData(packageId) {
+        var packageCard = document.querySelector('[data-package-id="' + packageId + '"]');
+        if (packageCard) {
+            var name = packageCard.getAttribute('data-package-name');
+            var description = packageCard.getAttribute('data-package-description');
+            var price = packageCard.getAttribute('data-package-price');
+            var imageUrl = packageCard.getAttribute('data-package-image-url');
+
+            document.getElementById('editPackageId').value = packageId;
+            document.getElementById('editPackageName').value = name;
+            document.getElementById('editPackageDescription').value = description;
+            document.getElementById('editPackagePrice').value = price;
+
+            var currentImage = document.getElementById('currentPackageImage');
+            currentImage.src = imageUrl ? imageUrl : ''; // Display the current image
+
+            // Clear any previously selected file and hide the preview
+            document.getElementById('editPackageImage').value = '';
+            document.getElementById('createPackageImage').value = '';
+            document.getElementById('newImagePreview').src = '';
+            document.getElementById('newImagePreview1').src = '';
+            document.getElementById('newImagePreviewContainer').style.display = 'none';
+            document.getElementById('newImagePreviewContainer1').style.display = 'none';
+
+            var editPackageModal = new bootstrap.Modal(document.getElementById('editPackageModal'));
+            editPackageModal.show();
         } else {
-            alert("Package updated successfully!"); // Show success message if something was entered
-            var editPackageModal = bootstrap.Modal.getInstance(document.getElementById('editPackageModal'));
-            editPackageModal.hide();
+            console.error('Package data not found for ID:', packageId);
+        }
+    }
+
+    // Preview the selected new image
+    document.getElementById('editPackageImage').addEventListener('change', function(event) {
+        var file = event.target.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('newImagePreview').src = e.target.result;
+                document.getElementById('newImagePreviewContainer').style.display = 'block'; // Show the preview
+
+            };
+            reader.readAsDataURL(file);
         }
     });
+    // Preview the selected new image
+    document.getElementById('createPackageImage').addEventListener('change', function(event) {
+        var file = event.target.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('newImagePreview1').src = e.target.result;
+                document.getElementById('newImagePreviewContainer1').style.display = 'block'; // Show the preview
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+
+    // Add event listeners to all edit buttons
+    document.querySelectorAll('.edit-package-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+            var packageId = this.getAttribute('data-package-id');
+            loadPackageData(packageId);
+        });
+    });
+
+    // Function to clear the edit package form
+    function clearEditForm() {
+        document.getElementById('editPackageForm').reset();
+        // Clear the current image
+        document.getElementById('currentPackageImage').src = '';
+    }
+
+    // Function to clear the create package form (if applicable)
+    function clearCreateForm() {
+        document.getElementById('createPackageForm').reset();
+    }
+
+    // Function to show the sign out confirmation modal (if applicable)
     function showSignOutModal() {
         var signOutModal = new bootstrap.Modal(document.getElementById('signOutModal'));
         signOutModal.show();
     }
 
+    // Handle sign out confirmation (if applicable)
     document.getElementById('confirmSignOutButton').addEventListener('click', function() {
-        // Redirect to the sign-out page
-        window.location.href = "../../../templates/frontendCode/Landing/loginInChoice.html";
+        window.location.href = "/LoginChoice"; // Adjust the logout URL as needed
     });
 </script>
-    </body>
+</body>
 </html>

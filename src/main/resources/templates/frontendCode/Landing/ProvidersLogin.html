@@ -1,132 +1,137 @@
-<html lang="en" data-pg-require="pinekit_theme/pinekit.css, assets/js/theme.min.js, assets/vendor/bootstrap-icons/font/bootstrap-icons.css, assets/vendor/bootstrap-icons/font/fonts/bootstrap-icons.woff, assets/vendor/bootstrap-icons/font/fonts/bootstrap-icons.woff2" data-pgc-master="master.html" style="background-color: #212529;">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="">
-        <title>Signin Template · Bootstrap v5.0</title>
-        <!-- Bootstrap core CSS -->
-        <link href="../../../static/CSS/css/theme.css" rel="stylesheet" type="text/css">
-        <link href="../../../static/CSS/bootstrap_theme/bootstrap.css" rel="stylesheet" type="text/css">
-        <!-- Custom styles for this template -->
-        <link href="../../../static/CSS/sign-in.css" rel="stylesheet">
-    </head>
-    <body style="background-color: #212428;">
-        <header style="text-align: center;">
-            <!-- Header Content -->
-        </header>
-        <main role="main" data-pgc-field="main">
-            <div class="container content-space-2 content-space-lg-3" data-pg-source="page-careers-apply.html" style="align-content: center; margin-left: 1px;">
-                <!-- Header -->
-                <div class="text-center mb-7">
-</div>
-                <!-- End Header -->
-                <div class="w-lg-75 mx-auto">
-                    <!-- Card -->
-                    <!-- End Card -->
-                </div>
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- Required Meta Tags Always Come First -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Provider Login - Travel Services Hub</title>
+    <link rel="shortcut icon" href="./favicon.ico">
+
+    <!-- CSS Files -->
+    <link th:href="@{/CSS/css/theme.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/CSS/Downloads/TravelServicesHub/css/theme.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/CSS/assets/vendor/bootstrap-icons/font/bootstrap-icons.css}" rel="stylesheet">
+    <link th:href="@{/CSS/pinekit_theme/pinekit.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/CSS/css/style.css}" rel="stylesheet">
+    <link th:href="@{/css/custom-styles.css}" rel="stylesheet" type="text/css">
+</head>
+<body>
+<header>
+    <nav class="bg-white navbar navbar-expand-lg navbar-light">
+        <div class="container" style="margin-left: -24px;">
+            <a class="navbar-brand" th:href="@{/welcome}">
+                <img class="navbar-brand-logo" th:src="@{/images/logo.png}" alt="Travel Services Hub Logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown-1" aria-controls="navbarNavDropdown-1" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown-1">
+                <ul class="ms-auto navbar-nav">
+                    <li class="nav-item">
+                        <a class="active nav-link" aria-current="page" th:href="@{/welcome}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/about}">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/services}">Services</a>
+                    </li>
+                </ul>
             </div>
-            <div class="align-items-center bg-dark d-flex min-h-100" data-pg-source="page-signup.html" style="margin-right: -35px; padding-right: 0px;">
-                <div id="content" role="main" class="flex-grow-1 ms-0 overflow-hidden rounded rounded-4" style="margin-left: 0px; clear: both; border-radius: 0px; border-left-width: 0px; border-top-width: 0px;">
-                    <!-- Content -->
-                    <div class="container content-space-t-1 content-space-b-2 d-flex justify-content-center align-items-center flex-column" style="padding-left: 0px; margin-left: 117px;">
-                        <div class="mx-lg-auto" style="max-width: 55rem;">
-                            <div class="d-flex justify-content-center align-items-center flex-column min-vh-lg-100" style="margin-left: -100px; margin-right: -51px; padding: 0px 168px 80px 0px; margin-top: 0px; border-top-left-radius: 19px; border-top-right-radius: 0px;">
-                                <!-- ========== HEADER ========== -->
-                                <header id="header" class="navbar navbar-height navbar-light mb-3">
-                                    <div class="container"><a class="navbar-brand mx-auto" href="./index.html" aria-label="Pinekit" style="padding-top: 0px; margin-bottom: -39px;"> <img class="navbar-brand-logo w-25" src="../../../static/images/logo.png" alt="Image Description"> </a>
-                                    </div>
-                                </header>
-                                <!-- ========== END HEADER ========== -->
-                                <div class="position-relative">
-                                    <!-- Card -->
-                                    <div class="card card-shadow card-login mx-auto" style="max-width: 700px;">
-                                        <div class="row" style="border-radius: 20px;">
-                                            <div class="col-md-8" style="border-radius: 0px;">
-                                                <div class="card-body" style="border-radius: 0px;">
-                                                    <!-- Form -->
-                                                    <form class="js-validate needs-validation" id="providerLoginForm" novalidate="">
-                                                        <div class="text-center">
-                                                            <div class="mb-5">
-                                                                <h3 class="card-title">Welcome Back</h3>
-                                                            </div>
-                                                        </div>
-                                                        <!-- Username Field -->
-                                                        <div class="row">
-                                                            <div class="col-sm-6">
-                                                                <div class="mb-4">
-                                                                    <input type="text" class="form-control form-control-lg" name="username" id="providerUsernameField" placeholder="Username" aria-label="Username" required="">
-                                                                    <span class="invalid-feedback">Please enter your username.</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <!-- Password Field -->
-                                                        <div class="row">
-                                                            <div class="col-sm-6">
-                                                                <div class="mb-4">
-                                                                    <input type="password" class="form-control form-control-lg" name="password" id="providerPasswordField" placeholder="Password" aria-label="Password" required="">
-                                                                    <span class="invalid-feedback">Please enter your password.</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <!-- Form Check -->
-                                                        <div class="d-grid gap-4">
-                                                            <button class="btn btn-lg" type="submit" style="background-color: #0abf53;color: white;">Login</button>
-                                                        </div>
-                                                    </form>
-                                                    <script>
-document.getElementById('providerLoginForm').addEventListener('submit', function(event) {
-    event.preventDefault();  // Prevent form submission
-    
-    var form = event.target;
-    var isValid = true;
-    
-    // Check for standard HTML5 validation
-    if (!form.checkValidity()) {
-        event.stopPropagation();
-        form.classList.add('was-validated');  // Add Bootstrap validation class
-        isValid = false;
-    }
+        </div>
+    </nav>
+</header>
+<main role="main" data-pgc-field="main">
+    <div class="w-lg-75 mx-auto">
+        <!-- Error message (if login fails) -->
+        <div th:if="${param.error}" class="alert alert-danger">
+            Invalid username or password.
+        </div>
+    </div>
+    <div class="w-lg-75 mx-auto">
+        <!-- Error message (if account is suspended) -->
+        <div th:if="${error2}" class="alert alert-danger">
+            account is suspended
+        </div>
+    </div>
 
-    if (isValid) {
-        // Redirect to the provider dashboard if the form is valid
-        window.location.href = "../../../templates/frontendCode/ProviderUI/dashboard.html";
-    }
-});
-
-</script>
-                                                </div>                                                 
-                                            </div>
-                                            <!-- Right Side Section -->
-                                            <div class="bg-soft-primary col-md-4 d-md-flex flex-column justify-content-center p-8 p-md-5 placeholder-glow" style="background-color: #0abf53; background-image: url('../../../static/images/An%20airplane%20flying%20over%20the%20horizon,%20representing%20the%20ease%20and%20accessibility%20of%20travel%20through%20the%20p%20(1).jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; padding-left: 0px; padding-right: 0px; margin: -1px 0px -1px -11px; border-radius: 0 6px 6px 0px;">
-                                                <h5 class="mb-4" style="color: #ffffff; font-size: -3px; margin-left: -26px; padding-left: 6px; padding-right: 0px; margin-right: -37px;">Build unforgettable travel experiences for your customers</h5>
-                                                <ul class="list-checked list-checked-primary list-py-2">
-</ul><span class="d-block"></span>
-                                            </div>                                             
-                                        </div>
-                                    </div>
-                                    <!-- SVG Decorations -->
-                                    <figure class="position-absolute top-0 end-0 zi-n1 d-none d-sm-block mt-n7 me-n10" style="width: 4rem;">
-</figure>
-                                    <figure class="position-absolute bottom-0 start-0 d-none d-sm-block ms-n10 mb-n10" style="width: 15rem;">
-</figure>
+    <div class="container my-5">
+        <div class="row">
+            <!-- Left Side Section: Form -->
+            <div class="col-md-8">
+                <h1 class="display-4 text-center">Provider Login</h1>
+                <p class="fs-5 text-center">Welcome back to Travel Services Hub!</p>
+                <div class="row justify-content-center">
+                    <div class="col-md-10">
+                        <!-- Login Form -->
+                        <form th:action="@{/ProviderLogin}" method="post" id="loginForm">
+                            <!-- Username Field -->
+                            <div class="form-group mb-3">
+                                <label for="usernameField">Username</label>
+                                <input type="text" class="form-control" name="username" id="usernameField" placeholder="Enter username" required>
+                            </div>
+                            <!-- Password Field -->
+                            <div class="form-group mb-3">
+                                <label for="passwordField">Password</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" name="password" id="passwordField" placeholder="Enter password" required>
+                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('passwordField')">
+                                        <i class="bi-eye"></i>
+                                    </button>
                                 </div>
                             </div>
-                        </div>
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-primary">Login</button>
+                            <a th:href="@{/LoginChoice}" class="btn btn-secondary ml-2">Cancel</a>
+                        </form>
                     </div>
                 </div>
             </div>
-        </main>
-        <!-- Go To -->
-        <!-- ========== END SECONDARY CONTENTS ========== -->
-        <!-- JS Global Compulsory -->
-        <script src="assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    </body>
+            <!-- Right Side Section -->
+            <div class="col-md-4 d-flex flex-column justify-content-center p-5 placeholder-glow"
+                 style="
+                     background-color: #0abf53;
+                     background-image: url('/images/An airplane flying over the horizon, representing the ease and accessibility of travel through the p (1).jpg');
+                     background-size: cover;
+                     background-position: center;
+                     background-repeat: no-repeat;
+                     border-radius: 0 5px 5px 0;
+                 ">
+                <h5 class="mb-4" style="color: #ffffff; font-weight: bold; font-size: 22px;">
+                    Build unforgettable travel experiences with:
+                </h5>
+                <ul class="list-checked list-checked-primary list-py-2">
+                    <li class="list-checked-item" style="color: #ffffff; font-weight: bold; font-size: 20px;">
+                        Comprehensive Travel Solutions
+                    </li>
+                    <li class="list-checked-item" style="color: #ffffff; font-weight: bold; font-size: 20px;">
+                        Effortless Booking Management
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- JavaScript Files -->
+<script th:src="@{/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js}"></script>
+<script>
+    function togglePassword(fieldId) {
+        const field = document.getElementById(fieldId);
+        const toggleButton = field.nextElementSibling;
+        const type = field.getAttribute('type') === 'password' ? 'text' : 'password';
+        field.setAttribute('type', type);
+
+        // Change the icon
+        const icon = toggleButton.querySelector('i');
+        if (type === 'text') {
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        } else {
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        }
+    }
+</script>
+</body>
 </html>
-<body class="text-center">
-    <script src="../../../static/CSS/assets/js/popper.min.js"></script>
-    <script src="../../../static/CSS/bootstrap/js/bootstrap.min.js"></script>
-</body>
-<body class="text-center">
-    <script src="../../../static/CSS/assets/js/popper.min.js"></script>
-    <script src="../../../static/CSS/bootstrap/js/bootstrap.min.js"></script>
-</body>

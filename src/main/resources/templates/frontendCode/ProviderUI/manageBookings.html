@@ -1,291 +1,335 @@
 <!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="">
-        <title>Manage Bookings · Travel Services Hub</title>
-        <!-- Bootstrap core CSS from CDN -->
-        <link href="../../../static/CSS/bootstrap_theme/bootstrap.css" rel="stylesheet" type="text/css">
-        <link href="../../../static/CSS/bootstrap_theme/bootstrap.css" rel="stylesheet" type="text/css">
-        <link href="../../../static/CSS/dashboard.css" rel="stylesheet">
-        <link href="../../../static/CSS/chartjs.css" rel="stylesheet">
-        <link href="../../../static/CSS/BellDropdown.css" rel="stylesheet">
-        <style>/* Consistent button styling */.btn-custom { background-color: #0abf53; color: white; border: none; } .btn-custom:hover { background-color: #089e45; }</style>
-    </head>
-    <body>
-        <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-            <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">Manage Bookings</a>
-            <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <!-- Logo Image -->
-            <img src="../../../static/images/logo.png" alt="Company Logo" class="mx-auto d-block" style="height: 100px; width: auto;">
-            <ul class="navbar-nav px-3">
-                <!-- Notification Bell -->
-                <li class="nav-item dropdown text-nowrap"><a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell">
-                            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                        </svg> <span class="badge bg-danger">3</span> <!-- Show number of new bookings --> </a>
-                    <!-- Dropdown Menu for Bookings -->
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
-                        <li>
-                            <h6 class="dropdown-header">New Bookings</h6>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="manageBookings.html">John Doe - Luxury Beach Escape <br><small>Booking Date: 2024-09-15</small></a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="manageBookings.html">Jane Smith - Mountain Adventure <br><small>Booking Date: 2024-09-16</small></a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="manageBookings.html">Michael Johnson - City Tour <br><small>Booking Date: 2024-09-17</small></a>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item btn btn-primary btn-custom" href="manageBookings.html">Go to Manage Bookings</a>
-                        </li>
-                    </ul>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <title>Manage Bookings · Travel Services Hub</title>
+    <!-- Bootstrap core CSS from CDN -->
+    <link href="/CSS/bootstrap_theme/bootstrap.css" rel="stylesheet" type="text/css">
+    <link href="/CSS/bootstrap_theme/bootstrap.css" rel="stylesheet" type="text/css">
+    <link href="/CSS/dashboard.css" rel="stylesheet">
+    <link href="/static/CSS/chartjs.css" rel="stylesheet">
+    <link href="/CSS/BellDropdown.css" rel="stylesheet">
+    <style>
+        /* Consistent button styling */
+        .btn-custom {
+            background-color: #0abf53;
+            color: white;
+            border: none;
+        }
+        .btn-custom:hover {
+            background-color: #089e45;
+        }
+    </style>
+</head>
+<body>
+<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">Manage Bookings</a>
+    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <!-- Logo Image -->
+    <img src="../../../static/images/logo.png" alt="Company Logo" class="mx-auto d-block" style="height: 100px; width: auto;">
+    <ul class="navbar-nav px-3">
+        <!-- Notification Bell -->
+        <li class="nav-item dropdown text-nowrap">
+            <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell">
+                    <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                <span class="badge bg-danger">3</span> <!-- Show number of new bookings -->
+            </a>
+            <!-- Dropdown Menu for Bookings -->
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+                <li>
+                    <h6 class="dropdown-header">New Bookings</h6>
                 </li>
-                <li class="nav-item text-nowrap">
-                    <a class="nav-link" href="#" onclick="showSignOutModal()">Sign out</a>
+                <li>
+                    <a class="dropdown-item" href="manageBookings.html">John Doe - Luxury Beach Escape <br><small>Booking Date: 2024-09-15</small></a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="manageBookings.html">Jane Smith - Mountain Adventure <br><small>Booking Date: 2024-09-16</small></a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="manageBookings.html">Michael Johnson - City Tour <br><small>Booking Date: 2024-09-17</small></a>
+                </li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li>
+                    <a class="dropdown-item btn btn-primary btn-custom" href="manageBookings.html">Go to Manage Bookings</a>
                 </li>
             </ul>
-        </header>
-        <div class="container-fluid">
-            <div class="row">
-                <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-                    <div class="position-sticky pt-3">
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="#"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home">
-                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                                    </svg> Dashboard </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link " href="dashboard.html"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home">
-                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                                    </svg> Dashboard </a>
-                            </li>
-                            <!-- Manage Bookings Link in Sidebar -->
-                            <li class="nav-item">
-                                <a class="nav-link active" href="manageBookings.html"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
-                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                                    </svg> Manage Bookings </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="managePackages.html"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layers">
-                                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                                        <polyline points="2 17 12 22 22 17"></polyline>
-                                        <polyline points="2 12 12 17 22 12"></polyline>
-                                    </svg> Manage Packages </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="RelyToReviews.html"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users">
-                                        <circle cx="9" cy="7" r="4"></circle>
-                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                    </svg> Reply to Reviews </a>
-                            </li>
-                            <!-- Profile Link in Sidebar -->
-                            <li class="nav-item">
-                                <a class="nav-link" href="Profile.html"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
-                                        <path d="M20.5 18.5a6 6 0 0 0-9 0"></path>
-                                        <circle cx="12" cy="7" r="4"></circle>
-                                    </svg> Profile </a>
-                            </li>
-                        </ul>
-                    </div>
-                </nav>
-                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                        <h1 class="h2">Bookings</h1>
-                        <div class="btn-toolbar mb-2 mb-md-0">
+        </li>
+        <li class="nav-item text-nowrap">
+            <a class="nav-link" href="#" onclick="showSignOutModal()">Sign out</a>
+        </li>
+    </ul>
+</header>
+<div class="container-fluid">
+    <div class="row">
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" th:href="@{/provider/dashboard}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/ProviderDashboard}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            Dashboard
+                        </a>
+                    </li>
+                    <!-- Manage Bookings Link in Sidebar -->
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/provider/manageBookings}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            Manage Bookings
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/provider/managePackages}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layers">
+                                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                                <polyline points="2 17 12 22 22 17"></polyline>
+                                <polyline points="2 12 12 17 22 12"></polyline>
+                            </svg>
+                            Manage Packages
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/provider/replyToReviews}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users">
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                            Reviews
+                        </a>
+                    </li>
+                    <!-- Profile Link in Sidebar -->
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/provider/profile}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
+                                <path d="M20.5 18.5a6 6 0 0 0-9 0"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            Profile
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Bookings</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                </div>
+            </div>
+            <!-- New and Pending Bookings Table -->
+            <h2>New and Pending Bookings</h2>
+            <div class="table-responsive">
+                <table class="table table-striped table-sm">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Customer</th>
+                        <th>Package</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td class="table-light text-black-50">
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#customerProfileModal" style="color: #0abf53;">John Doe</a>
+                        </td>
+                        <td style="color: #0abf53;">
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#packageDetailsModal" style="color: #0abf53;">Luxury Beach Escape</a>
+                        </td>
+                        <td>2024-09-15</td>
+                        <td>Unconfirmed</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-success">Confirm</button>
+                            <button class="btn btn-sm btn-outline-danger">Deny</button>
+                            <button class="btn btn-sm btn-outline-warning">Report</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Confirmed Bookings Table -->
+            <h2>Confirmed Bookings</h2>
+            <div class="table-responsive">
+                <table class="table table-striped table-sm">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Customer</th>
+                        <th>Package</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>
+                            <a href="#" style="color: #0abf53;" data-bs-toggle="modal" data-bs-target="#customerProfileModalMichael">Michael Johnson</a>
+                        </td>
+                        <td>
+                            <a href="#" style="color: #0abf53;" data-bs-toggle="modal" data-bs-target="#packageDetailsModalCityTour">City Tour</a>
+                        </td>
+                        <td>2024-09-12</td>
+                        <td>Confirmed</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
 </div>
-                    </div>
-                    <!-- New and Pending Bookings Table -->
-                    <h2>New and Pending Bookings</h2>
-                    <div class="table-responsive">
-                        <table class="table table-striped table-sm">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Customer</th>
-                                    <th>Package</th>
-                                    <th>Date</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td class="table-light text-black-50"> <a href="#" data-bs-toggle="modal" data-bs-target="#customerProfileModal" style="color: #0abf53;">John Doe</a></td>
-                                    <td style="color: #0abf53;"> <a href="#" data-bs-toggle="modal" data-bs-target="#packageDetailsModal" style="color: #0abf53;">Luxury Beach Escape</a></td>
-                                    <td>2024-09-15</td>
-                                    <td>Unconfirmed</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-success">Confirm</button>
-                                        <button class="btn btn-sm btn-outline-danger">Deny</button>
-                                        <button class="btn btn-sm btn-outline-warning">Report</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- Confirmed Bookings Table -->
-                    <h2>Confirmed Bookings</h2>
-                    <div class="table-responsive">
-                        <table class="table table-striped table-sm">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Customer</th>
-                                    <th>Package</th>
-                                    <th>Date</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td> <a href="#" style="color: #0abf53;" data-bs-toggle="modal" data-bs-target="#customerProfileModalMichael">Michael Johnson</a> </td>
-                                    <td> <a href="#" style="color: #0abf53;" data-bs-toggle="modal" data-bs-target="#packageDetailsModalCityTour">City Tour</a> </td>
-                                    <td>2024-09-12</td>
-                                    <td>Confirmed</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </main>
+<!-- Modal for Customer Profile -->
+<div class="modal fade" id="customerProfileModal" tabindex="-1" aria-labelledby="customerProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="customerProfileModalLabel">Customer Profile: John Doe</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Name:</strong> John Doe</p>
+                <p><strong>Email:</strong> john.doe@example.com</p>
+                <p><strong>Phone:</strong> +1234567890</p>
+                <p><strong>Booking History:</strong></p>
+                <ul>
+                    <li>Luxury Beach Escape - Confirmed</li>
+                    <li>Mountain Adventure - Completed</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
-        <!-- Modal for Customer Profile -->
-        <div class="modal fade" id="customerProfileModal" tabindex="-1" aria-labelledby="customerProfileModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="customerProfileModalLabel">Customer Profile: John Doe</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p><strong>Name:</strong> John Doe</p>
-                        <p><strong>Email:</strong> john.doe@example.com</p>
-                        <p><strong>Phone:</strong> +1234567890</p>
-                        <p><strong>Booking History:</strong></p>
-                        <ul>
-                            <li>Luxury Beach Escape - Confirmed</li>
-                            <li>Mountain Adventure - Completed</li>
-                        </ul>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Modal for Package Details -->
-        <div class="modal fade" id="packageDetailsModal" tabindex="-1" aria-labelledby="packageDetailsModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="packageDetailsModalLabel">Package Details: Luxury Beach Escape</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p><strong>Package Name:</strong> Luxury Beach Escape</p>
-                        <p><strong>Duration:</strong> 7 Days</p>
-                        <p><strong>Price:</strong> $2,500</p>
-                        <p><strong>Description:</strong> Enjoy a relaxing 7-day getaway at a luxurious beach resort...</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Modal for Customer Profile: Michael Johnson -->
-        <div class="modal fade" id="customerProfileModalMichael" tabindex="-1" aria-labelledby="customerProfileModalMichaelLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="customerProfileModalMichaelLabel">Customer Profile: Michael Johnson</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p><strong>Name:</strong> Michael Johnson</p>
-                        <p><strong>Email:</strong> michael.johnson@example.com</p>
-                        <p><strong>Phone:</strong> +1234567891</p>
-                        <p><strong>Booking History:</strong></p>
-                        <ul>
-                            <li>City Tour - Confirmed</li>
-                            <li>Luxury Beach Escape - Completed</li>
-                        </ul>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Modal for Package Details: City Tour -->
-        <div class="modal fade" id="packageDetailsModalCityTour" tabindex="-1" aria-labelledby="packageDetailsModalCityTourLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="packageDetailsModalCityTourLabel">Package Details: City Tour</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p><strong>Package Name:</strong> City Tour</p>
-                        <p><strong>Duration:</strong> 3 Days</p>
-                        <p><strong>Price:</strong> $1,000</p>
-                        <p><strong>Description:</strong> Explore the city with a guided tour, visiting popular landmarks...</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Sign Out Confirmation Modal -->
-        <div class="modal fade" id="signOutModal" tabindex="-1" aria-labelledby="signOutModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="signOutModalLabel">Confirm Sign Out</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        Are you sure you want to sign out?
+    </div>
 </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                        <button type="button" class="btn btn-danger" id="confirmSignOutButton">Yes</button>
-                    </div>
-                </div>
+<!-- Modal for Package Details -->
+<div class="modal fade" id="packageDetailsModal" tabindex="-1" aria-labelledby="packageDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="packageDetailsModalLabel">Package Details: Luxury Beach Escape</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Package Name:</strong> Luxury Beach Escape</p>
+                <p><strong>Duration:</strong> 7 Days</p>
+                <p><strong>Price:</strong> $2,500</p>
+                <p><strong>Description:</strong> Enjoy a relaxing 7-day getaway at a luxurious beach resort...</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
-        <!-- Bootstrap JS (including Popper.js) -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js"></script>
-        <script>
+    </div>
+</div>
+<!-- Modal for Customer Profile: Michael Johnson -->
+<div class="modal fade" id="customerProfileModalMichael" tabindex="-1" aria-labelledby="customerProfileModalMichaelLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="customerProfileModalMichaelLabel">Customer Profile: Michael Johnson</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Name:</strong> Michael Johnson</p>
+                <p><strong>Email:</strong> michael.johnson@example.com</p>
+                <p><strong>Phone:</strong> +1234567891</p>
+                <p><strong>Booking History:</strong></p>
+                <ul>
+                    <li>City Tour - Confirmed</li>
+                    <li>Luxury Beach Escape - Completed</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal for Package Details: City Tour -->
+<div class="modal fade" id="packageDetailsModalCityTour" tabindex="-1" aria-labelledby="packageDetailsModalCityTourLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="packageDetailsModalCityTourLabel">Package Details: City Tour</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Package Name:</strong> City Tour</p>
+                <p><strong>Duration:</strong> 3 Days</p>
+                <p><strong>Price:</strong> $1,000</p>
+                <p><strong>Description:</strong> Explore the city with a guided tour, visiting popular landmarks...</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Sign Out Confirmation Modal -->
+<div class="modal fade" id="signOutModal" tabindex="-1" aria-labelledby="signOutModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="signOutModalLabel">Confirm Sign Out</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to sign out?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                <button type="button" class="btn btn-danger" id="confirmSignOutButton">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Bootstrap JS (including Popper.js) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
     feather.replace();
     function showSignOutModal() {
         var signOutModal = new bootstrap.Modal(document.getElementById('signOutModal'));
         signOutModal.show();
     }
 
+    // Using Thymeleaf to inject the URL for sign out redirection
     document.getElementById('confirmSignOutButton').addEventListener('click', function() {
-        // Redirect to the sign-out page
-        window.location.href = "../../../templates/frontendCode/Landing/loginInChoice.html";
+        // Redirect to the LoginChoice controller endpoint
+        window.location.href = "/LoginChoice";
     });
+    /*]]>*/
 </script>
-    </body>
+</body>
 </html>

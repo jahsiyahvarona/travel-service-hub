@@ -1,214 +1,226 @@
 <!DOCTYPE html>
-<html lang="en" data-pgc-set-master>
-    <head>
-        <!-- Required Meta Tags Always Come First -->
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <title>Pinekit template</title>
-        <link rel="shortcut icon" href="./favicon.ico">
-        <link href="../../../static/CSS/css/theme.css" rel="stylesheet" type="text/css">
-        <link href="../../../static/CSS/Downloads/TravelServicesHub/css/theme.css" rel="stylesheet" type="text/css">
-        <link rel="stylesheet" href="../../../static/CSS/assets/vendor/bootstrap-icons/font/bootstrap-icons.css">
-        <link href="../../../static/CSS/pinekit_theme/pinekit.css" rel="stylesheet" type="text/css">
-        <link rel="stylesheet" href="../../../static/CSS/css/style.css">
-        <script>/* Pinegrow Interactions, do not remove */ (function(){try{if(!document.documentElement.hasAttribute('data-pg-ia-disabled')) { window.pgia_small_mq=typeof pgia_small_mq=='string'?pgia_small_mq:'(max-width:767px)';window.pgia_large_mq=typeof pgia_large_mq=='string'?pgia_large_mq:'(min-width:768px)';var style = document.createElement('style');var pgcss='html:not(.pg-ia-no-preview) [data-pg-ia-hide=""] {opacity:0;visibility:hidden;}html:not(.pg-ia-no-preview) [data-pg-ia-show=""] {opacity:1;visibility:visible;display:block;}';if(document.documentElement.hasAttribute('data-pg-id') && document.documentElement.hasAttribute('data-pg-mobile')) {pgia_small_mq='(min-width:0)';pgia_large_mq='(min-width:99999px)'} pgcss+='@media ' + pgia_small_mq + '{ html:not(.pg-ia-no-preview) [data-pg-ia-hide="mobile"] {opacity:0;visibility:hidden;}html:not(.pg-ia-no-preview) [data-pg-ia-show="mobile"] {opacity:1;visibility:visible;display:block;}}';pgcss+='@media ' + pgia_large_mq + '{html:not(.pg-ia-no-preview) [data-pg-ia-hide="desktop"] {opacity:0;visibility:hidden;}html:not(.pg-ia-no-preview) [data-pg-ia-show="desktop"] {opacity:1;visibility:visible;display:block;}}';style.innerHTML=pgcss;document.querySelector('head').appendChild(style);}}catch(e){console&&console.log(e);}})()</script>
-    </head>
-    <body>
-        <header>
-            <nav class="bg-white navbar navbar-expand-lg navbar-light">
-                <div class="container" style="margin-left: -24px;">
-                    <a class="navbar-brand" href="WelcomePage.html"><img class="navbar-brand-logo" src="../../../static/images/logo.png" alt="Image Description"></a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown-1" aria-controls="navbarNavDropdown-1" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse " id="navbarNavDropdown-1">
-                        <ul class="ms-auto navbar-nav">
-                            <li class="nav-item"> <a class="active nav-link" aria-current="page" href="WelcomePage.html">Home</a>
-                            </li>
-                            <li class="nav-item"> <a class="nav-link" href="AboutUs.html">About</a>
-                            </li>
-                            <li class="nav-item">
-</li>
-                            <li class="nav-item"> <a class="nav-link" href="#Services.html">Services</a>
-                            </li>
-                            <li class="nav-item">
-</li>
-                            <li class="nav-item dropdown">
-</li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
-        </header>
-        <main role="main">
-            <!-- Hero -->
-            <div class="container content-space-t-3 lib-hero" style="margin-top: 3px;">
-                <div class="align-items-lg-center bg-gradient bg-light border-white justify-content-lg-between rounded rounded-5 row" style="margin-top: -79px;">
-                    <div class="col-lg-5 mb-5 mb-lg-0">
-                        <div class="mb-5">
-                            <h1 class="display-4 text-dark mb-5">Discover the Perfect Travel Services for&nbsp;&nbsp;<font color="#0abf53">you</font></h1>
-                            <p class="fs-3 me-n5">Welcome to Travel Services Hub!
+<html lang="en" xmlns:th="http://www.thymeleaf.org" data-pgc-set-master>
+<head>
+    <!-- Required Meta Tags Always Come First -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Pinekit Template</title>
+    <link rel="shortcut icon" href="./favicon.ico">
+
+    <!-- CSS Files -->
+    <link th:href="@{/CSS/css/theme.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/CSS/Downloads/TravelServicesHub/css/theme.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/CSS/assets/vendor/bootstrap-icons/font/bootstrap-icons.css}" rel="stylesheet">
+    <link th:href="@{/CSS/pinekit_theme/pinekit.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/CSS/css/style.css}" rel="stylesheet">
+
+    <!-- Pinegrow Interactions Script -->
+    <script>
+        /* Pinegrow Interactions, do not remove */
+        (function(){
+            try{
+                if(!document.documentElement.hasAttribute('data-pg-ia-disabled')) {
+                    window.pgia_small_mq = typeof pgia_small_mq == 'string' ? pgia_small_mq : '(max-width:767px)';
+                    window.pgia_large_mq = typeof pgia_large_mq == 'string' ? pgia_large_mq : '(min-width:768px)';
+                    var style = document.createElement('style');
+                    var pgcss = 'html:not(.pg-ia-no-preview) [data-pg-ia-hide=""] {opacity:0;visibility:hidden;}html:not(.pg-ia-no-preview) [data-pg-ia-show=""] {opacity:1;visibility:visible;display:block;}';
+                    if(document.documentElement.hasAttribute('data-pg-id') && document.documentElement.hasAttribute('data-pg-mobile')) {
+                        pgia_small_mq = '(min-width:0)';
+                        pgia_large_mq = '(min-width:99999px)';
+                    }
+                    pgcss += '@media ' + pgia_small_mq + '{ html:not(.pg-ia-no-preview) [data-pg-ia-hide="mobile"] {opacity:0;visibility:hidden;}html:not(.pg-ia-no-preview) [data-pg-ia-show="mobile"] {opacity:1;visibility:visible;display:block;}}';
+                    pgcss += '@media ' + pgia_large_mq + '{html:not(.pg-ia-no-preview) [data-pg-ia-hide="desktop"] {opacity:0;visibility:hidden;}html:not(.pg-ia-no-preview) [data-pg-ia-show="desktop"] {opacity:1;visibility:visible;display:block;}}';
+                    style.innerHTML = pgcss;
+                    document.querySelector('head').appendChild(style);
+                }
+            } catch(e) { console && console.log(e); }
+        })()
+    </script>
+</head>
+<body>
+<header>
+    <nav class="bg-white navbar navbar-expand-lg navbar-light">
+        <div class="container" style="margin-left: -24px;">
+            <a class="navbar-brand" th:href="@{/welcome}">
+                <img class="navbar-brand-logo" th:src="@{/images/logo.png}" alt="Image Description">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown-1" aria-controls="navbarNavDropdown-1" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown-1">
+                <ul class="ms-auto navbar-nav">
+                    <li class="nav-item">
+                        <a class="active nav-link" aria-current="page" th:href="@{/welcome}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/about}">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/services}">Services</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+<main role="main">
+    <!-- Hero -->
+    <div class="container content-space-t-3 lib-hero" style="margin-top: 3px;">
+        <div class="align-items-lg-center bg-gradient bg-light border-white justify-content-lg-between rounded rounded-5 row" style="margin-top: -79px;">
+            <div class="col-lg-5 mb-5 mb-lg-0">
+                <div class="mb-5">
+                    <h1 class="display-4 text-dark mb-5">Discover the Perfect Travel Services for <span class="text-primary">you</span></h1>
+                    <p class="fs-3 me-n5">Welcome to Travel Services Hub!
                         We bring you the best travel services from a wide range of providers, designed to help you plan your dream vacation. Whether you’re seeking adventure, relaxation, or cultural exploration, we have the right travel services to fit your needs.</p>
-                        </div>
-                    </div>
-                    <!-- End Col -->
-                    <div class="col-lg-6">
-                        <div class="position-relative">
-                            <div class="position-relative">
-                                <div class="position-absolute bottom-0 end-0">
-</div>
-                                <img class="border-4 float-end position-relative rounded-5 sticky-top vw-100" src="../../../static/images/Pictures%20that%20represent%20this%20description_%20Welcome%20to%20Travel%20Services%20Hub!%20We%20bring%20you%20the%20best%20trav.jpg" alt="SVG" style="max-width: 30rem; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; grid-template-rows: 100px 100x 100px 100px; margin-left: 1px; border-top-left-radius: 0px; border-left-width: 0px; border-bottom-left-radius: 0px; border-left-color: #000000; border-top-right-radius: 0px;">
+                </div>
+            </div>
+            <!-- End Col -->
+            <div class="col-lg-6">
+                <div class="position-relative">
+                    <img class="border-4 float-end position-relative rounded-5 sticky-top vw-100" th:src="@{/images/Pictures that represent this description_ Welcome to Travel Services Hub! We bring you the best trav.jpg}" alt="Travel Services Image" style="max-width: 30rem;">
+                </div>
+            </div>
+            <!-- End Col -->
+        </div>
+        <!-- End Row -->
+    </div>
+    <!-- End Hero -->
+    <!-- Service Categories -->
+    <div class="container content-space-t-2">
+        <h2 class="mb-4">Service Categories:</h2>
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <h3>Customized Vacation Packages</h3>
+                <p>Tailor-made packages to suit your preferences, destinations, and budget. Our travel agents specialize in designing unique trips based on your preferences.</p>
+            </div>
+            <div class="col-md-6 mb-4">
+                <h3>Adventure Tours</h3>
+                <p>Get your adrenaline pumping with thrilling adventure tours. From hiking, rafting, and skiing to exotic safaris, we have you covered.</p>
+            </div>
+            <div class="col-md-6 mb-4">
+                <h3>Luxury Getaways</h3>
+                <p>Indulge in the ultimate luxury experience with our handpicked travel services. Enjoy first-class accommodations, private tours, and world-class amenities.</p>
+            </div>
+            <div class="col-md-6 mb-4">
+                <h3>Family Travel</h3>
+                <p>Create unforgettable memories with family-friendly vacation packages. Our services are designed with families in mind, ensuring fun for everyone.</p>
+            </div>
+            <div class="col-md-6 mb-4">
+                <h3>Destination Weddings and Honeymoons</h3>
+                <p>Turn your special day into a once-in-a-lifetime experience with our destination wedding and honeymoon services. We help you find the perfect venue and handle all the details.</p>
+            </div>
+            <div class="col-md-6 mb-4">
+                <h3>Corporate Travel Services</h3>
+                <p>Simplify business trips with our comprehensive corporate travel management. Book flights, hotels, and transportation seamlessly through our trusted agents.</p>
+            </div>
+            <div class="col-md-6 mb-4">
+                <h3>Cultural and Historical Tours</h3>
+                <p>Explore rich cultural heritage and historical landmarks across the globe. Our knowledgeable providers curate immersive experiences in various locations.</p>
+            </div>
+        </div>
+    </div>
+    <!-- End Service Categories -->
+    <!-- Features -->
+    <div class="container content-space-t-2 content-space-t-lg-3 lib-content mt-n4 pt-2">
+        <div class="row align-items-lg-center justify-content-lg-between">
+            <div class="col-lg-6 mb-5 mb-lg-0">
+                <img class="img-fluid rounded-3" th:src="@{/images/Pictures that represent different cultures, such as landmarks, cuisine, or festivals, to emphasize t.jpg}" alt="Cultural Exploration">
+            </div>
+            <div class="col-lg-5">
+                <h2 class="h1 mb-4">Why Choose Us?</h2>
+                <p class="fs-3 me-n5">At Travel Services Hub, we are dedicated to providing exceptional travel experiences. Our team of expert travel agents ensures personalized service and support throughout your journey. With a wide range of travel services, competitive pricing, and a commitment to customer satisfaction, we are your trusted partner in planning unforgettable adventures.</p>
+            </div>
+        </div>
+        <!-- End Row -->
+    </div>
+    <!-- End Features -->
+</main>
+<!-- Footer -->
+<footer class="bg-dark mt-5 pt-0" style="padding-left: 0px; padding-right: 0px; margin-right: -1px; margin-left: -3px; padding-top: 89px; margin-top: 17px;">
+    <div class="container">
+        <div class="align-items-center pb-0 pt-8 row">
+            <div class="col-md mb-5 mb-md-0">
+                <h2 class="fw-medium text-white-70 mb-0">Your dream vacation awaits, join <span class="text-white"><b>TSH</b></span> today!!!</h2>
+            </div>
+            <!-- End Col -->
+            <div class="col-md-auto">
+                <div class="d-grid d-sm-flex gap-3 mb-n5">
+                    <a class="btn btn-primary" th:href="@{/signUpChoice}">Sign up FREE</a>
+                    <a class="btn btn-ghost-light btn-pointer" th:href="@{/LoginChoice}">Login</a>
+                </div>
+            </div>
+            <!-- End Col -->
+        </div>
+        <!-- End Row -->
+        <div class="border-bottom border-white-10">
+            <div class="pt-0 py-6 row">
+                <div class="col-6 col-sm-4 col-lg mb-7 mb-lg-0">
+                    <!-- List -->
+                    <ul class="list-unstyled list-py-1 mb-0">
+                        <li>
+                            <a class="link link-light link-light-75" th:href="@{/welcome}">Home</a>
+                        </li>
+                        <li>
+                            <a class="link link-light link-light-75" th:href="@{/services}">Services</a>
+                        </li>
+                        <li>
+                            <a class="link link-light link-light-75" th:href="@{/about}">About</a>
+                        </li>
+                        <li>
+                            <a class="link link-light-75 link-primary text-primary" th:href="@{/SysAdminLogin}">Admin Login</a>
+                        </li>
+                    </ul>
+                    <!-- End List -->
+                </div>
+                <!-- End Col -->
+            </div>
+            <!-- End Row -->
+        </div>
+        <div class="row align-items-md-center py-6">
+            <div class="col-md mb-3 mb-md-0">
+                <!-- List -->
+                <ul class="list-inline list-px-2 mb-0">
+                    <li class="list-inline-item">
+                        <a class="link link-light link-light-75" href="#">Privacy and Policy</a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a class="link link-light link-light-75" href="#">Terms</a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a class="link link-light link-light-75" href="#">Status</a>
+                    </li>
+                    <li class="list-inline-item">
+                        <!-- Button Group -->
+                        <div class="btn-group">
+                            <a class="link link-light link-light-75" href="#" id="selectLanguage" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span class="d-flex align-items-center">
+                                            <img class="avatar avatar-xss avatar-circle me-2" th:src="@{/images/logo.png}" alt="Image description" width="30"/>
+                                        </span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item d-flex align-items-center active" href="#">
+                                    <img class="avatar avatar-xss avatar-circle me-2" th:src="@{/assets/vendor/flag-icon-css/flags/1x1/us.svg}" alt="English" width="16"/>
+                                    <span>English</span>
+                                </a>
+                                <!-- Add other languages if needed -->
                             </div>
                         </div>
-                        <!-- Media -->
-                        <!-- End Media -->
-                    </div>
-                    <!-- End Col -->
-                </div>
-                <!-- End Row -->
+                        <!-- End Button Group -->
+                    </li>
+                </ul>
+                <!-- End List -->
             </div>
-            <!-- End Hero -->
-            <!-- Service Categories -->
-            <div class="container content-space-t-2">
-                <h2 class="mb-4">Service Categories:</h2>
-                <div class="row">
-                    <div class="col-md-6 mb-4">
-                        <h3>Customized Vacation Packages</h3>
-                        <p>Tailor-made packages to suit your preferences, destinations, and budget. Our travel agents specialize in designing unique trips based on your preferences.</p>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                        <h3>Adventure Tours</h3>
-                        <p>Get your adrenaline pumping with thrilling adventure tours. From hiking, rafting, and skiing to exotic safaris, we have you covered.</p>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                        <h3>Luxury Getaways</h3>
-                        <p>Indulge in the ultimate luxury experience with our handpicked travel services. Enjoy first-class accommodations, private tours, and world-class amenities.</p>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                        <h3>Family Travel</h3>
-                        <p>Create unforgettable memories with family-friendly vacation packages. Our services are designed with families in mind, ensuring fun for everyone.</p>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                        <h3>Destination Weddings and Honeymoons</h3>
-                        <p>Turn your special day into a once-in-a-lifetime experience with our destination wedding and honeymoon services. We help you find the perfect venue and handle all the details.</p>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                        <h3>Corporate Travel Services</h3>
-                        <p>Simplify business trips with our comprehensive corporate travel management. Book flights, hotels, and transportation seamlessly through our trusted agents.</p>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                        <h3>Cultural and Historical Tours</h3>
-                        <p>Explore rich cultural heritage and historical landmarks across the globe. Our knowledgeable providers curate immersive experiences in various locations.</p>
-                    </div>
-                </div>
+            <!-- End Col -->
+            <div class="col-md-auto">
+                <p class="fs-5 text-white-70 mb-0">&copy; TSH 2024</p>
             </div>
-            <!-- End Service Categories -->
-            <!-- Icon Blocks -->
-            <!-- End Icon Blocks -->
-            <!-- Features -->
-            <div class="lib-content overflow-hidden">
-</div>
-            <!-- End Features -->
-            <!-- Icon Blocks -->
-            <div class="container lib-features">
-                <!-- End Row -->
-            </div>
-            <!-- End Icon Blocks -->
-            <!-- Features -->
-            <div class=" container content-space-t-2 content-space-t-lg-3 lib-content mt-n4 pt-2" style="margin-top: 162px;">
-                <div class=" align-items-lg-center justify-content-lg-between mt-n1 row" style="padding-left: 0px; margin-top: -482px;">
-                    <div class="col-lg-6 mb-5 mb-lg-0">
-                        <img class="img-fluid rounded-3" src="../../../static/images/Pictures%20that%20represent%20different%20cultures,%20such%20as%20landmarks,%20cuisine,%20or%20festivals,%20to%20emphasize%20t.jpg" alt="Image Description">
-                    </div>
-                    <div class="col-lg-5">
-                        <h2 class="h1 mb-4">Why Choose Us?</h2>
-                        <p class="fs-3 me-n5">At Travel Services Hub, we are dedicated to providing exceptional travel experiences. Our team of expert travel agents ensures personalized service and support throughout your journey. With a wide range of travel services, competitive pricing, and a commitment to customer satisfaction, we are your trusted partner in planning unforgettable adventures.</p>
-                    </div>
-                </div>
-                <!-- End Row -->
-            </div>
-            <!-- End Features -->
-        </main>
-        <!-- Footer -->
-        <footer class="bg-dark mt-5 pt-0" style="padding-left: 0px; padding-right: 0px; margin-right: -1px; margin-left: -3px; padding-top: 89px; margin-top: 17px;">
-            <div class="container">
-                <div class="align-items-center pb-0 pt-8 row">
-                    <div class="col-md mb-5 mb-md-0">
-                        <h2 class="fw-medium text-white-70 mb-0">Your dream&nbsp;vacation&nbsp;awaits, join&nbsp;<br><font color="#ffffff"><b>T S H&nbsp;&nbsp;</b></font>today!!!</h2>
-                    </div>
-                    <!-- End Col -->
-                    <div class="col-md-auto">
-                        <div class=" d-grid d-sm-flex gap-3 mb-n5"><a class="btn btn-primary" href="signUpChoice.html">Sign up FREE</a><a class="btn btn-ghost-light btn-pointer" href="loginInChoice.html">Login</a>
-                        </div>
-                    </div>
-                    <!-- End Col -->
-                </div>
-                <!-- End Row -->
-                <div class="border-bottom border-white-10">
-                    <div class="pt-0 py-6 row">
-                        <!-- End Col -->
-                        <div class="col-6 col-sm-4 col-lg mb-7 mb-lg-0">
-                            <!-- List -->
-                            <ul class="list-unstyled list-py-1 mb-0">
-                                <li>
-                                    <a class="link link-light link-light-75" href="WelcomePage.html">Home</a>
-                                </li>
-                                <li>
-                                    <a class="link link-light link-light-75" href="#">Services</a>
-                                    <a class="link link-light link-light-75" href="#"></a>
-                                </li>
-                                <li><a class="link link-light link-light-75" href="AboutUs.html">About</a>
-                                </li>
-                                <li>
-                                    <a class="link link-light-75 link-primary text-primary" href="SysAdminLogin.html">Admin Login</a>
-                                </li>
-                            </ul>
-                            <!-- End List -->
-                        </div>
-                        <!-- End Col -->
-                        <!-- End Col -->
-                        <!-- End Col -->
-                        <!-- End Col -->
-                    </div>
-                    <!-- End Row -->
-                </div>
-                <div class="row align-items-md-center py-6">
-                    <div class="col-md mb-3 mb-md-0">
-                        <!-- List -->
-                        <ul class="list-inline list-px-2 mb-0">
-                            <li class="list-inline-item">
-                                <a class="link link-light link-light-75" href="#">Privacy and Policy</a>
-                            </li>
-                            <li class="list-inline-item">
-                                <a class="link link-light link-light-75" href="#">Terms</a>
-                            </li>
-                            <li class="list-inline-item">
-                                <a class="link link-light link-light-75" href="#">Status</a>
-                            </li>
-                            <li class="list-inline-item">
-                                <!-- Button Group -->
-                                <div class="btn-group"><a class="link link-light link-light-75" href="javascript:;" id="selectLanguage" data-bs-toggle="dropdown" aria-expanded="false"> <span class="d-flex align-items-center"> <img class="avatar avatar-xss avatar-circle me-2" src="../../../static/images/logo.png" alt="Image description" width="30
-                                    "/> </span> </a>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item d-flex align-items-center active" href="#"> <img class="avatar avatar-xss avatar-circle me-2" src="assets/vendor/flag-icon-css/flags/1x1/us.svg" alt="Image description" width="16"/> <span>English</span> </a>
-                                        <a class="dropdown-item d-flex align-items-center" href="#"> <img class="avatar avatar-xss avatar-circle me-2" src="assets/vendor/flag-icon-css/flags/1x1/de.svg" alt="Image description" width="16"/> <span>Deutsch</span> </a>
-                                        <a class="dropdown-item d-flex align-items-center" href="#"> <img class="avatar avatar-xss avatar-circle me-2" src="assets/vendor/flag-icon-css/flags/1x1/es.svg" alt="Image description" width="16"/> <span>Español</span> </a>
-                                    </div>
-                                </div>
-                                <!-- End Button Group -->
-                            </li>
-                        </ul>
-                        <!-- End List -->
-                    </div>
-                    <!-- End Col -->
-                    <div class="col-md-auto">
-                        <p class="fs-5 text-white-70 mb-0">&copy; TSH 2024</p>
-                    </div>
-                    <!-- End Col -->
-                </div>
-                <!-- End Row -->
-            </div>
-        </footer>
-        <script src="assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="pgia/lib/pgia.js"></script>
-    </body>
+            <!-- End Col -->
+        </div>
+        <!-- End Row -->
+    </div>
+</footer>
+<!-- JavaScript Files -->
+<script th:src="@{/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/pgia/lib/pgia.js}"></script>
+</body>
 </html>

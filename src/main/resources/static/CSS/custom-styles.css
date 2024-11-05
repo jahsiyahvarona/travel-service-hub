@@ -1,0 +1,9 @@
+/* custom-styles.css */
+.error-message {
+    background-color: #f8f9fa; /* Off-white background */
+    color: #0abf53;           /* Green text */
+    padding: 8px;
+    border-radius: 4px;
+    margin-top: 5px;
+    font-size: 14px;
+}
