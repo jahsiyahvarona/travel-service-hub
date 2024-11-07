@@ -23,6 +23,8 @@ public class Booking {
     @JoinColumn(name = "package_id", nullable = false)
     private Package pkg;
 
+
+
     @Column(nullable = false)
     private LocalDate startDate;
 

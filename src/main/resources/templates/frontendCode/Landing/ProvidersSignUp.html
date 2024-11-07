@@ -14,6 +14,13 @@
     <link th:href="@{/CSS/pinekit_theme/pinekit.css}" rel="stylesheet" type="text/css">
     <link th:href="@{/CSS/css/style.css}" rel="stylesheet">
     <link th:href="@{/css/custom-styles.css}" rel="stylesheet" type="text/css">
+    <style>
+        .bordered-preview {
+            border: 2px solid #0abf53; /* Company color */
+            padding: 4px; /* Optional: space between the image and the border ring */
+        }
+    </style>
+
 
     <!-- Bootstrap Icons -->
     <link th:href="@{/assets/vendor/bootstrap-icons/font/bootstrap-icons.css}" rel="stylesheet">
@@ -98,7 +105,14 @@
                             <!-- Profile Picture -->
                             <div class="form-group mb-4">
                                 <label for="profilePic">Profile Picture or Logo (optional)</label>
-                                <input type="file" class="form-control" id="profilePic" name="profilePic" accept="image/*">
+                                <input type="file" class="form-control" id="profilePic" name="profilePic" accept=".jpeg, .jpg, .png">
+                                <small class="form-text text-muted">Only JPEG, JPG, and PNG files are allowed.</small>
+                            </div>
+
+                            <!-- New Image Preview (hidden initially) -->
+                            <div class="mb-3" id="newImagePreviewContainer" style="display: none;">
+                                <label class="form-label">Preview:</label>
+                                <img id="newImagePreview" src="" alt="New Image Preview" class="img-fluid bordered-preview" style="max-height: 200px; max-width: 200px; min-height: 200px; min-width: 200px; object-fit: cover;">
                             </div>
 
                             <!-- Submit Button -->
@@ -147,10 +161,29 @@
     document.addEventListener("DOMContentLoaded", function () {
         const signupForm = document.getElementById('signupForm');
 
+        // Event listener for profile picture preview
+        document.getElementById('profilePic').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const fileType = file.type.toLowerCase();
+                if (fileType === "image/jpeg" || fileType === "image/png" || fileType === "image/jpg") {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('newImagePreview').src = e.target.result;
+                        document.getElementById('newImagePreviewContainer').style.display = 'block'; // Show the preview
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    alert("Please select a valid image file (JPEG, JPG, PNG).");
+                    // Clear the file input if the file type is incorrect
+                    event.target.value = "";
+                    document.getElementById('newImagePreviewContainer').style.display = 'none';
+                }
+            }
+        });
+
         signupForm.addEventListener('submit', function (event) {
             let isValid = true;
-
-            // Get form fields
             const username = document.getElementById('username');
             const email = document.getElementById('email');
             const password = document.getElementById('password');
@@ -164,47 +197,30 @@
             clearError(confirmPassword);
             clearError(termsCheckbox);
 
-            // Validate username
+            // Validate username, email, password, confirm password, terms checkbox
             if (username.value.trim() === '') {
                 showError(username, 'Username is required');
                 isValid = false;
-            } else if (username.value.length > 15) {
-                showError(username, 'Username must be at most 15 characters');
-                isValid = false;
-            }else if (username.value.length < 6) {
-                showError(username, 'username must be at least 6 characters');
+            } else if (username.value.length > 15 || username.value.length < 6) {
+                showError(username, 'Username must be 6-15 characters');
                 isValid = false;
             }
 
-
-            // Validate email
-            if (email.value.trim() === '') {
-                showError(email, 'Email is required');
-                isValid = false;
-            } else if (!validateEmail(email.value.trim())) {
+            if (email.value.trim() === '' || !validateEmail(email.value.trim())) {
                 showError(email, 'Please enter a valid email address');
                 isValid = false;
             }
 
-            // Validate password
-            if (password.value.trim() === '') {
-                showError(password, 'Password is required');
-                isValid = false;
-            } else if (password.value.length < 8) {
+            if (password.value.trim() === '' || password.value.length < 8) {
                 showError(password, 'Password must be at least 8 characters');
                 isValid = false;
             }
 
-            // Validate confirm password
-            if (confirmPassword.value.trim() === '') {
-                showError(confirmPassword, 'Please confirm your password');
-                isValid = false;
-            } else if (password.value !== confirmPassword.value) {
+            if (confirmPassword.value.trim() === '' || password.value !== confirmPassword.value) {
                 showError(confirmPassword, 'Passwords do not match');
                 isValid = false;
             }
 
-            // Validate terms checkbox
             if (!termsCheckbox.checked) {
                 showError(termsCheckbox.parentElement, 'You must accept the Terms and Conditions');
                 isValid = false;

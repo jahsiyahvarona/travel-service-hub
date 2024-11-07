@@ -33,6 +33,9 @@ public class Package {
     @OneToMany(mappedBy = "pkg", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<LikeDislike> likeDislikes = new HashSet<>();
 
+    @OneToMany(mappedBy = "pkg", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Booking> bookings = new HashSet<>();
+
     // Constructors
 
 
@@ -112,6 +115,7 @@ public class Package {
 
 
     public Set<LikeDislike> getLikeDislikes() {
+
         return likeDislikes;
     }
 
@@ -130,5 +134,21 @@ public class Package {
     public void removeLikeDislike(LikeDislike likeDislike) {
         likeDislikes.remove(likeDislike);
         likeDislike.setPkg(null);
+    }
+
+    public Set<com.group5.travel_service_hub.entity.Reviews> getReviews() {
+        return Reviews;
+    }
+
+    public void setReviews(Set<com.group5.travel_service_hub.entity.Reviews> reviews) {
+        Reviews = reviews;
+    }
+
+    public Set<Booking> getBookings() {
+        return bookings;
+    }
+
+    public void setBookings(Set<Booking> bookings) {
+        this.bookings = bookings;
     }
 }

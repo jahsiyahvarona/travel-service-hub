@@ -3,6 +3,8 @@ package com.group5.travel_service_hub.controller;
 import com.group5.travel_service_hub.entity.Package;
 import com.group5.travel_service_hub.entity.Role;
 import com.group5.travel_service_hub.entity.User;
+import com.group5.travel_service_hub.repository.BookingRepository;
+import com.group5.travel_service_hub.repository.PackageRepository;
 import com.group5.travel_service_hub.service.PackageService;
 import com.group5.travel_service_hub.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,12 @@ public class PackageController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private BookingRepository bookingRepository;
+
+    @Autowired
+    private PackageRepository packageRepository;
 
 
 
@@ -199,6 +207,13 @@ public class PackageController {
         User loggedInUser = (User) session.getAttribute("loggedInUser");
         String username = loggedInUser.getUsername(); // Assuming there's a getUsername() method
         User user = userService.findByUsername(username);
+
+        Package pkg = packageRepository.findById(packageId).orElse(null);
+        long bookingCount = bookingRepository.countByPkg(pkg);
+        if (bookingCount > 0) {
+            redirectAttributes.addFlashAttribute("error", "Cannot delete package: There are existing bookings associated with this package.");
+            return "redirect:/provider/managePackages";
+        }
 
         // Verify the user has the PROVIDER or SYSADMIN role
         if (user.getRole() != Role.PROVIDER && user.getRole() != Role.SYSADMIN) {

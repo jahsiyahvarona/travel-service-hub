@@ -14,6 +14,13 @@
     <link th:href="@{/CSS/pinekit_theme/pinekit.css}" rel="stylesheet" type="text/css">
     <link th:href="@{/CSS/css/style.css}" rel="stylesheet">
     <link th:href="@{/css/custom-styles.css}" rel="stylesheet" type="text/css">
+    <style>
+        .bordered-preview {
+            border: 2px solid #0abf53; /* Company color */
+            padding: 4px; /* Optional: space between the image and the border ring */
+        }
+    </style>
+
 </head>
 <body>
 <header>
@@ -94,8 +101,16 @@
                             <!-- Profile Picture -->
                             <div class="form-group mb-4">
                                 <label for="profilePic">Profile Picture (optional)</label>
-                                <input type="file" class="form-control" id="profilePic" name="profilePic" accept="image/*">
+                                <input type="file" class="form-control" id="profilePic" name="profilePic" accept=".jpeg, .jpg, .png">
+                                <small class="form-text text-muted">Only JPEG, JPG, and PNG files are allowed.</small>
                             </div>
+
+                            <!-- Profile Picture Preview (initially hidden) -->
+                            <div class="mb-3" id="profilePicPreviewContainer" style="display: none;">
+                                <label class="form-label">Profile Picture Preview:</label>
+                                <img id="profilePicPreview" src="" alt="Profile Picture Preview" class="img-fluid bordered-preview" style="max-height: 200px; max-width: 200px; min-height: 200px; min-width: 200px; object-fit: cover;">
+                            </div>
+
                             <!-- Submit Button -->
                             <button type="submit" class="btn btn-primary">Sign Up</button>
                             <a th:href="@{/signUpChoice}" class="btn btn-secondary ml-2">Cancel</a>
@@ -133,76 +148,61 @@
 <script th:src="@{/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js}"></script>
 <!-- Include your JavaScript validation script -->
 <script>
-    function togglePassword(fieldId) {
-        const field = document.getElementById(fieldId);
-        const toggleButton = field.nextElementSibling;
-        const type = field.getAttribute('type') === 'password' ? 'text' : 'password';
-        field.setAttribute('type', type);
-
-        // Change the icon
-        const icon = toggleButton.querySelector('i');
-        if (type === 'text') {
-            icon.classList.remove('bi-eye');
-            icon.classList.add('bi-eye-slash');
-        } else {
-            icon.classList.remove('bi-eye-slash');
-            icon.classList.add('bi-eye');
-        }
-    }
-
     document.addEventListener("DOMContentLoaded", function () {
         const signupForm = document.getElementById('signupForm');
 
+        // Profile picture preview
+        document.getElementById('profilePic').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const fileType = file.type.toLowerCase();
+                if (fileType === "image/jpeg" || fileType === "image/png" || fileType === "image/jpg") {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('profilePicPreview').src = e.target.result;
+                        document.getElementById('profilePicPreviewContainer').style.display = 'block'; // Show the preview
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    alert("Please select a valid image file (JPEG, JPG, PNG).");
+                    event.target.value = ""; // Clear the input if invalid file type
+                    document.getElementById('profilePicPreviewContainer').style.display = 'none';
+                }
+            }
+        });
+
         signupForm.addEventListener('submit', function (event) {
             let valid = true;
-
-            // Get form fields
             const username = document.getElementById('username');
             const email = document.getElementById('email');
             const password = document.getElementById('password');
             const confirmPassword = document.getElementById('confirmPassword');
 
-            // Clear previous error messages
             clearError(username);
             clearError(email);
             clearError(password);
             clearError(confirmPassword);
 
-            // Validate username
-            if (username.value.trim() === '') {
-                showError(username, 'Username is required');
-                valid = false;
-            } else if (username.value.length > 15) {
-                showError(username, 'Username must be at most 15 characters');
-                valid = false;
-            } else if (username.value.length < 6) {
-                showError(username, 'Username must be at least 6 characters');
+            // Username validation
+            if (username.value.trim() === '' || username.value.length < 6 || username.value.length > 15) {
+                showError(username, 'Username must be between 6 and 15 characters');
                 valid = false;
             }
 
-            // Validate email
-            if (email.value.trim() === '') {
-                showError(email, 'Email is required');
-                valid = false;
-            } else if (!validateEmail(email.value.trim())) {
+            // Email validation
+            if (email.value.trim() === '' || !validateEmail(email.value.trim())) {
                 showError(email, 'Please enter a valid email address');
                 valid = false;
             }
 
-            // Validate password
-            if (password.value.trim() === '') {
-                showError(password, 'Password is required');
-                valid = false;
-            } else if (password.value.length < 8) {
+            // Password validation
+            if (password.value.trim() === '' || password.value.length < 8) {
                 showError(password, 'Password must be at least 8 characters');
                 valid = false;
             }
 
-            // Validate confirm password
-            if (confirmPassword.value.trim() === '') {
-                showError(confirmPassword, 'Please confirm your password');
-                valid = false;
-            } else if (password.value !== confirmPassword.value) {
+            // Confirm password validation
+            if (confirmPassword.value.trim() === '' || password.value !== confirmPassword.value) {
                 showError(confirmPassword, 'Passwords do not match');
                 valid = false;
             }
@@ -214,14 +214,11 @@
 
         function showError(input, message) {
             const formGroup = input.parentElement;
-
-            // Remove existing error message if any
             const existingError = formGroup.querySelector('.error-message');
             if (existingError) {
                 existingError.remove();
             }
 
-            // Create a new error message element
             const error = document.createElement('div');
             error.className = 'error-message mt-1';
             error.innerText = message;

@@ -2,7 +2,11 @@ package com.group5.travel_service_hub.repository;
 
 import com.group5.travel_service_hub.entity.Booking;
 import com.group5.travel_service_hub.entity.BookingStatus;
+import com.group5.travel_service_hub.entity.Package;
+import com.group5.travel_service_hub.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,6 +16,8 @@ import java.util.List;
  */
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
+    long countByPkg(Package pkg);
+
 
     /**
      * Finds all bookings made by a specific customer.
@@ -44,5 +50,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      * @return List of Booking entities.
      */
     List<Booking> findByStatus(BookingStatus status);
+
+    @Query("SELECT b FROM Booking b WHERE b.pkg.providerDetails = :provider")
+    List<Booking> findByProvider(@Param("provider") User provider);
+
 }
 
