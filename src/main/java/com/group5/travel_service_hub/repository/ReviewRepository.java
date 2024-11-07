@@ -35,5 +35,7 @@ public interface ReviewRepository extends JpaRepository<Reviews, Long> {
      * @return List of Reviews entities.
      */
     List<Reviews> findByAuthorId(Long id);
+
+    void delete(Reviews review);
 }
 
