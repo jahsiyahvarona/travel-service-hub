@@ -17,7 +17,7 @@ import java.util.Map;
  * REST Controller for managing Provider-related operations.
  */
 @RestController
-@RequestMapping("/api/providers")
+@RequestMapping("/providers")
 public class ProviderController {
 
     @Autowired
