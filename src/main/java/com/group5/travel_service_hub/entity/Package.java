@@ -1,5 +1,7 @@
 package com.group5.travel_service_hub.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
@@ -25,16 +27,19 @@ public class Package {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "provider_details_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private User providerDetails;
 
     @OneToMany(mappedBy = "pkg", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Reviews> Reviews = new HashSet<>();
-
+    @JsonIgnore
     @OneToMany(mappedBy = "pkg", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<LikeDislike> likeDislikes = new HashSet<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "pkg", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Booking> bookings = new HashSet<>();
+
 
     // Constructors
 
