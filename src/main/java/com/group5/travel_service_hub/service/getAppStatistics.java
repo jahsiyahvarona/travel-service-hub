@@ -8,7 +8,7 @@ import com.group5.travel_service_hub.repository.UserRepository;
 
 import java.util.List;
 
-public List<Statistic> getAppStatistics() {
+public class getAppStatistics() {
     long totalUsers = UserRepository.count();
     long totalPackages = PackageRepository.count();
     long totalBookings = BookingRepository.count();

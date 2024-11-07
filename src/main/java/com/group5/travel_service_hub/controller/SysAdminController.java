@@ -1,6 +1,7 @@
 package com.group5.travel_service_hub.controller;
 
 import com.group5.travel_service_hub.entity.*;
+import com.group5.travel_service_hub.repository.UserRepository;
 import com.group5.travel_service_hub.service.SysAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,11 @@ public class SysAdminController {
     @Autowired
     public SysAdminController(SysAdminService sysAdminService) {
         this.sysAdminService = sysAdminService;
+    }
+
+    @PostMapping("/users")
+    public User createUser(@RequestBody User user) {
+        return UserRepository.save(user);
     }
 
     // Retrieve all users
