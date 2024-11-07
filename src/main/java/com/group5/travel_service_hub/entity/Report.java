@@ -1,5 +1,6 @@
 package com.group5.travel_service_hub.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.group5.travel_service_hub.entity.ReportStatus;
 import com.group5.travel_service_hub.entity.PunishmentType;
 import jakarta.persistence.*;
@@ -11,21 +12,25 @@ public class Report {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Long id;
 
     // User who made the report
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reporter_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private User reporter;
 
     // Optional: Package being reported
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "package_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Package pkg;
 
     // Optional: review being reported
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Reviews Review;
 
     @Column(nullable = false)
@@ -38,6 +43,7 @@ public class Report {
     // Admin who reviewed the report
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reviewed_by_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private User reviewedBy;
 
     @Enumerated(EnumType.STRING)

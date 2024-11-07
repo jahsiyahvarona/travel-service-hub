@@ -20,6 +20,7 @@ public class Booking {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "customer_id", nullable = false)
+
     private User customer;
 
     // Package being booked

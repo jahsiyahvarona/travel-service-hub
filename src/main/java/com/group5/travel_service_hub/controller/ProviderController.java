@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +35,8 @@ public class ProviderController {
 
     @Autowired
     private LikeDislikeService likeDislikeService;
+    @Autowired
+    private ReportService reportService;
 
     /**
      * Create a new Provider profile.
@@ -224,5 +227,27 @@ public class ProviderController {
         }
 
         return ResponseEntity.ok(providerBookings);
+    }
+    /**
+     * Create a new report on a review.
+     *
+     * @param reporterId The ID of the user reporting the review.
+     * @param reviewId   The ID of the review being reported.
+     * @param report     The report details (reason).
+     * @return The created Report object.
+     */
+    @PostMapping("/newReport/{reviewId}/users/{reporterId}")
+    public ResponseEntity<Report> createReviewReport(
+            @PathVariable Long reporterId,
+            @PathVariable Long reviewId,
+            @RequestBody Report report) {
+
+        User reporter = userService.findById(reporterId);
+        report.setStatus(ReportStatus.PENDING); // Set initial status to PENDING
+        report.setTimestamp(LocalDateTime.now()); // Set the current timestamp
+
+        reportService.createReport(reporter, report, null, reviewId);
+
+        return ResponseEntity.ok(report);
     }
 }
