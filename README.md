@@ -89,6 +89,17 @@ Review Management Endpoints
 GET http://localhost:8080/providers/{providerId}/reviews - Retrieve all reviews for a provider’s packages.
 Path Variable: {providerId} - Use the ID of the provider.
 
+Report Management Endpoint
+POST http://localhost:8080/providers/newReport/{reviewId}/users/{reporterId}
+Description: Create a new report on a review.
+Path Variables:
+{reviewId} - ID of the review being reported
+{reporterId} - ID of the user reporting the review
+Body (JSON):
+{
+  "reason": "Inappropriate content",
+  "status": "PENDING"
+}
 
 
 
