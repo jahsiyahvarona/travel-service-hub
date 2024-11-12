@@ -1,169 +1,169 @@
 package com.group5.travel_service_hub.controller;
 
-import com.group5.travel_service_hub.entity.Booking;
+import com.group5.travel_service_hub.entity.*;
 import com.group5.travel_service_hub.entity.Package;
-import com.group5.travel_service_hub.entity.User;
-import com.group5.travel_service_hub.service.BookingService;
-import com.group5.travel_service_hub.service.PackageService;
-import com.group5.travel_service_hub.service.UserService;
-import jakarta.servlet.http.HttpSession;
+import com.group5.travel_service_hub.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 
-@Controller
-@RequestMapping("/customer")
+@RestController
+@RequestMapping("/customers")
 public class CustomerController {
 
-    private final UserService userService;
-    private final BookingService bookingService;
-    private final PackageService packageService;
+    @Autowired
+    private UserService userService;
 
     @Autowired
-    public CustomerController(UserService userService, BookingService bookingService, PackageService packageService) {
-        this.userService = userService;
-        this.bookingService = bookingService;
-        this.packageService = packageService;
+    private PackageService packageService;
+
+    @Autowired
+    private BookingService bookingService;
+
+    @Autowired
+    private ReviewsService reviewsService;
+
+    @Autowired
+    private LikeDislikeService likeDislikeService;
+    @Autowired
+    private ReportService reportService;
+    /**
+     * Create a new Customer profile.
+     *
+     * @param customer The Customer entity.
+     * @return The created Customer object.
+     */
+    @PostMapping("")
+    public ResponseEntity<User> createCustomerProfile(@RequestBody User customer) {
+        customer.setRole(Role.CUSTOMER);
+        User createdProvider = userService.registerUser(customer);
+        return ResponseEntity.ok(createdProvider);
     }
 
     /**
-     * Displays the Customer Dashboard.
+     * Get Customer profile by CustomerId.
+     *
+     * @param CustomerId The ID of the Customer.
+     * @return The Provider object.
      */
-    @GetMapping("/dashboard")
-    public String showDashboard(HttpSession session, Model model) {
-        User loggedInUser = (User) session.getAttribute("loggedInUser");
-        if (loggedInUser == null) {
-            return "redirect:/login";
+    @GetMapping("/{CustomerId}")
+    public ResponseEntity<User> getCustomerProfile(@PathVariable Long CustomerId) {
+        User customer = userService.findById(CustomerId);
+        return ResponseEntity.ok(customer);
+    }
+
+    /**
+     * Update Customer profile.
+     *
+     * @param customerId The ID of the customer.
+     * @param customer   The updated Customer details.
+     * @return The updated Customer object.
+     */
+    @PutMapping("/{customerId}")
+    public ResponseEntity<User> updateCustomerProfile(
+            @PathVariable Long customerId,
+            @RequestBody User customer) {
+        User updatedCustomer = userService.updateProfile(customerId, customer);
+        return ResponseEntity.ok(updatedCustomer);
+    }
+
+    /**
+     * Delete Customer profile.
+     *
+     * @param customerId The ID of the customer.
+     * @return A confirmation message.
+     */
+    @DeleteMapping("/{customerId}")
+    public ResponseEntity<String> deleteCustomerProfile(@PathVariable Long customerId) {
+        userService.deactivateUser(customerId);
+        return ResponseEntity.ok("Customer profile deactivated successfully.");
+    }
+    /**
+     * Subscribe to a service by creating a new booking.
+     *
+     * @param customerId The ID of the customer.
+     * @param packageId  The ID of the package.
+     * @param startDate  The start date of the booking.
+     * @param endDate    The end date of the booking.
+     * @return The created Booking object.
+     */
+    @PostMapping("/{customerId}/subscribe")
+    public ResponseEntity<Object> subscribeToService(
+            @PathVariable Long customerId,
+            @RequestParam Long packageId,
+            @RequestParam String startDate,
+            @RequestParam String endDate) {
+
+        Booking newBooking = bookingService.createBooking(
+                customerId,
+                packageId,
+                LocalDate.parse(startDate),
+                LocalDate.parse(endDate)
+        );
+
+        return ResponseEntity.status(201).body(newBooking);
+    }
+
+    /**
+     * Get all bookings for a specific customer.
+     *
+     * @param customerId The ID of the customer.
+     * @return List of Booking objects.
+     */
+    @GetMapping("/{customerId}/bookings")
+    public ResponseEntity<List<Booking>> getAllBookingsForCustomer(@PathVariable Long customerId) {
+        List<Booking> bookings = bookingService.getBookingsByCustomerId(customerId);
+        return ResponseEntity.ok(bookings);
+    }
+    /**
+     * Update an existing Package.
+     *
+     * @param providerId The ID of the provider.
+     * @param packageId  The ID of the package to update.
+     * @param pkg        The updated Package details.
+     * @return The updated Package object.
+     */
+    @PutMapping("/{providerId}/packages/{packageId}")
+    public ResponseEntity<com.group5.travel_service_hub.entity.Package> updatePackage(
+            @PathVariable Long providerId,
+            @PathVariable Long packageId,
+            @RequestBody com.group5.travel_service_hub.entity.Package pkg) {
+        Package existingPackage = packageService.getPackageById(packageId)
+                .orElseThrow(() -> new IllegalArgumentException("Package not found."));
+        if (!existingPackage.getProviderDetails().getId().equals(providerId)) {
+            return ResponseEntity.status(403).build();
+        }
+        pkg.setId(packageId);
+        pkg.setProviderDetails(existingPackage.getProviderDetails());
+        packageService.updatePackage(pkg);
+        return ResponseEntity.ok(pkg);
+    }
+    /**
+     * Write a review for a subscribed service.
+     *
+     * @param customerId The ID of the customer writing the review.
+     * @param packageId  The ID of the package being reviewed.
+     * @param content    The review content.
+     * @return The created Review object.
+     */
+    @PostMapping("/{customerId}/reviews")
+    public ResponseEntity<Reviews> writeReview(
+            @PathVariable Long customerId,
+            @RequestParam Long packageId,
+            @RequestParam String content) {
+
+        // Ensure the customer has subscribed to the service
+        boolean isSubscribed = bookingService.getBookingsByCustomerId(customerId).stream()
+                .anyMatch(booking -> booking.getPkg().getId().equals(packageId));
+
+        if (!isSubscribed) {
+            return ResponseEntity.status(403).body(null); // Forbidden if not subscribed
         }
 
-        User customer = userService.findByUsername(loggedInUser.getUsername());
-        model.addAttribute("customer", customer);
-        model.addAttribute("totalSpending", 4300);  // Example value
-        model.addAttribute("totalBookings", 10);    // Example value
-        model.addAttribute("favoritePackage", "Jamaica"); // Example value
-
-        return "frontendCode/CustomerUI/customerDashboard";
+        Reviews newReview = reviewsService.addReview(customerId, packageId, content);
+        return ResponseEntity.status(201).body(newReview);
     }
-
-    /**
-     * Displays the customer's bookings.
-     */
-    @GetMapping("/bookings")
-    public String viewBookings(HttpSession session, Model model) {
-        User loggedInUser = (User) session.getAttribute("loggedInUser");
-        if (loggedInUser == null) {
-            return "redirect:/login";
-        }
-
-        List<Booking> bookings = bookingService.getBookingsByCustomerId(loggedInUser.getId());
-        model.addAttribute("bookings", bookings);
-
-        return "frontendCode/CustomerUI/customerViewBookings";
-    }
-
-    /**
-     * Displays available packages.
-     */
-    @GetMapping("/packages")
-    public String viewPackages(HttpSession session, Model model) {
-        User loggedInUser = (User) session.getAttribute("loggedInUser");
-        if (loggedInUser == null) {
-            return "redirect:/login";
-        }
-
-       // List<Package> packages = packageService.findAllPackages();
-     //   model.addAttribute("packages", packages);
-
-        return "frontendCode/CustomerUI/customerViewPackages";
-    }
-
-    /**
-     * Displays the Leave a Review page.
-     */
-    @GetMapping("/reviews")
-    public String leaveReview(HttpSession session, Model model) {
-        User loggedInUser = (User) session.getAttribute("loggedInUser");
-        if (loggedInUser == null) {
-            return "redirect:/login";
-        }
-
-      //  List<Booking> recentBookings = bookingService.getRecentBookingsByCustomerId(loggedInUser.getId());
-      //  model.addAttribute("recentBookings", recentBookings);
-
-        return "frontendCode/CustomerUI/customerLeaveReview";
-    }
-
-    /**
-     * Submits a review for a booking.
-     */
-    @PostMapping("/reviews/submit")
-    public String submitReview(@RequestParam Long bookingId, @RequestParam String reviewContent, HttpSession session) {
-        User loggedInUser = (User) session.getAttribute("loggedInUser");
-        if (loggedInUser == null) {
-            return "redirect:/login";
-        }
-
-      //  bookingService.addReviewToBooking(bookingId, reviewContent);
-        return "redirect:/customer/reviews?success";
-    }
-
-    /**
-     * Displays the customer's profile.
-     */
-    @GetMapping("/profile")
-    public String viewProfile(HttpSession session, Model model) {
-        User loggedInUser = (User) session.getAttribute("loggedInUser");
-        if (loggedInUser == null) {
-            return "redirect:/login";
-        }
-
-        model.addAttribute("user", loggedInUser);
-        return "frontendCode/CustomerUI/customerProfile";
-    }
-
-    /**
-     * Updates the customer's profile.
-     */
-    @PostMapping("/profile/update")
-    public String updateProfile(@RequestParam Long userId, @ModelAttribute User userDetails, HttpSession session) {
-        User updatedUser = userService.updateProfile(userId, userDetails);
-        session.setAttribute("loggedInUser", updatedUser);
-        return "redirect:/customer/profile";
-    }
-
-    /**
-     * Updates the customer's profile picture.
-     */
-    @PostMapping("/profile/updatePic")
-    public String updateProfilePic(@RequestParam Long userId, @RequestParam("file") MultipartFile file, HttpSession session) {
-        User updatedUser = userService.updateProfilePic(userId, file);
-        session.setAttribute("loggedInUser", updatedUser);
-        return "redirect:/customer/profile";
-    }
-
-    /**
-     * Handles logout and invalidates the session.
-     */
-    @PostMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
-        return "redirect:/login?logout";
-    }
-
-    /**
-     * Registers a new customer.
-     */
-    @PostMapping("/register")
-    public ResponseEntity<User> registerCustomer(@RequestBody User user) {
-        User registeredUser = userService.registerUser(user);
-        return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
-
-    }
-
 }
