@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" data-pgc-set-master>
+<head>
+    <!-- Required Meta Tags Always Come First -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>About Us - Travel Services Hub</title>
+    <link rel="shortcut icon" href="./favicon.ico">
+
+    <!-- CSS Files -->
+    <link th:href="@{/CSS/css/theme.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/CSS/theme.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/CSS/assets/vendor/bootstrap-icons/font/bootstrap-icons.css}" rel="stylesheet">
+    <link th:href="@{/CSS/pinekit_theme/pinekit.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/CSS/css/style.css}" rel="stylesheet">
+
+    <!-- Pinegrow Interactions Script -->
+    <script>
+        /* Pinegrow Interactions, do not remove */
+        (function(){
+            try{
+                if(!document.documentElement.hasAttribute('data-pg-ia-disabled')) {
+                    window.pgia_small_mq = typeof pgia_small_mq == 'string' ? pgia_small_mq : '(max-width:767px)';
+                    window.pgia_large_mq = typeof pgia_large_mq == 'string' ? pgia_large_mq : '(min-width:768px)';
+                    var style = document.createElement('style');
+                    var pgcss = 'html:not(.pg-ia-no-preview) [data-pg-ia-hide=""] {opacity:0;visibility:hidden;}';
+                    pgcss += 'html:not(.pg-ia-no-preview) [data-pg-ia-show=""] {opacity:1;visibility:visible;display:block;}';
+                    if(document.documentElement.hasAttribute('data-pg-id') && document.documentElement.hasAttribute('data-pg-mobile')) {
+                        pgia_small_mq = '(min-width:0)';
+                        pgia_large_mq = '(min-width:99999px)';
+                    }
+                    pgcss += '@media ' + pgia_small_mq + '{ html:not(.pg-ia-no-preview) [data-pg-ia-hide="mobile"] {opacity:0;visibility:hidden;}';
+                    pgcss += 'html:not(.pg-ia-no-preview) [data-pg-ia-show="mobile"] {opacity:1;visibility:visible;display:block;}}';
+                    pgcss += '@media ' + pgia_large_mq + '{html:not(.pg-ia-no-preview) [data-pg-ia-hide="desktop"] {opacity:0;visibility:hidden;}';
+                    pgcss += 'html:not(.pg-ia-no-preview) [data-pg-ia-show="desktop"] {opacity:1;visibility:visible;display:block;}}';
+                    style.innerHTML = pgcss;
+                    document.querySelector('head').appendChild(style);
+                }
+            } catch(e){ console && console.log(e); }
+        })()
+    </script>
+</head>
+<body>
+<header>
+    <nav class="bg-white navbar navbar-expand-lg navbar-light">
+        <div class="container" style="margin-left: -24px;">
+            <a class="navbar-brand" th:href="@{/welcome}">
+                <img class="navbar-brand-logo" th:src="@{/images/logo.png}" alt="Image Description">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown-1" aria-controls="navbarNavDropdown-1" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown-1">
+                <ul class="ms-auto navbar-nav">
+                    <li class="nav-item">
+                        <a class="active nav-link" aria-current="page" th:href="@{/welcome}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/about}">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/services}">Services</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+<main role="main">
+    <div class="container content-space-t-3">
+        <h1 class="display-4 text-center">About Us</h1>
+        <p class="fs-5 text-center">At Travel Services Hub, we believe that every journey is unique and should be tailored to the individual. Our team of experienced travel agents is dedicated to creating unforgettable travel experiences for our clients.</p>
+        <div class="row justify-content-center">
+            <div class="position-relative bg-img-center min-vh-35 min-vh-md-75" style="padding-bottom: 0px; margin-bottom: -154px;">
+                <picture>
+                    <img th:src="@{/images/pexels-fauxels-3184286.jpg}" width="1023">
+                </picture>
+            </div>
+        </div>
+        <h2 class="mt-5">Our Mission</h2>
+        <p>Our mission is to simplify the travel planning process, providing personalized service and expert advice to help you explore the world with ease. We strive to empower our clients to travel confidently and create lasting memories.</p>
+        <h2 class="mt-4">Our Values</h2>
+        <ul>
+            <li>Customer Satisfaction: Your happiness is our top priority.</li>
+            <li>Integrity: We believe in honesty and transparency in all our dealings.</li>
+            <li>Quality: We strive to provide the best services to our clients.</li>
+            <li>Innovation: We embrace change and are constantly improving our services.</li>
+        </ul>
+        <h2 class="mt-4">Meet Our Team</h2>
+        <p>Our dedicated team is the heart of Travel Services Hub. Each member brings a wealth of experience and passion for travel, ensuring that every client receives exceptional service. From planning to execution, we work tirelessly to make your travel dreams a reality.</p>
+        <div class="container content-space-b-1 content-space-b-lg-3 lib-team">
+            <!-- Heading -->
+            <div class="w-lg-65 text-center mx-lg-auto mb-5 mb-sm-7 mb-lg-10">
+                <h2>Our Leadership</h2>
+            </div>
+            <!-- End Heading -->
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3">
+                <div class="col mb-10">
+                    <!-- Team Member -->
+                    <div class="w-sm-65 text-center mx-auto team-member">
+                        <img class="img-fluid rounded-3 mb-4" th:src="@{/images/green-person-10777 (3).png}" alt="Shaka Ombongi">
+                        <h5 class="mb-1">Shaka Ombongi</h5>
+                        <span class="d-block">Customer Developer</span>
+                    </div>
+                    <!-- End Team Member -->
+                </div>
+                <!-- End Col -->
+                <div class="col mb-10">
+                    <!-- Team Member -->
+                    <div class="w-sm-65 text-center mx-auto team-member">
+                        <img class="img-fluid rounded-3 mb-4" th:src="@{/images/green-person-10777 (3).png}" alt="Jahsiyah Varona">
+                        <h5 class="mb-1">Jahsiyah Varona</h5>
+                        <span class="d-block">Providers Developer / Project Lead</span>
+                    </div>
+                    <!-- End Team Member -->
+                </div>
+                <!-- End Col -->
+                <div class="col mb-10">
+                    <!-- Team Member -->
+                    <div class="w-sm-65 text-center mx-auto team-member">
+                        <img class="img-fluid rounded-3 mb-4" th:src="@{/images/green-person-10777 (3).png}" alt="Saniyah Khan">
+                        <h5 class="mb-1">Saniyah Khan</h5>
+                        <span class="d-block">SysAdmins Developer</span>
+                    </div>
+                    <!-- End Team Member -->
+                </div>
+                <!-- End Col -->
+            </div>
+            <!-- End Row -->
+        </div>
+        <h2 class="mt-4">Contact Us</h2>
+        <p>If you have any questions or would like to learn more about our services, please <a th:href="@{/contact}">contact us</a>. We look forward to helping you plan your next adventure!</p>
+    </div>
+</main>
+<footer class="bg-dark mt-5 pt-0" style="padding-left: 0px; padding-right: 0px; padding-top: 89px; margin-top: 17px;">
+    <div class="container">
+        <div class="align-items-center pb-0 pt-8 row">
+            <div class="col-md mb-5 mb-md-0">
+                <h2 class="fw-medium text-white-70 mb-0">Your dream vacation awaits, join <span class="text-white"><b>TSH</b></span> today!!!</h2>
+            </div>
+            <!-- End Col -->
+            <div class="col-md-auto">
+                <div class="d-grid d-sm-flex gap-3 mb-n5">
+                    <a class="btn btn-primary" th:href="@{/signUpChoice}">Sign up FREE</a>
+                    <a class="btn btn-ghost-light btn-pointer" th:href="@{/LoginChoice}">Login</a>
+                </div>
+            </div>
+            <!-- End Col -->
+        </div>
+        <!-- End Row -->
+        <div class="border-bottom border-white-10">
+            <div class="pt-0 py-6 row">
+                <div class="col-6 col-sm-4 col-lg mb-7 mb-lg-0">
+                    <!-- List -->
+                    <ul class="list-unstyled list-py-1 mb-0">
+                        <li>
+                            <a class="link link-light link-light-75" th:href="@{/welcome}">Home</a>
+                        </li>
+                        <li>
+                            <a class="link link-light link-light-75" th:href="@{/services}">Services</a>
+                        </li>
+                        <li>
+                            <a class="link link-light link-light-75" th:href="@{/about}">About</a>
+                        </li>
+                        <li>
+                            <a class="link link-light link-light-75 text-primary" th:href="@{/SysAdminLogin}">Admin Login</a>
+                        </li>
+                    </ul>
+                    <!-- End List -->
+                </div>
+                <!-- End Col -->
+            </div>
+            <!-- End Row -->
+        </div>
+        <div class="row align-items-md-center py-6">
+            <div class="col-md mb-3 mb-md-0">
+                <!-- List -->
+                <ul class="list-inline list-px-2 mb-0">
+                    <li class="list-inline-item">
+                        <a class="link link-light link-light-75" href="#">Privacy and Policy</a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a class="link link-light link-light-75" href="#">Terms</a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a class="link link-light link-light-75" href="#">Status</a>
+                    </li>
+                    <li class="list-inline-item">
+                        <!-- Button Group -->
+                        <div class="btn-group">
+                            <a class="link link-light link-light-75" href="#" id="selectLanguage" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span class="d-flex align-items-center">
+                                            <img class="avatar avatar-xss avatar-circle me-2" th:src="@{/images/logo.png}" alt="Image description" width="30"/>
+                                        </span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item d-flex align-items-center active" href="#">
+                                    <img class="avatar avatar-xss avatar-circle me-2" th:src="@{/assets/vendor/flag-icon-css/flags/1x1/us.svg}" alt="English" width="16"/>
+                                    <span>English</span>
+                                </a>
+                                <!-- Add other languages if needed -->
+                            </div>
+                        </div>
+                        <!-- End Button Group -->
+                    </li>
+                </ul>
+                <!-- End List -->
+            </div>
+            <!-- End Col -->
+            <div class="col-md-auto">
+                <p class="fs-5 text-white-70 mb-0">&copy; TSH 2024</p>
+            </div>
+            <!-- End Col -->
+        </div>
+        <!-- End Row -->
+    </div>
+</footer>
+<!-- JavaScript Files -->
+<script th:src="@{/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/CSS/pgia/lib/pgia.js}"></script>
+</body>
+</html>

@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reply to Reviews · Travel Services Hub</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/CSS/dashboard.css" rel="stylesheet">
+    <link href="/CSS/BellDropdown.css" rel="stylesheet">
+    <style>
+        /* Button Customization */
+        .btn-custom {
+            background-color: #0abf53;
+            color: white;
+            border: none;
+        }
+        .btn-custom:hover {
+            background-color: #089e45;
+        }
+
+        /* Reply Section Spacing */
+        .reply-section {
+            margin-top: 15px;
+        }
+
+        /* Package Image Styling */
+        .package-image {
+            height: 200px; /* Adjusted height */
+            width: 100%;
+            object-fit: cover;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+        }
+
+        /* Modal Content Styling */
+        .modal-content-custom {
+            border-radius: 10px;
+        }
+
+        /* Profile Picture Styling in Modals */
+        .profile-pic {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        /* Fixed Card Dimensions */
+        .fixed-card {
+            height: 700px; /* Adjust as needed */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Card Body Styling with Flexbox */
+        .card-body {
+            flex: 1; /* Ensures the body takes up remaining space */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Comment Text Styling */
+        .card-text {
+            flex: 1; /* Allows the text to grow and fill space */
+            max-height: 100px; /* Set a maximum height for the comment */
+            max-width: 60ch; /* Approximate wrapping after 30 characters */
+            overflow-y: auto; /* Adds a vertical scrollbar if content exceeds max-height */
+            padding-right: 10px; /* Adds space for the scrollbar */
+            word-wrap: break-word; /* Ensures long words break to avoid overflow */
+            overflow-wrap: break-word; /* Ensures words break as needed */
+            margin-bottom: 5px; /* Reduced margin to decrease space between comment and "By: Customer" */
+        }
+
+        /* Optional: Style the scrollbar for better aesthetics in comment area */
+        .card-text::-webkit-scrollbar {
+            width: 6px;
+        }
+        .card-text::-webkit-scrollbar-thumb {
+            background-color: rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+        .card-text::-webkit-scrollbar-track {
+            background-color: rgba(0,0,0,0.05);
+        }
+
+        /* Ensure Modals are Scrollable if Content Overflows */
+        .modal-body {
+            overflow-y: auto;
+        }
+
+        /* Custom Reply Area Styles */
+        .reply-area {
+            max-height: 200px; /* Increased max-height to allow more content */
+            overflow: hidden;   /* Hide overflow, handled by internal scroll */
+            padding: 10px;      /* Adjust padding for better spacing */
+            background-color: rgb(194, 234, 220); /* Light green background */
+            border: 1px solid rgb(10, 191, 83);   /* Green border */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .reply-content {
+            flex: 1; /* Allows the content to grow and fill available space */
+            overflow-y: auto; /* Adds a scrollbar if content exceeds available space */
+            padding-right: 10px; /* Optional: Adds space for the scrollbar */
+            word-wrap: break-word; /* Ensures long words break to avoid overflow */
+            overflow-wrap: break-word; /* Ensures words break as needed */
+        }
+
+        .reply-buttons {
+            margin-top: 10px; /* Reduced margin to decrease space */
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        /* Optional: Style the scrollbar for the reply content */
+        .reply-content::-webkit-scrollbar {
+            width: 4px;
+        }
+        .reply-content::-webkit-scrollbar-thumb {
+            background-color: rgba(0,0,0,0.2);
+            border-radius: 2px;
+        }
+        .reply-content::-webkit-scrollbar-track {
+            background-color: rgba(0,0,0,0.05);
+        }
+
+        /* Optional: Style the scrollbar for the reply area */
+        .reply-area::-webkit-scrollbar {
+            width: 4px;
+        }
+        .reply-area::-webkit-scrollbar-thumb {
+            background-color: rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+        .reply-area::-webkit-scrollbar-track {
+            background-color: rgba(0,0,0,0.05);
+        }
+        /* Flexbox Layout for Reply Buttons Container */
+        .reply-buttons {
+            display: flex;
+            align-items: center; /* Vertically centers the items */
+            margin-top: 10px;    /* Optional: Adjusts top margin */
+        }
+
+        /* Align the Reply Date to the Left */
+        .reply-date {
+            margin-right: auto;      /* Pushes the buttons to the right */
+            font-size: 0.9rem;       /* Optional: Adjusts font size */
+            color: #155724;          /* Optional: Changes text color for better contrast */
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .card-text {
+                max-width: 25ch; /* Further reduces max-width for smaller screens */
+            }
+            .reply-area {
+                max-height: 150px; /* Reduced height for smaller screens */
+            }
+        }
+    </style>
+
+
+</head>
+<body>
+<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">Reply to Reviews</a>
+    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <!-- Logo Image -->
+    <img src="/images/logo.png" alt="Company Logo" class="mx-auto d-block" style="height: 100px; width: auto;">
+    <ul class="navbar-nav px-3">
+        <li class="nav-item dropdown text-nowrap">
+            <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell">
+                    <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                <span class="badge bg-danger">3</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+                <li>
+                    <h6 class="dropdown-header">New Bookings</h6>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="manageBookings.html">
+                        John Doe - Luxury Beach Escape <br>
+                        <small>Booking Date: 2024-09-15</small>
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="manageBookings.html">
+                        Jane Smith - Mountain Adventure <br>
+                        <small>Booking Date: 2024-09-16</small>
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="manageBookings.html">
+                        Michael Johnson - City Tour <br>
+                        <small>Booking Date: 2024-09-17</small>
+                    </a>
+                </li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li>
+                    <a class="dropdown-item btn btn-primary btn-custom" href="manageBookings.html">Go to Manage Bookings</a>
+                </li>
+            </ul>
+        </li>
+        <li class="nav-item text-nowrap">
+            <a class="nav-link" href="#" onclick="showSignOutModal()">Sign out</a>
+        </li>
+    </ul>
+</header>
+<div class="container-fluid">
+    <div class="row">
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" th:href="@{/ProviderDashboard}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                 class="feather feather-home">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link " th:href="@{/ProviderDashboard}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                 class="feather feather-home">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            Dashboard
+                        </a>
+                    </li>
+                    <!-- Manage Bookings Link in Sidebar -->
+                    <li class="nav-item">
+                        <a class="nav-link " th:href="@{/provider/manageBookings}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                 class="feather feather-calendar">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            Manage Bookings
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link " th:href="@{/provider/managePackages}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                 class="feather feather-layers">
+                                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                                <polyline points="2 17 12 22 22 17"></polyline>
+                                <polyline points="2 12 12 17 22 12"></polyline>
+                            </svg>
+                            Manage Packages
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/provider/replyToReviews}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                 class="feather feather-users">
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                            Reviews
+                        </a>
+                    </li>
+                    <!-- Profile Link in Sidebar -->
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/provider/profile}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                 class="feather feather-user">
+                                <path d="M20.5 18.5a6 6 0 0 0-9 0"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            Profile
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <!-- Flash Messages -->
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <span th:text="${successMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Reviews</h1>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6" th:each="review : ${reviews}">
+                    <div class="card mb-4 shadow-sm fixed-card">
+                        <div class="card-body d-flex flex-column">
+                            <!-- Package Image -->
+                            <img th:src="${review.pkg.getImageUrl()}" class="img-fluid package-image" alt="Package Image">
+
+                            <!-- Review Header -->
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="card-title" th:text="${review.pkg.getName()}">Package Name</h5>
+                                <small class="text-muted" th:text="${#temporals.format(review.timestamp, 'dd MMM yyyy HH:mm')}">Date</small>
+                            </div>
+
+                            <!-- Review Content -->
+                            <strong>Comment:</strong>
+                            <p class="card-text" th:text="${review.content}">Review Content</p>
+
+                            <!-- Customer Info with Modal Link -->
+                            <p class="card-text">
+                                <strong>By:</strong>
+                                <a href="#" data-bs-toggle="modal" th:data-bs-target="'#customerInfoModal' + ${review.id}" th:text="${review.getAuthor().getUsername()}" style="color: #0abf53; text-decoration: underline; cursor: pointer;">
+                                    Customer Name
+                                </a>
+                            </p>
+
+                            <!-- Reply Display with Edit and Delete Buttons (Only If There's an Existing Reply) -->
+                            <div th:if="${review.replyContent}" class="alert alert-success reply-area">
+                                <strong>Your Reply:</strong>
+                                <div class="reply-content">
+                                    <p th:text="${review.replyContent}">Provider's reply</p>
+                                </div>
+                                <div class="reply-buttons">
+                                    <small class="reply-date" th:text="${#temporals.format(review.replyTimestamp, 'dd MMM yyyy HH:mm')}">Reply Date</small>
+                                    <div class="button-group">
+                                        <button class="btn btn-sm btn-outline-secondary me-2" type="button" data-bs-toggle="modal" th:data-bs-target="'#editReplyModal' + ${review.id}">
+                                            Edit
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" type="button" data-bs-toggle="modal" th:data-bs-target="'#deleteReplyModal' + ${review.id}">
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-flex justify-content-end mt-2">
+
+                                <!-- Report Button -->
+                                <button class="btn btn-sm btn-outline-warning" type="button" data-bs-toggle="modal" th:data-bs-target="'#reportModal' + ${review.id}">
+                                    Report
+                                </button>
+                            </div>
+
+                            <!-- Reply Form (Only If There's No Existing Reply) -->
+                            <div th:if="${review.replyContent == null}" class="reply-section">
+                                <form th:action="@{/provider/replyToReview}" method="post">
+                                    <input type="hidden" name="reviewId" th:value="${review.id}" />
+
+                                    <div class="mb-3">
+                                        <label for="replyContent" class="form-label">Your Reply:</label>
+                                        <textarea class="form-control" name="replyContent" id="replyContent" rows="3" required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-sm btn-custom">Submit</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Customer Info Modal -->
+                    <div class="modal fade" th:id="'customerInfoModal' + ${review.id}" tabindex="-1" aria-labelledby="customerInfoModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content modal-content-custom">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" th:text="'Customer Information: ' + ${review.getAuthor().getUsername()}">Customer Information</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body text-center">
+                                    <!-- Customer Profile Picture -->
+                                    <img th:src="${review.getAuthor().getProfilePic() != null ? review.getAuthor().getProfilePic() : '/images/default-profile.png'}"
+                                         class="profile-pic mb-3" alt="Profile Picture">
+                                    <!-- Display customer details here -->
+                                    <p><strong>Username:</strong> <span th:text="${review.getAuthor().getUsername()}">Username</span></p>
+                                    <p><strong>Email:</strong> <span th:text="${review.getAuthor().getEmail()}">Email</span></p>
+                                    <!-- Add more customer fields as needed -->
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Edit Modal (Only If There's an Existing Reply) -->
+                    <div th:if="${review.replyContent != null}" class="modal fade" th:id="'editReplyModal' + ${review.id}" tabindex="-1" aria-labelledby="editReplyModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content modal-content-custom">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" th:text="'Edit Reply for Review #' + ${review.id}">Reply</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form th:action="@{/provider/editReply}" method="post">
+                                        <input type="hidden" name="reviewId" th:value="${review.id}" />
+
+
+                                        <div class="mb-3">
+                                            <label for="editReplyContent" class="form-label">Your Reply</label>
+                                            <textarea class="form-control" name="replyContent" id="editReplyContent" rows="3" required th:text="${review.replyContent}"></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-sm btn-custom">Save</button>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delete Reply Modal (Only If There's an Existing Reply) -->
+                    <div th:if="${review.replyContent != null}" class="modal fade" th:id="'deleteReplyModal' + ${review.id}" tabindex="-1" aria-labelledby="deleteReplyModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content modal-content-custom">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" th:text="'Delete Reply for Review #' + ${review.id}">Delete</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to delete your reply to this review?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <form th:action="@{/provider/deleteReply}" method="post">
+                                        <input type="hidden" name="reviewId" th:value="${review.id}" />
+
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Report Modal -->
+                    <div class="modal fade" th:id="'reportModal' + ${review.id}" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content modal-content-custom">
+                                <form th:action="@{/reports/create}" method="post">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" th:text="'Report Review #' + ${review.id}">Report Review</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <input type="hidden" name="reviewId" th:value="${review.id}" />
+
+
+                                        <div class="mb-3">
+                                            <label for="reason" class="form-label">Reason for Report</label>
+                                            <textarea class="form-control" name="reason" id="reason" rows="3" required></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-warning">Submit</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Display a message if there are no reviews -->
+                <div th:if="${#lists.isEmpty(reviews)}" class="col-12">
+                    <div class="alert alert-info text-center" role="alert">
+                        No reviews available.
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<!-- Sign Out Confirmation Modal -->
+<div class="modal fade" id="signOutModal" tabindex="-1" aria-labelledby="signOutModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content modal-content-custom">
+            <div class="modal-header">
+                <h5 class="modal-title" id="signOutModalLabel">Confirm Sign Out</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to sign out?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                <button type="button" class="btn btn-danger" id="confirmSignOutButton">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Bootstrap JS and Feather Icons -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    document.addEventListener('DOMContentLoaded', function () {
+        feather.replace();
+
+        // Handle Sign Out Modal
+        window.showSignOutModal = function() {
+            var signOutModal = new bootstrap.Modal(document.getElementById('signOutModal'));
+            signOutModal.show();
+        }
+
+        document.getElementById('confirmSignOutButton').addEventListener('click', function () {
+            // Redirect to the sign-out page
+            window.location.href = "/LoginChoice";
+        });
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

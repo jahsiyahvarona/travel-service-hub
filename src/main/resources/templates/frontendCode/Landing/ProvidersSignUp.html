@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- Required Meta Tags and CSS Links -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Provider Sign Up - Travel Services Hub</title>
+    <link rel="shortcut icon" href="./favicon.ico">
+
+    <!-- CSS Files -->
+    <link th:href="@{/CSS/css/theme.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/CSS/Downloads/TravelServicesHub/css/theme.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/CSS/assets/vendor/bootstrap-icons/font/bootstrap-icons.css}" rel="stylesheet">
+    <link th:href="@{/CSS/pinekit_theme/pinekit.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/CSS/css/style.css}" rel="stylesheet">
+    <link th:href="@{/css/custom-styles.css}" rel="stylesheet" type="text/css">
+    <style>
+        .bordered-preview {
+            border: 2px solid #0abf53; /* Company color */
+            padding: 4px; /* Optional: space between the image and the border ring */
+        }
+    </style>
+
+
+    <!-- Bootstrap Icons -->
+    <link th:href="@{/assets/vendor/bootstrap-icons/font/bootstrap-icons.css}" rel="stylesheet">
+</head>
+<body>
+<header>
+    <nav class="bg-white navbar navbar-expand-lg navbar-light">
+        <div class="container" style="margin-left: -24px;">
+            <a class="navbar-brand" th:href="@{/welcome}">
+                <img class="navbar-brand-logo" th:src="@{/images/logo.png}" alt="Image Description">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown-1" aria-controls="navbarNavDropdown-1" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown-1">
+                <ul class="ms-auto navbar-nav">
+                    <li class="nav-item">
+                        <a class="active nav-link" aria-current="page" th:href="@{/welcome}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/about}">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/services}">Services</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+<main role="main">
+    <div class="container my-5">
+        <div class="row">
+            <!-- Left Side Section: Form -->
+            <div class="col-md-8">
+                <h1 class="display-4 text-center">Create Your Provider Account</h1>
+                <p class="fs-5 text-center">Join Travel Services Hub and offer your services!</p>
+                <div class="row justify-content-center">
+                    <div class="col-md-10">
+                        <!-- Display registration errors -->
+                        <div th:if="${registrationError}" class="error-message mt-1">
+                            <p th:text="${registrationError}" class="error-message mt-1"></p>
+                        </div>
+                        <!-- Form to Create New Provider -->
+                        <form th:action="@{/ProvidersSignUp}" method="post" enctype="multipart/form-data" id="signupForm">
+                            <!-- Username -->
+                            <div class="form-group mb-3">
+                                <label for="username">Username</label>
+                                <input type="text" class="form-control" id="username" name="username"
+                                       placeholder="Enter username" required maxlength="15">
+                            </div>
+
+                            <!-- Email -->
+                            <div class="form-group mb-3">
+                                <label for="email">Email address</label>
+                                <input type="email" class="form-control" id="email" name="email"
+                                       placeholder="Enter email" required>
+                            </div>
+                            <!-- Password -->
+                            <div class="form-group mb-3">
+                                <label for="password">Password</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="password" name="password"
+                                           placeholder="Enter password" required minlength="8">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password')">
+                                        <i class="bi-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Confirm Password -->
+                            <div class="form-group mb-3">
+                                <label for="confirmPassword">Confirm Password</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
+                                           placeholder="Confirm password" required minlength="8">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('confirmPassword')">
+                                        <i class="bi-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Profile Picture -->
+                            <div class="form-group mb-4">
+                                <label for="profilePic">Profile Picture or Logo (optional)</label>
+                                <input type="file" class="form-control" id="profilePic" name="profilePic" accept=".jpeg, .jpg, .png">
+                                <small class="form-text text-muted">Only JPEG, JPG, and PNG files are allowed.</small>
+                            </div>
+
+                            <!-- New Image Preview (hidden initially) -->
+                            <div class="mb-3" id="newImagePreviewContainer" style="display: none;">
+                                <label class="form-label">Preview:</label>
+                                <img id="newImagePreview" src="" alt="New Image Preview" class="img-fluid bordered-preview" style="max-height: 200px; max-width: 200px; min-height: 200px; min-width: 200px; object-fit: cover;">
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-primary">Create a Provider Account</button>
+                            <a th:href="@{/signUpChoice}" class="btn btn-secondary ml-2">Cancel</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- Right Side Section -->
+            <div class="col-md-4 d-flex flex-column justify-content-center p-5"
+                 style="
+                     background-color: #0abf53;
+                     background-image: url('/images/An airplane flying over the horizon, representing the ease and accessibility of travel through the p.jpg');
+                     background-size: cover;
+                     background-position: center;
+                     background-repeat: no-repeat;
+                 ">
+                <h5 class="mb-4" style="color: #ffffff;  font-weight: bold; font-size: 22px">
+                    Build unforgettable travel experiences for your customers by:
+                </h5>
+                <ul class="list-checked list-checked-primary list-py-2">
+                    <li class="list-checked-item" style="color: #ffffff; font-weight: bold; font-size: 20px;">
+                        Creating the best packages!
+                    </li>
+                    <li class="list-checked-item" style="color: #ffffff; font-weight: bold; font-size: 20px;">
+                        Offering the best prices!
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- JavaScript Files -->
+<script th:src="@{/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js}"></script>
+<!-- Include your JavaScript validation script -->
+<script th:src="@{/js/provider-signup-validation.js}"></script>
+<script>
+    function togglePassword(fieldId) {
+        const field = document.getElementById(fieldId);
+        const type = field.getAttribute('type') === 'password' ? 'text' : 'password';
+        field.setAttribute('type', type);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const signupForm = document.getElementById('signupForm');
+
+        // Event listener for profile picture preview
+        document.getElementById('profilePic').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const fileType = file.type.toLowerCase();
+                if (fileType === "image/jpeg" || fileType === "image/png" || fileType === "image/jpg") {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('newImagePreview').src = e.target.result;
+                        document.getElementById('newImagePreviewContainer').style.display = 'block'; // Show the preview
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    alert("Please select a valid image file (JPEG, JPG, PNG).");
+                    // Clear the file input if the file type is incorrect
+                    event.target.value = "";
+                    document.getElementById('newImagePreviewContainer').style.display = 'none';
+                }
+            }
+        });
+
+        signupForm.addEventListener('submit', function (event) {
+            let isValid = true;
+            const username = document.getElementById('username');
+            const email = document.getElementById('email');
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+            const termsCheckbox = document.getElementById('termsCheckbox');
+
+            // Clear previous error messages
+            clearError(username);
+            clearError(email);
+            clearError(password);
+            clearError(confirmPassword);
+            clearError(termsCheckbox);
+
+            // Validate username, email, password, confirm password, terms checkbox
+            if (username.value.trim() === '') {
+                showError(username, 'Username is required');
+                isValid = false;
+            } else if (username.value.length > 15 || username.value.length < 6) {
+                showError(username, 'Username must be 6-15 characters');
+                isValid = false;
+            }
+
+            if (email.value.trim() === '' || !validateEmail(email.value.trim())) {
+                showError(email, 'Please enter a valid email address');
+                isValid = false;
+            }
+
+            if (password.value.trim() === '' || password.value.length < 8) {
+                showError(password, 'Password must be at least 8 characters');
+                isValid = false;
+            }
+
+            if (confirmPassword.value.trim() === '' || password.value !== confirmPassword.value) {
+                showError(confirmPassword, 'Passwords do not match');
+                isValid = false;
+            }
+
+            if (!termsCheckbox.checked) {
+                showError(termsCheckbox.parentElement, 'You must accept the Terms and Conditions');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+
+        function showError(element, message) {
+            const formGroup = element.parentElement;
+            let error = formGroup.querySelector('.error-message');
+            if (!error) {
+                error = document.createElement('div');
+                error.className = 'error-message mt-1';
+                formGroup.appendChild(error);
+            }
+            error.innerText = message;
+        }
+
+        function clearError(element) {
+            const formGroup = element.parentElement;
+            const error = formGroup.querySelector('.error-message');
+            if (error) {
+                error.remove();
+            }
+        }
+
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+    });
+</script>
+</body>
+</html>

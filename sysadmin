@@ -1,0 +1,76 @@
+-- Users Table
+CREATE TABLE Users (
+    UserID INT PRIMARY KEY AUTO_INCREMENT,
+    Username VARCHAR(50) NOT NULL,
+    Role ENUM('customer', 'provider', 'admin') NOT NULL,
+    Status ENUM('active', 'suspended', 'banned') DEFAULT 'active',
+    Created_At TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    Updated_At TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Travel_Packages Table
+CREATE TABLE Travel_Packages (
+    PackageID INT PRIMARY KEY AUTO_INCREMENT,
+    AgentID INT NOT NULL,
+    Description TEXT NOT NULL,
+    Location VARCHAR(100) NOT NULL,
+    Price DECIMAL(10, 2) NOT NULL,
+    Status ENUM('available', 'unavailable') DEFAULT 'available',
+    Created_At TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    Updated_At TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (AgentID) REFERENCES Users(UserID) ON DELETE CASCADE
+);
+
+-- Bookings Table
+CREATE TABLE Bookings (
+    BookingID INT PRIMARY KEY AUTO_INCREMENT,
+    UserID INT NOT NULL,
+    PackageID INT NOT NULL,
+    BookingDate DATE NOT NULL,
+    Status ENUM('confirmed', 'pending', 'canceled') DEFAULT 'confirmed',
+    Created_At TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE,
+    FOREIGN KEY (PackageID) REFERENCES Travel_Packages(PackageID) ON DELETE CASCADE
+);
+
+-- Reviews Table
+CREATE TABLE Reviews (
+    ReviewID INT PRIMARY KEY AUTO_INCREMENT,
+    UserID INT NOT NULL,
+    PackageID INT NOT NULL,
+    Content TEXT NOT NULL,
+    Rating DECIMAL(2, 1) CHECK (Rating >= 1 AND Rating <= 5),
+    Status ENUM('active', 'flagged', 'deleted') DEFAULT 'active',
+    Created_At TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE,
+    FOREIGN KEY (PackageID) REFERENCES Travel_Packages(PackageID) ON DELETE CASCADE
+);
+
+-- Provider_Statistics Table
+CREATE TABLE Provider_Statistics (
+    StatID INT PRIMARY KEY AUTO_INCREMENT,
+    PackageID INT NOT NULL,
+    Views INT DEFAULT 0,
+    Bookings INT DEFAULT 0,
+    Rating DECIMAL(2, 1) DEFAULT 0,
+    FOREIGN KEY (PackageID) REFERENCES Travel_Packages(PackageID) ON DELETE CASCADE
+);
+
+-- Flagged_Content Table
+CREATE TABLE Flagged_Content (
+    ContentID INT PRIMARY KEY AUTO_INCREMENT,
+    ContentType ENUM('service', 'review') NOT NULL,
+    FlaggedBy INT NOT NULL,
+    FlagReason VARCHAR(255),
+    DateFlagged TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    Status ENUM('pending', 'resolved', 'ignored') DEFAULT 'pending',
+    FOREIGN KEY (FlaggedBy) REFERENCES Users(UserID) ON DELETE SET NULL
+);
+
+-- Usage_Statistics Table
+CREATE TABLE Usage_Statistics (
+    StatID INT PRIMARY KEY AUTO_INCREMENT,
+    MetricType ENUM('active_users', 'bookings', 'views', 'average_rating') NOT NULL,
+    Value DECIMAL(10, 2),
+    DateRange DATE NOT NULL
+);

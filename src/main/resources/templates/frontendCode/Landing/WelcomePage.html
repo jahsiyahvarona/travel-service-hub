@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" data-pgc-set-master>
+<head>
+    <!-- Required Meta Tags Always Come First -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Pinekit Template</title>
+    <link rel="shortcut icon" href="./favicon.ico">
+
+    <!-- CSS Files -->
+    <link th:href="@{/CSS/css/theme.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/CSS/Downloads/TravelServicesHub/css/theme.css}" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" th:href="@{/CSS/assets/vendor/bootstrap-icons/font/bootstrap-icons.css}">
+    <link th:href="@{/CSS/pinekit_theme/pinekit.css}" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" th:href="@{/CSS/css/style.css}">
+
+    <!-- Pinegrow Interactions Script -->
+    <script>
+        /* Pinegrow Interactions, do not remove */
+        (function(){
+            try{
+                if(!document.documentElement.hasAttribute('data-pg-ia-disabled')) {
+                    window.pgia_small_mq = typeof pgia_small_mq == 'string' ? pgia_small_mq : '(max-width:767px)';
+                    window.pgia_large_mq = typeof pgia_large_mq == 'string' ? pgia_large_mq : '(min-width:768px)';
+                    var style = document.createElement('style');
+                    var pgcss = 'html:not(.pg-ia-no-preview) [data-pg-ia-hide=""] {opacity:0;visibility:hidden;}html:not(.pg-ia-no-preview) [data-pg-ia-show=""] {opacity:1;visibility:visible;display:block;}';
+                    if(document.documentElement.hasAttribute('data-pg-id') && document.documentElement.hasAttribute('data-pg-mobile')) {
+                        pgia_small_mq = '(min-width:0)';
+                        pgia_large_mq = '(min-width:99999px)';
+                    }
+                    pgcss += '@media ' + pgia_small_mq + '{ html:not(.pg-ia-no-preview) [data-pg-ia-hide="mobile"] {opacity:0;visibility:hidden;}html:not(.pg-ia-no-preview) [data-pg-ia-show="mobile"] {opacity:1;visibility:visible;display:block;}}';
+                    pgcss += '@media ' + pgia_large_mq + '{html:not(.pg-ia-no-preview) [data-pg-ia-hide="desktop"] {opacity:0;visibility:hidden;}html:not(.pg-ia-no-preview) [data-pg-ia-show="desktop"] {opacity:1;visibility:visible;display:block;}}';
+                    style.innerHTML = pgcss;
+                    document.querySelector('head').appendChild(style);
+                }
+            } catch(e) { console && console.log(e); }
+        })()
+    </script>
+</head>
+<body>
+<header>
+    <nav class="bg-white navbar navbar-expand-lg navbar-light">
+        <div class="container" style="margin-left: -24px;">
+            <a class="navbar-brand" th:href="@{/welcome}">
+                <img class="navbar-brand-logo" th:src="@{/images/logo.png}" alt="Image Description">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown-1" aria-controls="navbarNavDropdown-1" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown-1">
+                <ul class="ms-auto navbar-nav">
+                    <li class="nav-item">
+                        <a class="active nav-link" aria-current="page" th:href="@{/welcome}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/about}">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/services}">Services</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+<main role="main">
+    <!-- Hero Section -->
+    <div class="container content-space-t-3 lib-hero" style="margin-top: 3px;">
+        <div class="align-items-lg-center bg-gradient bg-light border-white justify-content-lg-between rounded rounded-5 row" style="margin-top: -79px;">
+            <div class="col-lg-5 mb-5 mb-lg-0">
+                <div class="mb-5">
+                    <h1 class="display-4 text-dark mb-5">Start your journey with <span class="text-primary">TSH</span></h1>
+                    <p class="fs-3">Connecting you with top travel agents, personalized vacation packages, and seamless booking for your perfect getaway.</p>
+                </div>
+                <div class="d-grid d-sm-flex gap-3 mb-5">
+                    <a class="btn btn-ghost-dark btn-pointer" th:href="@{/LoginChoice}">Sign in</a>
+                    <a class="btn btn-primary" th:href="@{/signUpChoice}" style="box-shadow: #706666;">SIGN UP</a>
+                </div>
+            </div>
+            <!-- End Col -->
+            <div class="col-lg-6">
+                <div class="position-relative">
+                    <img class="border-4 float-end position-relative rounded-5 sticky-top vw-100" th:src="@{/images/An airplane flying over the horizon, representing the ease and accessibility of travel through the p (1).jpg}" alt="Airplane Image" style="max-width: 30rem;">
+                </div>
+            </div>
+            <!-- End Col -->
+        </div>
+        <!-- End Row -->
+    </div>
+    <!-- End Hero Section -->
+
+    <!-- Features Section -->
+    <div class="container content-space-t-2 content-space-t-lg-3 lib-content" style="margin-top: -65px;">
+        <div class="row justify-content-lg-between align-items-lg-center" style="padding-left: 48px;">
+            <div class="col-lg-6 mb-5 mb-lg-0">
+                <img class="img-fluid rounded-3" th:src="@{/images/travel agents working on their projects in a tour agency.jpg}" alt="Travel Agents">
+            </div>
+            <!-- End Col -->
+            <div class="col-lg-5 mt-auto">
+                <div class="mb-5">
+                    <h2 style="margin-top: -23px;">We tackle the challenges of vacation planning</h2>
+                    <p>As a partner in connecting travelers to expert agents, we’ve designed services that simplify the entire process of finding and booking vacation packages. Our platform addresses common travel challenges with the following key benefits:</p>
+                </div>
+                <!-- List Checked -->
+                <ul class="list-checked list-checked-soft-bg-primary list-checked-lg mb-5" style="margin-top: -14px;">
+                    <li class="list-checked-item">
+                        <span class="fw-bold">Quick &amp; easy</span> bookings
+                    </li>
+                    <li class="list-checked-item">Customized vacation packages</li>
+                    <li class="list-checked-item">Seamless customer experience</li>
+                </ul>
+                <!-- End List Checked -->
+                <a class="btn btn-primary" th:href="@{/services}">Our services</a>
+            </div>
+            <!-- End Col -->
+        </div>
+        <!-- End Row -->
+    </div>
+    <!-- End Features Section -->
+</main>
+<footer class="bg-dark mt-5 pt-0" style="padding-left: 0px; padding-right: 0px; margin-right: -1px; margin-left: -3px; padding-top: 89px; margin-top: 17px;">
+    <div class="container">
+        <div class="align-items-center pb-0 pt-8 row">
+            <div class="col-md mb-5 mb-md-0">
+                <h2 class="fw-medium text-white-70 mb-0">Your dream vacation awaits, join <span class="text-white"><b>TSH</b></span> today!!!</h2>
+            </div>
+            <!-- End Col -->
+            <div class="col-md-auto">
+                <div class="d-grid d-sm-flex gap-3 mb-n5">
+                    <a class="btn btn-primary" th:href="@{/signUpChoice}">Sign up FREE</a>
+                    <a class="btn btn-ghost-light btn-pointer" th:href="@{/LoginChoice}">Login</a>
+                </div>
+            </div>
+            <!-- End Col -->
+        </div>
+        <!-- End Row -->
+        <div class="border-bottom border-white-10">
+            <div class="pt-0 py-6 row">
+                <div class="col-6 col-sm-4 col-lg mb-7 mb-lg-0">
+                    <!-- Footer Links -->
+                    <ul class="list-unstyled list-py-1 mb-0">
+                        <li>
+                            <a class="link link-light link-light-75" th:href="@{/welcome}">Home</a>
+                        </li>
+                        <li>
+                            <a class="link link-light link-light-75" th:href="@{/services}">Services</a>
+                        </li>
+                        <li>
+                            <a class="link link-light link-light-75" th:href="@{/about}">About</a>
+                        </li>
+                        <li>
+                            <a class="link link-light-75 link-primary" th:href="@{/SysAdminLogin}">Admin Login</a>
+                        </li>
+                    </ul>
+                    <!-- End Footer Links -->
+                </div>
+                <!-- End Col -->
+            </div>
+            <!-- End Row -->
+        </div>
+        <div class="row align-items-md-center py-6">
+            <div class="col-md mb-3 mb-md-0">
+                <!-- Footer Navigation -->
+                <ul class="list-inline list-px-2 mb-0">
+                    <li class="list-inline-item">
+                        <a class="link link-light link-light-75" href="#">Privacy and Policy</a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a class="link link-light link-light-75" href="#">Terms</a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a class="link link-light link-light-75" href="#">Status</a>
+                    </li>
+                    <li class="list-inline-item">
+                        <!-- Language Selector -->
+                        <div class="btn-group">
+                            <a class="link link-light link-light-75" href="#" id="selectLanguage" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span class="d-flex align-items-center">
+                                            <img class="avatar avatar-xss avatar-circle me-2" th:src="@{/images/logo.png}" alt="Image description" width="30"/>
+                                        </span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item d-flex align-items-center active" href="#">
+                                    <img class="avatar avatar-xss avatar-circle me-2" src="assets/vendor/flag-icon-css/flags/1x1/us.svg" alt="English" width="16"/>
+                                    <span>English</span>
+                                </a>
+                                <!-- Add other languages if needed -->
+                            </div>
+                        </div>
+                        <!-- End Language Selector -->
+                    </li>
+                </ul>
+                <!-- End Footer Navigation -->
+            </div>
+            <!-- End Col -->
+            <div class="col-md-auto">
+                <p class="fs-5 text-white-70 mb-0">&copy; TSH 2024</p>
+            </div>
+            <!-- End Col -->
+        </div>
+        <!-- End Row -->
+    </div>
+</footer>
+
+<!-- JavaScript Files -->
+<script th:src="@{/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/pgia/lib/pgia.js}"></script>
+</body>
+</html>
