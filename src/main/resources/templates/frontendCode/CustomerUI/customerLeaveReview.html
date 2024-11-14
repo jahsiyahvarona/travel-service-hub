@@ -1,60 +1,173 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <title>Leave a Review · Travel Services Hub</title>
-    <!-- Bootstrap core CSS from CDN -->
+    <!-- Bootstrap core CSS -->
+    <link href="/CSS/bootstrap_theme/bootstrap.css" rel="stylesheet" type="text/css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../../../static/CSS/dashboard.css" rel="stylesheet">
+    <link href="/CSS/dashboard.css" rel="stylesheet">
+    <link href="/CSS/chartjs.css" rel="stylesheet">
+    <link href="/CSS/BellDropdown.css" rel="stylesheet">
+    <style>
+        .btn-custom { background-color: #0abf53; color: white; border: none; }
+        .btn-custom:hover { background-color: #089e45; }
+        .review-input { margin-top: 10px; }
+        .card { margin-bottom: 20px; }
+    </style>
 </head>
 <body>
 <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">Customer Dashboard</a>
-    <img src="../../../static/images/logo.png" alt="Company Logo" style="height: 100px; width: auto;">
+    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">Leave a Review</a>
+    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
+            data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <img src="/images/logo.png" alt="Company Logo" class="mx-auto d-block" style="height: 100px; width: auto;">
     <ul class="navbar-nav px-3">
         <li class="nav-item text-nowrap">
-            <a class="nav-link" href="../Landing/loginChoice.html">Sign out</a>
+            <a class="nav-link" href="#" onclick="showSignOutModal()">Sign out</a>
         </li>
     </ul>
 </header>
+
 <div class="container-fluid">
     <div class="row">
         <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
             <div class="position-sticky pt-3">
                 <ul class="nav flex-column">
-                    <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="customerViewBookings.html">My Bookings</a></li>
-                    <li class="nav-item"><a class="nav-link" href="customerViewPackages.html">Explore Packages</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="customerLeaveReview.html">Leave a Review</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/CustomerDashboard}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                 class="feather feather-home">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/customer/bookings}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                 class="feather feather-calendar">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            My Bookings
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/customer/reviews}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                 class="feather feather-message-square">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            Leave a Review
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/customer/profile}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                 class="feather feather-user">
+                                <path d="M20.5 18.5a6 6 0 0 0-9 0"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            Profile
+                        </a>
+                    </li>
                 </ul>
             </div>
         </nav>
+
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <h1 class="h2">Leave a Review</h1>
-            <p>We appreciate your feedback. Please let us know about your experience with us:</p>
-            <form>
-                <div class="mb-3">
-                    <label for="serviceRating" class="form-label">Rating</label>
-                    <select class="form-select" id="serviceRating">
-                        <option selected>Choose...</option>
-                        <option value="1">1 - Poor</option>
-                        <option value="2">2 - Fair</option>
-                        <option value="3">3 - Good</option>
-                        <option value="4">4 - Very Good</option>
-                        <option value="5">5 - Excellent</option>
-                    </select>
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Your Bookings - Leave a Review</h1>
+            </div>
+
+            <div class="row">
+                <!-- Sample booking cards for prototype -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <img src="/images/sample1.jpg" class="card-img-top" alt="Sample Package 1">
+                        <div class="card-body">
+                            <h5 class="card-title">Luxury Beach Escape</h5>
+                            <p class="card-text">A relaxing getaway at a pristine beach resort.</p>
+                            <div class="review-input">
+                                <textarea class="form-control" id="review1" rows="3" placeholder="Write your review..."></textarea>
+                                <button class="btn btn-sm btn-custom mt-2" onclick="submitReview('review1')">Submit Review</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="reviewText" class="form-label">Your Review</label>
-                    <textarea class="form-control" id="reviewText" rows="3"></textarea>
+                <div class="col-md-6">
+                    <div class="card">
+                        <img src="/images/sample2.jpg" class="card-img-top" alt="Sample Package 2">
+                        <div class="card-body">
+                            <h5 class="card-title">Mountain Adventure</h5>
+                            <p class="card-text">Explore breathtaking mountain landscapes.</p>
+                            <div class="review-input">
+                                <textarea class="form-control" id="review2" rows="3" placeholder="Write your review..."></textarea>
+                                <button class="btn btn-sm btn-custom mt-2" onclick="submitReview('review2')">Submit Review</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-custom">Submit Review</button>
-            </form>
+            </div>
         </main>
     </div>
 </div>
+
+<!-- Sign Out Modal -->
+<div class="modal fade" id="signOutModal" tabindex="-1" aria-labelledby="signOutModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="signOutModalLabel">Confirm Sign Out</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to sign out?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                <button type="button" class="btn btn-danger" id="confirmSignOutButton">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS and Feather Icons -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js"></script>
+<script>
+    feather.replace();
+
+    function submitReview(reviewId) {
+        const reviewContent = document.getElementById(reviewId).value;
+        if (reviewContent.trim()) {
+            alert("Review submitted: " + reviewContent);
+            document.getElementById(reviewId).value = ""; // Clear the review field
+        } else {
+            alert("Please write a review before submitting.");
+        }
+    }
+
+    function showSignOutModal() {
+        var signOutModal = new bootstrap.Modal(document.getElementById('signOutModal'));
+        signOutModal.show();
+    }
+
+    document.getElementById('confirmSignOutButton').addEventListener('click', function () {
+        window.location.href = "/LoginChoice";
+    });
+</script>
 </body>
 </html>

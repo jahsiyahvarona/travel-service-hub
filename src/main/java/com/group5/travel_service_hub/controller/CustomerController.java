@@ -1,99 +1,170 @@
+
 package com.group5.travel_service_hub.controller;
 
+import com.group5.travel_service_hub.entity.Booking;
+import com.group5.travel_service_hub.entity.Package;
 import com.group5.travel_service_hub.entity.User;
+import com.group5.travel_service_hub.service.BookingService;
+import com.group5.travel_service_hub.service.PackageService;
 import com.group5.travel_service_hub.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-/**
- * REST controller for managing User as Customer.
- */
-@RestController
-@RequestMapping("/api/customer")
+@Controller
+@RequestMapping("/customer")
 public class CustomerController {
 
     private final UserService userService;
+    private final BookingService bookingService;
+    private final PackageService packageService;
 
     @Autowired
-    public CustomerController(UserService userService) {
+    public CustomerController(UserService userService, BookingService bookingService, PackageService packageService) {
         this.userService = userService;
+        this.bookingService = bookingService;
+        this.packageService = packageService;
+    }
+
+    /**
+     * Displays the Customer Dashboard.
+     */
+    @GetMapping("/dashboard")
+    public String showDashboard(HttpSession session, Model model) {
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/login";
+        }
+
+        User customer = userService.findByUsername(loggedInUser.getUsername());
+        model.addAttribute("customer", customer);
+        model.addAttribute("totalSpending", 4300);  // Example value
+        model.addAttribute("totalBookings", 10);    // Example value
+        model.addAttribute("favoritePackage", "Jamaica"); // Example value
+
+        return "frontendCode/CustomerUI/customerDashboard";
+    }
+
+    /**
+     * Displays the customer's bookings.
+     */
+    @GetMapping("/bookings")
+    public String viewBookings(HttpSession session, Model model) {
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/login";
+        }
+
+        List<Booking> bookings = bookingService.getBookingsByCustomerId(loggedInUser.getId());
+        model.addAttribute("bookings", bookings);
+
+        return "frontendCode/CustomerUI/customerViewBookings";
+    }
+
+    /**
+     * Displays available packages.
+     */
+    @GetMapping("/packages")
+    public String viewPackages(HttpSession session, Model model) {
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/login";
+        }
+
+        // List<Package> packages = packageService.findAllPackages();
+        //   model.addAttribute("packages", packages);
+
+        return "frontendCode/CustomerUI/customerViewPackages";
+    }
+
+    /**
+     * Displays the Leave a Review page.
+     */
+    @GetMapping("/reviews")
+    public String leaveReview(HttpSession session, Model model) {
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/login";
+        }
+
+        //  List<Booking> recentBookings = bookingService.getRecentBookingsByCustomerId(loggedInUser.getId());
+        //  model.addAttribute("recentBookings", recentBookings);
+
+        return "frontendCode/CustomerUI/customerLeaveReview";
+    }
+
+    /**
+     * Submits a review for a booking.
+     */
+    @PostMapping("/reviews/submit")
+    public String submitReview(@RequestParam Long bookingId, @RequestParam String reviewContent, HttpSession session) {
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/login";
+        }
+
+        //  bookingService.addReviewToBooking(bookingId, reviewContent);
+        return "redirect:/customer/reviews?success";
+    }
+
+    /**
+     * Displays the customer's profile.
+     */
+    @GetMapping("/profile")
+    public String viewProfile(HttpSession session, Model model) {
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/login";
+        }
+
+        model.addAttribute("user", loggedInUser);
+        return "frontendCode/CustomerUI/customerProfile";
+    }
+
+    /**
+     * Updates the customer's profile.
+     */
+    @PostMapping("/profile/update")
+    public String updateProfile(@RequestParam Long userId, @ModelAttribute User userDetails, HttpSession session) {
+        User updatedUser = userService.updateProfile(userId, userDetails);
+        session.setAttribute("loggedInUser", updatedUser);
+        return "redirect:/customer/profile";
+    }
+
+    /**
+     * Updates the customer's profile picture.
+     */
+    @PostMapping("/profile/updatePic")
+    public String updateProfilePic(@RequestParam Long userId, @RequestParam("file") MultipartFile file, HttpSession session) {
+        User updatedUser = userService.updateProfilePic(userId, file);
+        session.setAttribute("loggedInUser", updatedUser);
+        return "redirect:/customer/profile";
+    }
+
+    /**
+     * Handles logout and invalidates the session.
+     */
+    @PostMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/login?logout";
     }
 
     /**
      * Registers a new customer.
-     *
-     * @param user The User object with customer details.
-     * @return The created User object.
      */
     @PostMapping("/register")
     public ResponseEntity<User> registerCustomer(@RequestBody User user) {
         User registeredUser = userService.registerUser(user);
         return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
+
     }
 
-    /**
-     * Retrieves all users.
-     *
-     * @return List of all User objects.
-     */
-    @GetMapping("/all")
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.findAllUsers();
-        return new ResponseEntity<>(users, HttpStatus.OK);
-    }
-
-    /**
-     * Retrieves a customer's details by user ID.
-     *
-     * @param userId The ID of the user.
-     * @return User object.
-     */
-    @GetMapping("/details/{userId}")
-    public ResponseEntity<User> getUserDetails(@PathVariable Long userId) {
-        User user = userService.findById(userId);
-        return new ResponseEntity<>(user, HttpStatus.OK);
-    }
-
-    /**
-     * Updates a customer's profile.
-     *
-     * @param userId      The ID of the user.
-     * @param userDetails The User object with updated profile details.
-     * @return The updated User object.
-     */
-    @PutMapping("/update/{userId}")
-    public ResponseEntity<User> updateUserDetails(@PathVariable Long userId, @RequestBody User userDetails) {
-        User updatedUser = userService.updateProfile(userId, userDetails);
-        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
-    }
-
-    /**
-     * Updates the customer's profile picture.
-     *
-     * @param userId The ID of the user.
-     * @param file   The profile picture file.
-     * @return The updated User object.
-     */
-    @PutMapping("/updateProfilePic/{userId}")
-    public ResponseEntity<User> updateProfilePic(@PathVariable Long userId, @RequestParam("file") MultipartFile file) {
-        User updatedUser = userService.updateProfilePic(userId, file);
-        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
-    }
-
-    /**
-     * Deletes the user's account.
-     *
-     * @param userId The ID of the user.
-     * @return Response message indicating successful deletion.
-     */
-    @DeleteMapping("/delete/{userId}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
-        userService.deactivateUser(userId);
-        return new ResponseEntity<>("User account deleted successfully.", HttpStatus.OK);
-    }
 }

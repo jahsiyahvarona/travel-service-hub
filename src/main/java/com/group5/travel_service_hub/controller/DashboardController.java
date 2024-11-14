@@ -1,6 +1,8 @@
 package com.group5.travel_service_hub.controller;
 
-import com.group5.travel_service_hub.entity.*;
+import com.group5.travel_service_hub.entity.Booking;
+import com.group5.travel_service_hub.entity.LikeDislike;
+import com.group5.travel_service_hub.entity.User;
 import com.group5.travel_service_hub.entity.Package;
 import com.group5.travel_service_hub.repository.BookingRepository;
 import com.group5.travel_service_hub.repository.PackageRepository;
@@ -29,8 +31,43 @@ public class DashboardController {
 
 
     @GetMapping("/CostumerDashboard")
-    public String showDashboard() {
-        return "frontendCode/CustomerUI/customerDashboard"; // This is assuming you're using Thymeleaf
+    public String showCustomerDashboard(HttpSession session, Model model) {
+        // Retrieve the logged-in user from the session
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/login"; // Redirect to login if user is not found in the session
+        }
+
+        User customer = userService.findByUsername(loggedInUser.getUsername());
+
+        // Fetch all bookings for the logged-in customer
+        List<Booking> customerBookings = bookingRepository.findByCustomerId(customer.getId());
+
+        // Calculate total spending
+        double totalSpending = customerBookings.stream()
+                .mapToDouble(booking -> booking.getPkg().getPrice())
+                .sum();
+
+        // Calculate total bookings
+        long totalBookings = customerBookings.size();
+
+        // Find the most booked package for the customer
+        Map<Package, Long> bookingsCountByPackage = customerBookings.stream()
+                .collect(Collectors.groupingBy(Booking::getPkg, Collectors.counting()));
+
+        Package favoritePackage = bookingsCountByPackage.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
+
+        // Pass data to the model
+        model.addAttribute("userName", customer.getUsername());
+        model.addAttribute("totalSpending", totalSpending);
+        model.addAttribute("totalBookings", totalBookings);
+        model.addAttribute("favoritePackage", favoritePackage != null ? favoritePackage.getName() : "N/A");
+        model.addAttribute("profilePicUrl", customer.getProfilePic());
+
+        return "frontendCode/CustomerUI/customerDashboard";
     }
 
     @GetMapping("/ProviderDashboard")
@@ -38,52 +75,44 @@ public class DashboardController {
         // Retrieve the logged-in user from the session
         User loggedInUser = (User) session.getAttribute("loggedInUser");
         if (loggedInUser == null) {
-            return "redirect:/ProviderLogin";  // Redirect to login if user is not found in the session
+            return "redirect:/login"; // Redirect to login if user is not found in the session
         }
 
         User provider = userService.findByUsername(loggedInUser.getUsername());
 
-        // Fetch all bookings specific to the provider's packages
-        List<Booking> allBookings = bookingRepository.findAllDistinctBookingsByProviderDetailsId(provider.getId());
+        // Fetch bookings specific to the provider's packages
+        List<Booking> bookings = bookingRepository.findByProvider(provider);
 
-        // Filter confirmed bookings for sales calculations
-        List<Booking> confirmedBookings = allBookings.stream()
-                .filter(booking -> booking.getStatus() == BookingStatus.CONFIRMED)
-                .toList();
-
-        // Aggregate bookings data by month for the booking performance chart (All bookings)
-        Map<String, Long> bookingsCountByMonth = allBookings.stream()
+        // Aggregate bookings data by month for the booking performance chart
+        Map<String, Long> bookingsCountByMonth = bookings.stream()
                 .collect(Collectors.groupingBy(
                         booking -> booking.getTimestamp().getMonth().toString(),
                         Collectors.counting()
                 ));
 
-        // Aggregate sales data by month for the sales performance chart (Only confirmed bookings)
-        Map<String, Double> salesAmountByMonth = confirmedBookings.stream()
+        // Aggregate sales data by month for the sales performance chart
+        Map<String, Double> salesAmountByMonth = bookings.stream()
                 .collect(Collectors.groupingBy(
                         booking -> booking.getTimestamp().getMonth().toString(),
-                        Collectors.summingDouble(Booking::getPrice)
+                        Collectors.summingDouble(booking -> booking.getPkg().getPrice())
                 ));
 
         // Prepare lists for chart data
-        Set<String> allMonthsSet = new HashSet<>();
-        allMonthsSet.addAll(bookingsCountByMonth.keySet());
-        allMonthsSet.addAll(salesAmountByMonth.keySet());
-        List<String> months = new ArrayList<>(allMonthsSet);
+        List<String> months = new ArrayList<>(bookingsCountByMonth.keySet());
         // Sort months in chronological order
         months.sort(Comparator.comparingInt(month -> Month.valueOf(month.toUpperCase()).getValue()));
 
         List<Long> bookingData = months.stream()
-                .map(month -> bookingsCountByMonth.getOrDefault(month, 0L))
+                .map(bookingsCountByMonth::get)
                 .collect(Collectors.toList());
 
         List<Double> salesData = months.stream()
-                .map(month -> salesAmountByMonth.getOrDefault(month, 0.0))
+                .map(salesAmountByMonth::get)
                 .collect(Collectors.toList());
 
-        // Calculate total sales from confirmed bookings
-        double totalSales = confirmedBookings.stream()
-                .mapToDouble(Booking::getPrice)
+        // Calculate total sales
+        double totalSales = bookings.stream()
+                .mapToDouble(booking -> booking.getPkg().getPrice())
                 .sum();
 
         // Find the most liked package
@@ -106,7 +135,7 @@ public class DashboardController {
         }
 
         // Find the most booked package
-        Map<Package, Long> bookingsCountByPackage = confirmedBookings.stream()
+        Map<Package, Long> bookingsCountByPackage = bookings.stream()
                 .collect(Collectors.groupingBy(Booking::getPkg, Collectors.counting()));
 
         Package mostBookedPackage = bookingsCountByPackage.entrySet().stream()
@@ -126,8 +155,8 @@ public class DashboardController {
             // If Package has a 'status' field, uncomment the line below
             // packageStatusForMostBooked = mostBookedPackage.getStatus();
         }
-
-        // Add data to the model
+// Add profile picture URL to the model
+        // Pass data to the model
         model.addAttribute("profilePicUrl",provider.getProfilePic());
         model.addAttribute("providerName", provider.getUsername());
         model.addAttribute("months", months);
@@ -143,7 +172,7 @@ public class DashboardController {
         model.addAttribute("likesCountForMostBooked", likesCountForMostBooked);
         model.addAttribute("packageStatusForMostBooked", packageStatusForMostBooked);
 
-        return "frontendCode/ProviderUI/dashboard"; // Replace with your actual dashboard view name
+        return "frontendCode/ProviderUI/dashboard";
     }
 
 
