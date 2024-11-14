@@ -1,65 +1,236 @@
-<!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" >
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <title>Dashboard · Travel Services Hub</title>
-    <!-- Bootstrap core CSS from CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Meta Tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard · Travel Services Hub</title>
+    <!-- Bootstrap CSS -->
+    <link href="/CSS/bootstrap_theme/bootstrap.css" rel="stylesheet" type="text/css">
     <link href="/CSS/dashboard.css" rel="stylesheet">
+    <link href="/CSS/BellDropdown.css" rel="stylesheet">
+    <style>
+        .btn-custom {
+            background-color: #0abf53;
+            color: white;
+            border: none;
+        }
+        .btn-custom:hover {
+            background-color: #089e45;
+        }
+    </style>
 </head>
 <body>
+<!-- Header -->
 <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
     <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">Customer Dashboard</a>
-    <img src="../../../static/images/logo.png" alt="Company Logo" style="height: 100px; width: auto;">
+    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
+            data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false"
+            aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <img src="/images/logo.png" alt="Company Logo" class="mx-auto d-block" style="height: 100px; width: auto;">
     <ul class="navbar-nav px-3">
+        <li class="nav-item dropdown text-nowrap">
+            <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button"
+               data-bs-toggle="dropdown" aria-expanded="false">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell">
+                    <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                <span class="badge bg-danger" th:text="${newNotifications}">0</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+                <li><h6 class="dropdown-header">New Notifications</h6></li>
+                <li th:each="notification : ${notifications}">
+                    <a class="dropdown-item" th:href="@{/customer/viewBooking/{id}(id=${notification.bookingId})}">
+                        <span th:text="${notification.message}">Notification Message</span>
+                        <br><small th:text="${notification.date}">Date</small>
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item btn btn-primary btn-custom" th:href="@{/customer/notifications}">View All</a></li>
+            </ul>
+        </li>
+        <!-- Sign Out Link -->
         <li class="nav-item text-nowrap">
-            <a class="nav-link" href="/templates/frontendCode/Landing/loginChoice.html">Sign out</a>
+            <a class="nav-link" href="#" onclick="showSignOutModal()">Sign out</a>
         </li>
     </ul>
 </header>
+
+<!-- Main Container -->
 <div class="container-fluid">
     <div class="row">
+        <!-- Sidebar Navigation -->
         <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
             <div class="position-sticky pt-3">
                 <ul class="nav flex-column">
-                    <li class="nav-item"><a class="nav-link active" href="dashboard.html">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/frontendCode/CustomerUI/customerViewBookings.html">My Bookings</a></li>
-                    <li class="nav-item"><a class="nav-link" href="customerViewPackages.html">Explore Packages</a></li>
-                    <li class="nav-item"><a class="nav-link" href="customerLeaveReview.html">Leave a Review</a></li>
+                    <!-- Dashboard Link -->
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" th:href="@{/CustomerDashboard}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            Dashboard
+                        </a>
+                    </li>
+
+                    <!-- View Packages Link -->
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/customer/packages}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layers">
+                                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                                <polyline points="2 17 12 22 22 17"></polyline>
+                                <polyline points="2 12 12 17 22 12"></polyline>
+                            </svg>
+                            View Packages
+                        </a>
+                    </li>
+
+                    <!-- View Bookings Link -->
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/customer/bookings}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            View Bookings
+                        </a>
+                    </li>
+
+                    <!-- Leave Review Link -->
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/customer/reviews}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            Leave Review
+                        </a>
+                    </li>
+
+                    <!-- Profile Link -->
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/customer/profile}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
+                                <path d="M20.5 18.5a6 6 0 0 0-9 0"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            Profile
+                        </a>
+                    </li>
                 </ul>
             </div>
         </nav>
+
+
+        <!-- Main Content Area -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <h1 class="h2">Welcome, Customer</h1>
-            <div class="pt-3 pb-2 mb-3 border-bottom">
-                <h4>Quick Stats</h4>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="bg-light p-3 border rounded">
-                            <h6>Total Bookings</h6>
-                            <p>2 Trips</p>
+            <h1 class="h2">Welcome, <span th:text="${userName}">Customer</span></h1>
+            <div class="row">
+                <!-- Total Bookings -->
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header">
+                            <h4>Total Bookings</h4>
+                        </div>
+                        <div class="card-body text-center">
+                            <h1 th:text="'$' + ${totalSpending}">4,300</h1>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- Total Spending -->
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header">
+                            <h4>Total Spending</h4>
+                        </div>
+                        <div class="card-body text-center">
+                            <h1 th:text="'$' + ${totalSpending}">6,988</h1>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="bg-light p-3 border rounded">
-                            <h6>Upcoming Trips</h6>
-                            <p>4 Planned</p>
+                </div>
+                <!-- Favorite Package -->
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header">
+                            <h4>Favorite Package</h4>
                         </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="bg-light p-3 border rounded">
-                            <h6>Reviews Made</h6>
-                            <p>5 Reviews</p>
+                        <div class="card-body text-center">
+                            <h5 th:text="${favoritePackage}">Jamaica</h5>
+
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- Additional dynamic content -->
+
+            <!-- Booking Performance Chart -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header">
+                    <h4>Booking Trends</h4>
+                </div>
+                <div class="card-body">
+                    <canvas id="bookingTrendsChart"></canvas>
+                </div>
+            </div>
         </main>
     </div>
 </div>
+
+<!-- Sign Out Modal -->
+<div class="modal fade" id="signOutModal" tabindex="-1" aria-labelledby="signOutModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="signOutModalLabel">Confirm Sign Out</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to sign out?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                <button type="button" class="btn btn-danger" id="confirmSignOutButton">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var ctx = document.getElementById('bookingTrendsChart').getContext('2d');
+        var bookingChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: /*[[${months}]]*/ ["Jan", "Feb", "Mar"],
+                datasets: [{
+                    label: 'Bookings',
+                    data: /*[[${bookingTrends}]]*/ [5, 10, 7],
+                    borderColor: '#0abf53',
+                    backgroundColor: 'rgba(10, 191, 83, 0.2)',
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { yAxes: [{ ticks: { beginAtZero: true } }] }
+            }
+        });
+    });
+
+    function showSignOutModal() {
+        var signOutModal = new bootstrap.Modal(document.getElementById('signOutModal'));
+        signOutModal.show();
+    }
+</script>
 </body>
 </html>
