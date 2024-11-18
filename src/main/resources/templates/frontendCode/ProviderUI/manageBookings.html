@@ -11,38 +11,15 @@
     <link href="/CSS/BellDropdown.css" rel="stylesheet">
     <style>
         /* Consistent button styling */
-        .btn-custom {
-            background-color: #0abf53;
-            color: white;
-            border: none;
-        }
-        .btn-custom:hover {
-            background-color: #089e45;
-        }
         .profile-pic {
             width: 100px;
             height: 100px;
             object-fit: cover;
             border-radius: 50%;
         }
-        .default-package-img {
-            width: 100%;
-            height: auto;
-            max-height: 200px;
-            object-fit: cover;
-        }
+
     </style>
     <style>
-        /* Button Customization */
-        .btn-custom {
-            background-color: #0abf53;
-            color: white;
-            border: none;
-        }
-        .btn-custom:hover {
-            background-color: #089e45;
-        }
-
         /* Package Image Styling */
         .package-image {
             width: 100%;
@@ -73,10 +50,12 @@
         .package-description::-webkit-scrollbar {
             width: 6px;
         }
+
         .package-description::-webkit-scrollbar-thumb {
             background-color: rgba(0, 0, 0, 0.2);
             border-radius: 4px;
         }
+
         .package-description::-webkit-scrollbar-track {
             background-color: rgba(0, 0, 0, 0.05);
         }
@@ -86,6 +65,7 @@
             .package-description {
                 max-height: 120px;
             }
+
             .package-image {
                 max-width: 200px;
             }
@@ -97,10 +77,6 @@
             width: 100%;
         }
 
-        /* Optional: Center Footer Buttons if Needed */
-        /* .modal-footer {
-            justify-content: center;
-        } */
     </style>
 </head>
 <body>
@@ -134,7 +110,9 @@
                 <ul class="nav flex-column">
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" th:href="@{/provider/dashboard}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round" class="feather feather-home">
                                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
                             </svg>
@@ -144,7 +122,9 @@
                     <!-- Dashboard Link -->
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/ProviderDashboard}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round" class="feather feather-home">
                                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
                             </svg>
@@ -251,7 +231,7 @@
                         <td>
                             <a href="#" th:text="${booking.pkg.name}"
                                data-bs-toggle="modal"
-                               th:data-bs-target="'#packageDetailsModal' + ${booking.pkg.id}"
+                               th:data-bs-target="'#packageDetailsModal' + ${booking.id}"
                                style="color: #0abf53;">
                                 Package Name
                             </a>
@@ -260,11 +240,11 @@
                         <td th:text="${booking.status}">Unconfirmed</td>
                         <td>
                             <form th:action="@{/provider/confirmBooking}" method="post" style="display:inline;">
-                                <input type="hidden" name="bookingId" th:value="${booking.id}" />
+                                <input type="hidden" name="bookingId" th:value="${booking.id}"/>
                                 <button class="btn btn-sm btn-outline-success" type="submit">Confirm</button>
                             </form>
                             <form th:action="@{/provider/denyBooking}" method="post" style="display:inline;">
-                                <input type="hidden" name="bookingId" th:value="${booking.id}" />
+                                <input type="hidden" name="bookingId" th:value="${booking.id}"/>
                                 <button class="btn btn-sm btn-outline-danger" type="submit">Deny</button>
                             </form>
                             <!-- Report Button Triggering Modal -->
@@ -310,7 +290,7 @@
                         <td>
                             <a href="#" th:text="${booking.pkg.name}"
                                data-bs-toggle="modal"
-                               th:data-bs-target="'#packageDetailsModal' + ${booking.pkg.id}"
+                               th:data-bs-target="'#packageDetailsModal' + ${booking.id}"
                                style="color: #0abf53;">
                                 Package Name
                             </a>
@@ -320,7 +300,7 @@
                         <td>
                             <!-- Add Unconfirm Button -->
                             <form th:action="@{/provider/unconfirmBooking}" method="post" style="display:inline;">
-                                <input type="hidden" name="bookingId" th:value="${booking.id}" />
+                                <input type="hidden" name="bookingId" th:value="${booking.id}"/>
                                 <button class="btn btn-sm btn-outline-secondary" type="submit">Unconfirm</button>
                             </form>
                         </td>
@@ -345,15 +325,18 @@
         <div class="modal-dialog modal-dialog-centered"> <!-- Added modal-dialog-centered -->
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" th:text="'Customer Profile: ' + ${booking.customer.username}">Customer Profile</h5>
+                    <h5 class="modal-title" th:text="'Customer Profile: ' + ${booking.customer.username}">Customer
+                        Profile</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <!-- Customer Profile Picture -->
                     <img th:src="${booking.customer.profilePic != null ? booking.customer.profilePic : '/images/default-profile.png'}"
                          class="profile-pic mb-3 mx-auto d-block" alt="Profile Picture"> <!-- Centered Image -->
-                    <p class="text-center"><strong>Name:</strong> <span th:text="${booking.customer.username}">John Doe</span></p>
-                    <p class="text-center"><strong>Email:</strong> <span th:text="${booking.customer.email}">john.doe@example.com</span></p>
+                    <p class="text-center"><strong>Name:</strong> <span
+                            th:text="${booking.customer.username}">John Doe</span></p>
+                    <p class="text-center"><strong>Email:</strong> <span th:text="${booking.customer.email}">john.doe@example.com</span>
+                    </p>
                     <!-- Add more customer details as needed -->
                 </div>
                 <div class="modal-footer justify-content-center"> <!-- Centered Footer Buttons -->
@@ -366,15 +349,16 @@
 <!-- Modals for Package Details -->
 <div th:each="booking : ${bookings}">
     <div class="modal fade"
-         th:id="'packageDetailsModal' + ${booking.pkg.id}"
+         th:id="'packageDetailsModal' + ${booking.id}"
          tabindex="-1"
-         aria-labelledby="'packageDetailsModalLabel' + ${booking.pkg.id}"
+         aria-labelledby="'packageDetailsModalLabel' + ${booking.id}"
          aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- Added modal-dialog-centered and modal-lg -->
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" th:text="'Package Details: ' + ${booking.pkg.name}">Package Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> <!-- Close Button in Header -->
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <!-- Close Button in Header -->
                 </div>
                 <div class="modal-body">
 
@@ -389,13 +373,10 @@
 
                     <!-- Scrollable Description Content -->
                     <div class="package-description">
-                        <p th:text="${booking.id}">Package Description</p>
+                        <p th:text="${booking.pkg.description}">Package Description</p>
                     </div>
 
-                    <!-- Add more package details as needed -->
                 </div>
-                <!-- Removed Close Button from Footer -->
-                <!-- Optional: If you still want a Close button in the footer aligned to the right, uncomment the following -->
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -422,12 +403,13 @@
                     </div>
                     <div class="modal-body">
                         <!-- Hidden field for bookingId -->
-                        <input type="hidden" name="bookingId" th:value="${booking.id}" />
+                        <input type="hidden" name="bookingId" th:value="${booking.id}"/>
 
                         <!-- Reason for Report -->
                         <div class="mb-3">
                             <label th:for="'reason' + ${booking.id}" class="form-label">Reason for Report</label>
-                            <textarea class="form-control" th:id="'reason' + ${booking.id}" name="reason" rows="3" required></textarea>
+                            <textarea class="form-control" th:id="'reason' + ${booking.id}" name="reason" rows="3"
+                                      required></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">

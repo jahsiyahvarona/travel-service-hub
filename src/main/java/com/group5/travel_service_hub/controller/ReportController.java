@@ -17,24 +17,27 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controller for managing report-related operations.
+ */
 @Controller
 @RequestMapping("/reports")
 public class ReportController {
 
     @Autowired
-    private ReportService reportService;
+    private ReportService reportService; // Service for handling report-related operations
 
     @Autowired
-    private ReviewsService reviewsService;
+    private ReviewsService reviewsService; // Service for managing reviews
 
     @Autowired
-    private PackageService packageService;
+    private PackageService packageService; // Service for managing packages
 
     @Autowired
-    private BookingService bookingService;
+    private BookingService bookingService; // Service for managing bookings
 
     @Autowired
-    private UserService userService;
+    private UserService userService; // Service for managing users
 
     /**
      * Creates a new report.
@@ -64,49 +67,52 @@ public class ReportController {
         }
 
         try {
-            // Create the report
+            // Create the report using the service
             reportService.createReport(loggedInUser, reason, packageId, reviewId, bookingId);
 
-            // Determine the type of report and set an appropriate success message
+            // Determine the type of report and redirect accordingly with a success message
             if (bookingId != null) {
                 redirectAttributes.addFlashAttribute("successMessage", "Booking reported successfully.");
-                return "redirect:/provider/manageBookings"; // Redirect to Manage Bookings
+                return "redirect:/provider/manageBookings"; // Redirect to Manage Bookings page
             } else if (reviewId != null) {
                 redirectAttributes.addFlashAttribute("successMessage", "Review reported successfully.");
-                return "redirect:/provider/replyToReviews"; // Redirect to Reply to Reviews
+                return "redirect:/provider/replyToReviews"; // Redirect to Reply to Reviews page
             } else if (packageId != null) {
                 redirectAttributes.addFlashAttribute("successMessage", "Package reported successfully.");
-                return "redirect:/provider/managePackages"; // Redirect to Manage Packages
+                return "redirect:/provider/managePackages"; // Redirect to Manage Packages page
             } else {
                 redirectAttributes.addFlashAttribute("successMessage", "Report submitted successfully.");
-                return "redirect:/provider/dashboard"; // Generic redirect
+                return "redirect:/provider/dashboard"; // Redirect to Provider Dashboard
             }
 
         } catch (IllegalArgumentException | IllegalStateException e) {
-            // Handle known exceptions and add an error message
+            // Handle known exceptions and set an error message
             redirectAttributes.addFlashAttribute("errorMessage", "Error creating report: " + e.getMessage());
-            return "redirect:/provider/dashboard"; // Adjust redirection as needed
+            return "redirect:/provider/dashboard"; // Redirect to Provider Dashboard
         } catch (Exception e) {
             // Handle unexpected exceptions
             redirectAttributes.addFlashAttribute("errorMessage", "An unexpected error occurred while creating the report.");
-            return "redirect:/provider/dashboard"; // Adjust redirection as needed
+            return "redirect:/provider/dashboard"; // Redirect to Provider Dashboard
         }
     }
 
     /**
      * Retrieves all reports.
+     * Endpoint: GET /reports
      *
      * @return List of all reports as a JSON response.
      */
     @GetMapping
     @ResponseBody
     public ResponseEntity<List<Report>> getAllReports() {
+        // Fetch and return all reports as JSON
         List<Report> reports = reportService.getAllReports();
         return ResponseEntity.ok(reports);
     }
 
     /**
      * Retrieves a report by ID.
+     * Endpoint: GET /reports/{reportId}
      *
      * @param reportId The ID of the report.
      * @return The report as a JSON response if found.
@@ -114,6 +120,7 @@ public class ReportController {
     @GetMapping("/{reportId}")
     @ResponseBody
     public ResponseEntity<Report> getReportById(@PathVariable Long reportId) {
+        // Fetch the report by ID and return it if found, otherwise return a 404 response
         Optional<Report> report = reportService.getReportById(reportId);
         return report.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

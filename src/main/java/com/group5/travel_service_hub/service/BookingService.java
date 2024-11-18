@@ -43,16 +43,21 @@ public class BookingService {
      */
     @Transactional
     public Booking createBooking(Long customerId, Long packageId, LocalDate startDate, LocalDate endDate) {
+        // Fetch the customer by their ID
         User customer = userRepository.findById(customerId)
                 .orElseThrow(() -> new IllegalArgumentException("Customer not found with ID: " + customerId));
+
+        // Fetch the package by its ID
         Package pkg = packageRepository.findById(packageId)
                 .orElseThrow(() -> new IllegalArgumentException("Package not found with ID: " + packageId));
 
         // Capture the current price of the package
         double currentPrice = pkg.getPrice();
 
-        // Create a new Booking instance with the captured price
+        // Create a new Booking instance
         Booking booking = new Booking(customer, pkg, currentPrice, startDate, endDate, BookingStatus.UNCONFIRMED);
+
+        // Save and return the booking
         return bookingRepository.save(booking);
     }
 
@@ -94,21 +99,29 @@ public class BookingService {
      */
     @Transactional
     public void updateBookingStatus(Long bookingId, BookingStatus status) {
+        // Fetch the booking by its ID
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found with ID: " + bookingId));
+
+        // Update the status of the booking
         booking.setStatus(status);
+
+        // Save the updated booking
         bookingRepository.save(booking);
     }
 
     /**
-     * Deletes a booking by ID.
+     * Deletes a booking by its ID.
      *
      * @param bookingId The ID of the booking to delete.
      */
     @Transactional
     public void deleteBooking(Long bookingId) {
+        // Fetch the booking by its ID
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found with ID: " + bookingId));
+
+        // Delete the booking
         bookingRepository.delete(booking);
     }
 

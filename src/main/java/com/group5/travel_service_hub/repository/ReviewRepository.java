@@ -6,32 +6,41 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * Repository interface for performing CRUD operations on the Reviews entity.
+ * Extends JpaRepository to provide built-in methods for database interaction.
+ */
 @Repository
 public interface ReviewRepository extends JpaRepository<Reviews, Long> {
 
     /**
-     * Finds all Reviews associated with a specific provider's details.
+     * Retrieves all reviews associated with a specific provider.
      *
-     * @param providerId The ID of the provider.
-     * @return List of Reviews entities.
+     * @param providerId The ID of the provider's details.
+     * @return A list of Reviews entities related to the specified provider.
      */
     List<Reviews> findByProviderId(Long providerId);
 
     /**
-     * Finds all Reviews associated with a specific package.
+     * Retrieves all reviews associated with a specific package.
      *
      * @param packageId The ID of the package.
-     * @return List of Reviews entities.
+     * @return A list of Reviews entities related to the specified package.
      */
     List<Reviews> findByPkgId(Long packageId);
 
     /**
-     * Finds all Reviews written by a specific author.
+     * Retrieves all reviews written by a specific author.
      *
-     * @param authorId The ID of the author.
-     * @return List of Reviews entities.
+     * @param authorId The ID of the user who authored the reviews.
+     * @return A list of Reviews entities created by the specified author.
      */
     List<Reviews> findByAuthorId(Long authorId);
 
+    /**
+     * Deletes a specific review entity from the database.
+     *
+     * @param review The review entity to be deleted.
+     */
     void delete(Reviews review);
 }

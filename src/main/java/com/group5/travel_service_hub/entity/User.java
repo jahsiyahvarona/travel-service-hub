@@ -1,63 +1,72 @@
 package com.group5.travel_service_hub.entity;
+
 import jakarta.persistence.*;
-
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
+/**
+ * Entity class representing a User in the Travel Service Hub system.
+ * It holds common user details, such as username, password, email, role, and account status.
+ */
 @Entity
 @Table(name = "users")
 public class User {
 
-    // Common fields
+    // Primary key for the users table, auto-generated
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Unique username for each user
     @Column(nullable = false, unique = true)
     private String username;
 
+    // Encrypted password for user authentication
     @Column(nullable = false)
-    private String password;  // Store hashed passwords
+    private String password;
 
+    // Unique email address for the user
     @Column(nullable = false, unique = true)
     private String email;
 
+    // Role of the user (e.g., PROVIDER, CUSTOMER, SYSADMIN)
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
 
-    // field for account status
+    // Indicates whether the user account is active; default is true
     @Column(nullable = false)
-    private boolean active = true; // Default to active
+    private boolean active = true;
 
+    // Indicates whether the user account is banned; default is false
     @Column(nullable = false)
     private boolean banned = false;
 
-   // public void setAccountStatus(String status) {
-    //}
+    // Path or URL to the user's profile picture
+    private String profilePic;
 
-
-    //@Enumerated(EnumType.STRING)
-  // @Column()
-   // private AccountStatus accountStatus;
-
-    private String profilePic; // URL or path to the profile picture
-
+    // List of packages associated with the user if they are a provider
     @OneToMany(mappedBy = "providerDetails", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Package> packages;
 
-
-
-
-
-
     // Constructors
 
-    public User() {
-    }
+    /**
+     * Default constructor required by JPA.
+     */
+    public User() {}
 
+    /**
+     * Full constructor including all fields.
+     *
+     * @param id         The user's ID.
+     * @param username   The user's username.
+     * @param password   The user's encrypted password.
+     * @param email      The user's email address.
+     * @param role       The user's role.
+     * @param active     Whether the account is active.
+     * @param banned     Whether the account is banned.
+     * @param profilePic Path or URL to the user's profile picture.
+     */
     public User(Long id, String username, String password, String email, Role role, boolean active, boolean banned, String profilePic) {
         this.id = id;
         this.username = username;
@@ -67,9 +76,19 @@ public class User {
         this.active = active;
         this.banned = banned;
         this.profilePic = profilePic;
-
     }
 
+    /**
+     * Constructor excluding ID, useful for new user creation.
+     *
+     * @param username   The user's username.
+     * @param password   The user's encrypted password.
+     * @param email      The user's email address.
+     * @param role       The user's role.
+     * @param active     Whether the account is active.
+     * @param banned     Whether the account is banned.
+     * @param profilePic Path or URL to the user's profile picture.
+     */
     public User(String username, String password, String email, Role role, boolean active, boolean banned, String profilePic) {
         this.username = username;
         this.password = password;
@@ -80,6 +99,17 @@ public class User {
         this.profilePic = profilePic;
     }
 
+    /**
+     * Alternative constructor with reordered parameters.
+     *
+     * @param username   The user's username.
+     * @param password   The user's encrypted password.
+     * @param role       The user's role.
+     * @param active     Whether the account is active.
+     * @param banned     Whether the account is banned.
+     * @param email      The user's email address.
+     * @param profilePic Path or URL to the user's profile picture.
+     */
     public User(String username, String password, Role role, boolean active, boolean banned, String email, String profilePic) {
         this.username = username;
         this.password = password;
@@ -89,15 +119,11 @@ public class User {
         this.email = email;
         this.profilePic = profilePic;
     }
+
     // Getters and Setters
-    // ... (omitted for brevity)
 
-    public String getProfilePic() {
-        return profilePic;
-    }
-
-    public void setProfilePic(String profilePic) {
-        this.profilePic = profilePic;
+    public Long getId() {
+        return id;
     }
 
     public void setId(Long id) {
@@ -136,14 +162,6 @@ public class User {
         this.role = role;
     }
 
-
-
-
-
-    public Long getId() {
-        return id;
-    }
-
     public boolean isActive() {
         return active;
     }
@@ -158,6 +176,22 @@ public class User {
 
     public void setBanned(boolean banned) {
         this.banned = banned;
+    }
+
+    public String getProfilePic() {
+        return profilePic;
+    }
+
+    public void setProfilePic(String profilePic) {
+        this.profilePic = profilePic;
+    }
+
+    public List<Package> getPackages() {
+        return packages;
+    }
+
+    public void setPackages(List<Package> packages) {
+        this.packages = packages;
     }
 
 }

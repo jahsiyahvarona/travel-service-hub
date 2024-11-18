@@ -6,30 +6,32 @@ import com.group5.travel_service_hub.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+
 /**
- * Repository interface for User entity.
+ * Repository interface for performing CRUD operations on the User entity.
+ * Extends JpaRepository to provide built-in methods for database interaction.
  */
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
     /**
-     * Finds a user by their username.
+     * Retrieves a user entity by their unique username.
      *
-     * @param username The username to search for.
-     * @return The User entity if found, else null.
+     * @param username The username of the user to retrieve.
+     * @return The User entity if found; otherwise, returns null.
      */
     User findByUsername(String username);
 
     /**
-     * Finds a user by their email.
+     * Retrieves a user entity by their unique email.
      *
-     * @param email The email to search for.
-     * @return The User entity if found, else null.
+     * @param email The email of the user to retrieve.
+     * @return The User entity if found; otherwise, returns null.
      */
     User findByEmail(String email);
 
     /**
-     * Checks if a user exists by username.
+     * Checks if a user exists with the specified username.
      *
      * @param username The username to check.
      * @return True if a user with the given username exists, else false.
@@ -37,35 +39,36 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByUsername(String username);
 
     /**
-     * Checks if a user exists by email.
+     * Checks if a user exists with the specified email.
      *
      * @param email The email to check.
      * @return True if a user with the given email exists, else false.
      */
     boolean existsByEmail(String email);
 
-    //Methods for SysAdmin Functionality
+    // Methods for SysAdmin Functionality
 
     /**
-     * @param role filter the roles of the users such as customer, provider and sysadmin
-     * @return List of users with specified role
+     * Retrieves all users with a specified role.
+     *
+     * @param role The role to filter users by (e.g., CUSTOMER, PROVIDER, SYSADMIN).
+     * @return A list of users with the specified role.
      */
-
     List<User> findByRole(Role role);
 
     /**
-     * Find users by their account status
+     * Retrieves users based on their banned status.
      *
-     * @param accountStats The account status to filer such as active or banned.
-     * @return List of users with the specified account status
-     */
-   // List<User> findByAccountStatus(AccountStatus accountStatus);
-
-    /**
-     * Find users that are banned.
-     *
-     * @param banned checks whether the user is banned or not
-     * @return List of users who match the banned status
+     * @param banned True if retrieving banned users; false for non-banned users.
+     * @return A list of users matching the specified banned status.
      */
     List<User> findByBanned(boolean banned);
+
+    /**
+     * Retrieves users by their active status.
+     *
+     * @param active True to retrieve active users; false to retrieve inactive users.
+     * @return A list of users with the specified active status.
+     */
+    List<User> findByActive(boolean active);
 }

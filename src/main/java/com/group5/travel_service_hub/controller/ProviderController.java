@@ -154,9 +154,21 @@ public class ProviderController {
 
     // Mapping for Profile Page
     @GetMapping("/profile")
-    public String profile(Model model) {
-        return "frontendCode/ProviderUI/Profile"; // Ensure you have a profile.html file
+    public String profile(HttpSession session, Model model) {
+        // Retrieve the logged-in user from the session
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+
+        // If the user is not logged in, redirect to the login page
+        if (loggedInUser == null) {
+            return "redirect:/ProviderLogin";
+        }
+
+        // Add the logged-in user to the model for Thymeleaf to access
+        model.addAttribute("loggedInUser", loggedInUser);
+
+        return "frontendCode/ProviderUI/Profile"; // Ensure you have a Profile.html file in the specified directory
     }
+
 
     /**
      * Mapping for Reply to Reviews Page
@@ -200,32 +212,27 @@ public class ProviderController {
             return "redirect:/ProviderLogin"; // Redirect to login if user is not found in the session
         }
 
-        String username = loggedInUser.getUsername();
-        User user = userService.findByUsername(username);
+        User provider = userService.findByUsername(loggedInUser.getUsername());
 
         // Fetch bookings associated with the provider
-        List<Booking> bookings = bookingService.getBookingsByProviderId(user.getId());
+        List<Booking> bookings = bookingService.getBookingsByProviderId(provider.getId());
 
-        // Separate bookings by status
+        // Filter bookings to include only unconfirmed bookings
         List<Booking> newAndPendingBookings = bookings.stream()
-                .filter(b -> b.getStatus() == BookingStatus.UNCONFIRMED)
-                .collect(Collectors.toList());
+                .filter(booking -> booking.getStatus().equals(BookingStatus.UNCONFIRMED))
+                .toList();
 
+
+        // Filter bookings to include only confirmed bookings
         List<Booking> confirmedBookings = bookings.stream()
-                .filter(b -> b.getStatus() == BookingStatus.CONFIRMED)
-                .collect(Collectors.toList());
-
-        List<Booking> allUserBookings = bookings.stream()
-                .filter(b -> b.getPkg().getProviderDetails().getId() == user.getId())
+                .filter(booking -> booking.getStatus().equals(BookingStatus.CONFIRMED))
                 .toList();
 
         // Add bookings to the model
         model.addAttribute("newAndPendingBookings", newAndPendingBookings);
         model.addAttribute("confirmedBookings", confirmedBookings);
         model.addAttribute("bookings", bookings);
-
-        // Add provider name to the model (optional)
-        model.addAttribute("providerName", user.getUsername());
+        model.addAttribute("providerName", provider.getUsername());
         return "frontendCode/ProviderUI/manageBookings"; // Ensure you have a manageBookings.html file
     }
 

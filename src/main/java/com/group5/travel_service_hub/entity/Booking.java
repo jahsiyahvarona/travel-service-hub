@@ -5,43 +5,63 @@ import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.Objects;
 
+/**
+ * Represents a booking made by a customer for a specific package.
+ */
 @Entity
 @Table(name = "bookings")
 public class Booking {
 
+    // Unique identifier for each booking
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Customer who made the booking
+    // The customer who made the booking
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     private User customer;
 
-    // Package being booked
+    // The package being booked
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "package_id", nullable = false)
     private Package pkg;
 
-    // Price at the time of booking; not updatable after creation
+    // The price at the time of booking (immutable after creation)
     @Column(nullable = false, updatable = false)
     private double price;
 
+    // The start date of the booking
     @Column(nullable = false)
     private LocalDate startDate;
 
+    // The end date of the booking
     @Column(nullable = false)
     private LocalDate endDate;
 
+    // The current status of the booking
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private BookingStatus status;
 
+    // Timestamp indicating when the booking was created
     @Column(nullable = false, updatable = false)
     private LocalDateTime timestamp;
 
     // Constructors
 
+    /**
+     * Full constructor for initializing all fields.
+     *
+     * @param id         The unique ID of the booking.
+     * @param customer   The customer making the booking.
+     * @param pkg        The package being booked.
+     * @param price      The price at the time of booking.
+     * @param startDate  The start date of the booking.
+     * @param endDate    The end date of the booking.
+     * @param status     The initial status of the booking.
+     * @param timestamp  The timestamp when the booking was created.
+     */
     public Booking(Long id, User customer, Package pkg, double price, LocalDate startDate, LocalDate endDate, BookingStatus status, LocalDateTime timestamp) {
         this.id = id;
         this.customer = customer;
@@ -54,7 +74,7 @@ public class Booking {
     }
 
     /**
-     * Constructor to create a new Booking instance.
+     * Constructor for creating a new booking (ID and timestamp are auto-generated).
      *
      * @param customer   The customer making the booking.
      * @param pkg        The package being booked.
@@ -76,7 +96,6 @@ public class Booking {
     public Booking() {}
 
     // Getters and Setters
-
     public Long getId() {
         return id;
     }
@@ -105,7 +124,7 @@ public class Booking {
         return price;
     }
 
-    // No setter for price to prevent updates after creation
+    // No setter for price to ensure it remains immutable
 
     public LocalDate getStartDate() {
         return startDate;

@@ -1,13 +1,18 @@
 package com.group5.travel_service_hub.controller;
 
+import com.group5.travel_service_hub.entity.Package;
+import com.group5.travel_service_hub.entity.Role;
 import com.group5.travel_service_hub.entity.User;
 import com.group5.travel_service_hub.service.UserService;
 import com.group5.travel_service_hub.repository.UserRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
-
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.util.List;
@@ -15,15 +20,15 @@ import java.util.List;
 /**
  * REST Controller for managing user-related operations.
  */
-@RestController
+@Controller
 @RequestMapping("/api/users")
 public class UserController {
 
     @Autowired
-    private UserService userService;
+    private UserService userService; // Service layer for user-related operations
 
     @Autowired
-    private UserRepository userRepository;
+    private UserRepository userRepository; // Repository for direct database interaction
 
     /**
      * Registers a new user.
@@ -43,7 +48,6 @@ public class UserController {
      *
      * @return List of all users.
      */
-
     @GetMapping("/all")
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> users = userService.findAllUsers();
@@ -57,7 +61,6 @@ public class UserController {
      * @param userId The ID of the user.
      * @return The user entity.
      */
-
     @GetMapping("/{userId}")
     public ResponseEntity<User> getUserById(@PathVariable Long userId) {
         User user = userService.findById(userId);
@@ -71,7 +74,6 @@ public class UserController {
      * @param userId The ID of the user to activate.
      * @return The activated user.
      */
-
     @PostMapping("/{userId}/activate")
     public ResponseEntity<User> activateUser(@PathVariable Long userId) {
         User activatedUser = userService.activateUser(userId);
@@ -85,7 +87,6 @@ public class UserController {
      * @param userId The ID of the user to deactivate.
      * @return The deactivated user.
      */
-
     @PostMapping("/{userId}/deactivate")
     public ResponseEntity<User> deactivateUser(@PathVariable Long userId) {
         User deactivatedUser = userService.deactivateUser(userId);
@@ -99,7 +100,6 @@ public class UserController {
      * @param userId The ID of the user to ban.
      * @return The banned user.
      */
-
     @PostMapping("/{userId}/ban")
     public ResponseEntity<User> banUser(@PathVariable Long userId) {
         User bannedUser = userService.banUser(userId);
@@ -113,7 +113,6 @@ public class UserController {
      * @param userId The ID of the user to unban.
      * @return The unbanned user.
      */
-
     @PostMapping("/{userId}/unban")
     public ResponseEntity<User> unbanUser(@PathVariable Long userId) {
         User unbannedUser = userService.unbanUser(userId);
@@ -127,7 +126,6 @@ public class UserController {
      * @param principal The security principal of the authenticated user.
      * @return The user entity.
      */
-
     @GetMapping("/me")
     public ResponseEntity<User> getAuthenticatedUser(Principal principal) {
         String username = principal.getName();
@@ -135,85 +133,83 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    /**
-     * Updates the authenticated user's profile.
-     * Accessible by authenticated users.
-     *
-     * @param principal   The security principal of the authenticated user.
-     * @param updatedUser The user entity containing updated profile details.
-     * @return The updated user entity.
-     */
 
-    @PutMapping("/me/profile")
-    public ResponseEntity<User> updateProfile(Principal principal, @RequestBody User updatedUser) {
-        String username = principal.getName();
-        User user = userService.findByUsername(username);
-        User updated = userService.updateProfile(user.getId(), updatedUser);
-        return ResponseEntity.ok(updated);
+
+
+    /**
+     * Handles profile updates for logged-in users via form submission.
+     *
+     * @param username   Updated username.
+     * @param email      Updated email.
+     * @param profilePic Updated profile picture.
+     * @param session    HTTP session for retrieving the logged-in user.
+     * @param redirectAttributes Redirect attributes for status messages.
+     * @return Redirect to the provider's profile page.
+     */
+    @PostMapping("/updateProfile")
+    public String updateProfile(@RequestParam("username") String username,
+                                @RequestParam("email") String email,
+                                @RequestParam(value = "profilePic", required = false) MultipartFile profilePic,
+                                HttpSession session,
+                                RedirectAttributes redirectAttributes) {
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        String loggedInUsername = loggedInUser.getUsername();
+        User user = userService.findByUsername(loggedInUsername);
+
+        if (user.getRole() != Role.PROVIDER && user.getRole() != Role.SYSADMIN) {
+            redirectAttributes.addFlashAttribute("error", "Access denied: Only providers can update packages.");
+            return "redirect:/provider/profile";
+        }
+
+        try {
+            if (user.getUsername().equals(username) && user.getEmail().equals(email) && profilePic.isEmpty()) {
+                return "redirect:/provider/profile";
+            }
+
+            user.setUsername(username);
+            user.setEmail(email);
+            userService.updateProfile(user.getId(), user);
+
+            if (profilePic != null && !profilePic.isEmpty()) {
+                userService.updateProfilePic(user.getId(), profilePic);
+            }
+
+            redirectAttributes.addFlashAttribute("successMessage", "Profile updated successfully.");
+            session.setAttribute("loggedInUser", user);
+        } catch (IllegalArgumentException | DataIntegrityViolationException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error updating profile: " + e.getMessage());
+        }
+
+        return "redirect:/provider/profile";
     }
 
     /**
-     * Updates the authenticated user's password.
-     * Accessible by authenticated users.
+     * Handles password changes for logged-in users.
      *
-     * @param principal    The security principal of the authenticated user.
-     * @param oldPassword  The current password.
-     * @param newPassword  The new desired password.
-     * @return The updated user entity.
+     * @param currentPassword The current password.
+     * @param newPassword     The new password.
+     * @param session         HTTP session for retrieving the logged-in user.
+     * @param redirectAttributes Redirect attributes for status messages.
+     * @return Redirect to the provider's profile page.
      */
+    @PostMapping("/changePassword")
+    public String changePassword(@RequestParam("currentPassword") String currentPassword,
+                                 @RequestParam("newPassword") String newPassword,
+                                 HttpSession session,
+                                 RedirectAttributes redirectAttributes) {
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
 
-    @PutMapping("/me/password")
-    public ResponseEntity<User> updatePassword(Principal principal,
-                                               @RequestParam String oldPassword,
-                                               @RequestParam String newPassword) {
-        String username = principal.getName();
-        User user = userService.findByUsername(username);
-        User updatedUser = userService.updatePassword(user.getId(), oldPassword, newPassword);
-        return ResponseEntity.ok(updatedUser);
+        if (loggedInUser == null) {
+            return "redirect:/ProviderLogin";
+        }
+
+        try {
+            userService.updatePassword(loggedInUser.getId(), currentPassword, newPassword);
+            redirectAttributes.addFlashAttribute("successMessage", "Password changed successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to change password: " + e.getMessage());
+        }
+
+        return "redirect:/provider/profile";
     }
-
-    /**
-     * Updates the authenticated user's email.
-     * Accessible by authenticated users.
-     *
-     * @param principal The security principal of the authenticated user.
-     * @param newEmail  The new email address.
-     * @return The updated user entity.
-     */
-
-    @PutMapping("/me/email")
-    public ResponseEntity<User> updateEmail(Principal principal,
-                                            @RequestParam String newEmail) {
-        String username = principal.getName();
-        User user = userService.findByUsername(username);
-        user.setEmail(newEmail);
-        User updatedUser = userService.updateProfile(user.getId(), user);
-        return ResponseEntity.ok(updatedUser);
-    }
-
-    /**
-     * Updates the authenticated user's profile picture by handling file upload.
-     * Accessible by authenticated users.
-     *
-     * @param principal The security principal of the authenticated user.
-     * @param file      The profile picture file.
-     * @return The updated user entity.
-     */
-
-    @PutMapping(value = "/me/profile-pic", consumes = {"multipart/form-data"})
-    public ResponseEntity<User> updateProfilePic(Principal principal,
-                                                 @RequestParam("file") MultipartFile file) {
-        String username = principal.getName();
-        User user = userService.findByUsername(username);
-        User updatedUser = userService.updateProfilePic(user.getId(), file);
-        return ResponseEntity.ok(updatedUser);
-    }
-
-
-
-    // Additional endpoints can be added here as needed
-
-
-
-
 }

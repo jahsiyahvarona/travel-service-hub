@@ -152,6 +152,10 @@
 <!-- Include your JavaScript validation script -->
 <script th:src="@{/js/provider-signup-validation.js}"></script>
 <script>
+    /**
+     * Toggles the visibility of the password fields
+     * @param {string} fieldId - The ID of the input field to toggle
+     */
     function togglePassword(fieldId) {
         const field = document.getElementById(fieldId);
         const type = field.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -162,26 +166,27 @@
         const signupForm = document.getElementById('signupForm');
 
         // Event listener for profile picture preview
-        document.getElementById('profilePic').addEventListener('change', function(event) {
+        const profilePicInput = document.getElementById('profilePic');
+        const previewContainer = document.getElementById('newImagePreviewContainer');
+        const previewImage = document.getElementById('newImagePreview');
+
+        profilePicInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
-            if (file) {
-                const fileType = file.type.toLowerCase();
-                if (fileType === "image/jpeg" || fileType === "image/png" || fileType === "image/jpg") {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        document.getElementById('newImagePreview').src = e.target.result;
-                        document.getElementById('newImagePreviewContainer').style.display = 'block'; // Show the preview
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    alert("Please select a valid image file (JPEG, JPG, PNG).");
-                    // Clear the file input if the file type is incorrect
-                    event.target.value = "";
-                    document.getElementById('newImagePreviewContainer').style.display = 'none';
-                }
+            if (file && (file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewContainer.style.display = 'block'; // Show preview
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('Please select a valid image file (JPEG, JPG, PNG).');
+                previewContainer.style.display = 'none'; // Hide preview
+                event.target.value = ''; // Reset input
             }
         });
 
+        // Form submission validation
         signupForm.addEventListener('submit', function (event) {
             let isValid = true;
             const username = document.getElementById('username');
@@ -197,7 +202,7 @@
             clearError(confirmPassword);
             clearError(termsCheckbox);
 
-            // Validate username, email, password, confirm password, terms checkbox
+            // Validate username
             if (username.value.trim() === '') {
                 showError(username, 'Username is required');
                 isValid = false;
@@ -206,31 +211,41 @@
                 isValid = false;
             }
 
+            // Validate email
             if (email.value.trim() === '' || !validateEmail(email.value.trim())) {
                 showError(email, 'Please enter a valid email address');
                 isValid = false;
             }
 
+            // Validate password
             if (password.value.trim() === '' || password.value.length < 8) {
                 showError(password, 'Password must be at least 8 characters');
                 isValid = false;
             }
 
+            // Validate confirm password
             if (confirmPassword.value.trim() === '' || password.value !== confirmPassword.value) {
                 showError(confirmPassword, 'Passwords do not match');
                 isValid = false;
             }
 
+            // Validate terms checkbox
             if (!termsCheckbox.checked) {
                 showError(termsCheckbox.parentElement, 'You must accept the Terms and Conditions');
                 isValid = false;
             }
 
+            // Prevent form submission if validation fails
             if (!isValid) {
                 event.preventDefault();
             }
         });
 
+        /**
+         * Displays an error message for an input element
+         * @param {HTMLElement} element - The input element to show an error for
+         * @param {string} message - The error message to display
+         */
         function showError(element, message) {
             const formGroup = element.parentElement;
             let error = formGroup.querySelector('.error-message');
@@ -242,6 +257,10 @@
             error.innerText = message;
         }
 
+        /**
+         * Clears any error messages for an input element
+         * @param {HTMLElement} element - The input element to clear errors for
+         */
         function clearError(element) {
             const formGroup = element.parentElement;
             const error = formGroup.querySelector('.error-message');
@@ -250,6 +269,11 @@
             }
         }
 
+        /**
+         * Validates an email address format
+         * @param {string} email - The email address to validate
+         * @returns {boolean} - Returns true if the email is valid, otherwise false
+         */
         function validateEmail(email) {
             const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return re.test(email);

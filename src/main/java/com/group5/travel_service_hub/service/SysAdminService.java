@@ -1,11 +1,8 @@
 package com.group5.travel_service_hub.service;
-import com.group5.travel_service_hub.entity.Package;
+
 import com.group5.travel_service_hub.entity.*;
+import com.group5.travel_service_hub.entity.Package;
 import com.group5.travel_service_hub.repository.*;
-import com.group5.travel_service_hub.repository.UserRepository;
-import com.group5.travel_service_hub.repository.PackageRepository;
-import com.group5.travel_service_hub.repository.BookingRepository;
-import com.group5.travel_service_hub.repository.ReportRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +34,7 @@ public class SysAdminService {
     private UserService userService; // Delegates user-related operations
 
     /**
-     * Retrieves all users.
+     * Retrieves all users in the system.
      *
      * @return List of all User objects.
      */
@@ -46,10 +43,10 @@ public class SysAdminService {
     }
 
     /**
-     * Retrieves a user by ID.
+     * Retrieves a user by their ID.
      *
      * @param userId The ID of the user.
-     * @return The User object.
+     * @return The User object if found.
      */
     public User getUserById(Long userId) {
         return userRepository.findById(userId)
@@ -57,7 +54,7 @@ public class SysAdminService {
     }
 
     /**
-     * Deletes a user by ID.
+     * Deletes a user by their ID.
      *
      * @param userId The ID of the user to delete.
      */
@@ -68,7 +65,7 @@ public class SysAdminService {
     }
 
     /**
-     * Retrieves all travel packages.
+     * Retrieves all travel packages in the system.
      *
      * @return List of all Package objects.
      */
@@ -77,7 +74,7 @@ public class SysAdminService {
     }
 
     /**
-     * Deletes a travel package by ID.
+     * Deletes a travel package by its ID.
      *
      * @param packageId The ID of the package to delete.
      */
@@ -89,7 +86,7 @@ public class SysAdminService {
     }
 
     /**
-     * Retrieves all bookings.
+     * Retrieves all bookings in the system.
      *
      * @return List of all Booking objects.
      */
@@ -98,7 +95,7 @@ public class SysAdminService {
     }
 
     /**
-     * Deletes a booking by ID.
+     * Deletes a booking by its ID.
      *
      * @param bookingId The ID of the booking to delete.
      */
@@ -109,10 +106,8 @@ public class SysAdminService {
         bookingRepository.delete(booking);
     }
 
-
-
     /**
-     * Deletes a comment by ID.
+     * Deletes a comment by its ID.
      *
      * @param commentId The ID of the comment to delete.
      */
@@ -124,7 +119,7 @@ public class SysAdminService {
     }
 
     /**
-     * Retrieves all reports.
+     * Retrieves all reports submitted in the system.
      *
      * @return List of all Report objects.
      */
@@ -133,10 +128,10 @@ public class SysAdminService {
     }
 
     /**
-     * Retrieves a report by ID.
+     * Retrieves a specific report by its ID.
      *
      * @param reportId The ID of the report.
-     * @return The Report object.
+     * @return The Report object if found.
      */
     public Report getReportById(Long reportId) {
         return reportRepository.findById(reportId)
@@ -144,15 +139,14 @@ public class SysAdminService {
     }
 
     /**
-     * Updates the status of a report and applies punishment if accepted.
+     * Updates the status of a report and applies punishment if necessary.
      *
-     * @param reportId        The ID of the report to update.
-     * @param status          The new status of the report.
-     * @param punishmentType  The punishment type to apply if accepted.
-     * @return The updated Report object.
+     * @param reportId       The ID of the report.
+     * @param status         The new status of the report (e.g., ACCEPTED, REJECTED).
+     * @param punishmentType The type of punishment to apply if the report is accepted.
      */
     @Transactional
-    public Report updateReportStatus(Long reportId, ReportStatus status, PunishmentType punishmentType) {
+    public void updateReportStatus(Long reportId, ReportStatus status, PunishmentType punishmentType) {
         Report report = getReportById(reportId);
 
         if (report.getStatus() != ReportStatus.PENDING) {
@@ -166,11 +160,11 @@ public class SysAdminService {
             applyPunishment(report);
         }
 
-        return reportRepository.save(report);
+        reportRepository.save(report);
     }
 
     /**
-     * Deletes a report by ID.
+     * Deletes a report by its ID.
      *
      * @param reportId The ID of the report to delete.
      */
@@ -181,9 +175,9 @@ public class SysAdminService {
     }
 
     /**
-     * Applies punishment based on the report details by delegating to UserService.
+     * Applies the appropriate punishment based on the report details.
      *
-     * @param report The report containing punishment details.
+     * @param report The report containing punishment information.
      */
     private void applyPunishment(Report report) {
         PunishmentType punishment = report.getPunishmentType();
@@ -213,7 +207,7 @@ public class SysAdminService {
     }
 
     /**
-     * Unbans a user.
+     * Unbans a previously banned user.
      *
      * @param userId The ID of the user to unban.
      */
@@ -223,7 +217,7 @@ public class SysAdminService {
     }
 
     /**
-     * Unsuspends a user.
+     * Unsuspends a previously suspended user.
      *
      * @param userId The ID of the user to unsuspend.
      */
@@ -232,32 +226,26 @@ public class SysAdminService {
         userService.activateUser(userId);
     }
 
-
-    // Update the user's account status (Suspended, Active, etc.)
-    @Transactional
-    public void updateUserAccountStatus(Long userId, String status) {
-        User user = getUserById(userId);
-        // Assuming you have an 'accountStatus' field in User
-      //  user.setAccountStatus(status);
-        userRepository.save(user);
-    }
-
+    /**
+     * Retrieves application statistics such as total users, packages, bookings, and reports.
+     *
+     * @return List of statistics for the application.
+     */
     public List<Statistic> getAppStatistics() {
-        // Get the total counts for users, packages, bookings, and reports
         long totalUsers = userRepository.count();
         long totalPackages = packageRepository.count();
         long totalBookings = bookingRepository.count();
         long totalReports = reportRepository.count();
 
-        // Create a Statistic object to hold the data
         Statistic stats = new Statistic(totalUsers, totalPackages, totalBookings, totalReports);
-
-        // Return the statistic wrapped in a list
         return List.of(stats);
     }
 
-
-    // Delete a review (similar to deleting a comment)
+    /**
+     * Deletes a review by its ID.
+     *
+     * @param reviewId The ID of the review to delete.
+     */
     @Transactional
     public void deleteReview(Long reviewId) {
         Reviews review = ReviewsRepository.findById(reviewId)
@@ -265,12 +253,15 @@ public class SysAdminService {
         ReviewsRepository.delete(review);
     }
 
+    /**
+     * Updates the account status of a user.
+     *
+     * @param userId    The ID of the user.
+     * @param newStatus The new account status to set.
+     */
     public void updateUserStatus(Long userId, AccountStatus newStatus) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-       // user.setAccountStatus(String.valueOf(newStatus));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
         userRepository.save(user);
     }
-
-
-
 }

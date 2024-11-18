@@ -1,7 +1,7 @@
 package com.group5.travel_service_hub.service;
-import com.group5.travel_service_hub.entity.Package;
+
 import com.group5.travel_service_hub.entity.*;
-import com.group5.travel_service_hub.entity.Report;
+import com.group5.travel_service_hub.entity.Package;
 import com.group5.travel_service_hub.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class CustomerService {
     private BookingRepository bookingRepository;
 
     @Autowired
-    private ReviewRepository ReviewRepository;
+    private ReviewRepository reviewRepository;
 
     @Autowired
     private ReportRepository reportRepository;
@@ -38,8 +38,10 @@ public class CustomerService {
      * @throws IllegalArgumentException If the user is not found or not a customer.
      */
     private User getCustomerUser(Long userId) {
+        // Retrieve the user by ID
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found."));
+        // Ensure the user is a customer
         if (user.getRole() != Role.CUSTOMER) {
             throw new IllegalArgumentException("User is not a customer.");
         }
@@ -52,6 +54,7 @@ public class CustomerService {
      * @return List of Package objects.
      */
     public List<Package> getAllPackages() {
+        // Fetch all packages from the repository
         return packageRepository.findAll();
     }
 
@@ -62,6 +65,7 @@ public class CustomerService {
      * @return The Package object.
      */
     public Package getPackageById(Long packageId) {
+        // Fetch the package by ID
         return packageRepository.findById(packageId)
                 .orElseThrow(() -> new IllegalArgumentException("Package not found."));
     }
@@ -76,13 +80,15 @@ public class CustomerService {
      */
     @Transactional
     public Booking bookPackage(Long userId, Long packageId, Booking booking) {
+        // Retrieve the customer and package
         User customer = getCustomerUser(userId);
         Package pkg = getPackageById(packageId);
 
+        // Associate booking details with the customer and package
         booking.setCustomer(customer);
         booking.setPkg(pkg);
-        // Set other booking details as necessary
 
+        // Save and return the booking
         return bookingRepository.save(booking);
     }
 
@@ -93,6 +99,7 @@ public class CustomerService {
      * @return List of Booking objects.
      */
     public List<Booking> getBookingsByCustomer(Long userId) {
+        // Retrieve the customer and their bookings
         User customer = getCustomerUser(userId);
         return bookingRepository.findByCustomerId(customer.getId());
     }
@@ -105,19 +112,18 @@ public class CustomerService {
      */
     @Transactional
     public void cancelBooking(Long userId, Long bookingId) {
+        // Retrieve the customer and booking
         User customer = getCustomerUser(userId);
-
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found."));
 
+        // Check authorization and delete the booking
         if (!booking.getCustomer().getId().equals(customer.getId())) {
             throw new SecurityException("Unauthorized to cancel this booking.");
         }
 
         bookingRepository.delete(booking);
     }
-
-
 
     /**
      * Reports a package or review.
@@ -130,26 +136,25 @@ public class CustomerService {
      */
     @Transactional
     public Report createReport(Long userId, Report report, Long packageId, Long reviewId) {
-
+        // Retrieve the customer and associate with the report
         User customer = getCustomerUser(userId);
         report.setReporter(customer);
 
+        // Associate the report with a package or review
         if (packageId != null) {
             Package pkg = getPackageById(packageId);
             report.setPkg(pkg);
         } else if (reviewId != null) {
-            Reviews review = ReviewRepository.findById(reviewId)
+            Reviews review = reviewRepository.findById(reviewId)
                     .orElseThrow(() -> new IllegalArgumentException("Review not found."));
             report.setReview(review);
         } else {
             throw new IllegalArgumentException("Report must target a package or a review.");
         }
 
-        // Set other report details as necessary
-
+        // Save and return the report
         return reportRepository.save(report);
     }
-
 
     /**
      * Retrieves all Reviews made by the customer.
@@ -158,7 +163,8 @@ public class CustomerService {
      * @return List of Reviews objects.
      */
     public List<Reviews> getCommentsByCustomer(Long userId) {
+        // Retrieve the customer and their reviews
         User customer = getCustomerUser(userId);
-        return ReviewRepository.findByAuthorId(customer.getId());
+        return reviewRepository.findByAuthorId(customer.getId());
     }
 }

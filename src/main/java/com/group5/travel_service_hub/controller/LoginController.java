@@ -13,33 +13,36 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+/**
+ * Controller for managing login-related actions for different user roles.
+ */
 @Controller
 public class LoginController {
 
     @Autowired
-    private AuthenticationService authenticationService;
+    private AuthenticationService authenticationService; // Handles user authentication logic
 
     @Autowired
-    private UserService userService;
+    private UserService userService; // Handles user-related services
 
     /**
-     * Display the customer's login page.
+     * Displays the customer login page.
      *
-     * @return The customer login page template.
+     * @return The path to the customer login template.
      */
     @GetMapping("/CustomerLogin")
     public String showCustomerLoginPage() {
-        return "frontendCode/Landing/CustomerLogin"; // Ensure this template exists
+        return "frontendCode/Landing/CustomerLogin"; // Maps to the customer login template
     }
 
     /**
-     * Handle customer login requests.
+     * Handles login for customers.
      *
-     * @param username           The username entered by the user.
-     * @param password           The password entered by the user.
-     * @param request            The HTTP request to store user data.
-     * @param redirectAttributes Attributes for flash messages.
-     * @return Redirect to the appropriate dashboard based on the login result.
+     * @param username           Customer's username.
+     * @param password           Customer's password.
+     * @param request            The HTTP request to manage session.
+     * @param redirectAttributes Flash attributes for passing feedback messages.
+     * @return Redirect to the customer dashboard if successful, or back to the login page on failure.
      */
     @PostMapping("/CustomerLogin")
     public String loginCustomer(@RequestParam("username") String username,
@@ -49,100 +52,102 @@ public class LoginController {
         User user = authenticationService.authenticate(username, password);
 
         if (user != null) {
-            // Invalidate the old session to prevent session fixation
+            // Invalidate the previous session to prevent session fixation attacks
             HttpSession oldSession = request.getSession(false);
             if (oldSession != null) {
                 oldSession.invalidate();
             }
-            if(!user.isActive()){
-                redirectAttributes.addFlashAttribute("error2", "account is suspended.");
 
+            if (!user.isActive()) {
+                // If account is suspended, provide feedback to the user
+                redirectAttributes.addFlashAttribute("error2", "Account is suspended.");
                 return "redirect:/CustomerLogin?error2";
             }
 
-            // Create a new session
+            // Create a new session for the authenticated user
             HttpSession newSession = request.getSession(true);
             newSession.setAttribute("loggedInUser", user);
 
-
+            // Redirect to the customer dashboard
             return "redirect:/CostumerDashboard";
         } else {
-            // Redirect to login page with error if login fails
-            redirectAttributes.addFlashAttribute("error", "Invalid username or password for Provider.");
+            // Provide error feedback if authentication fails
+            redirectAttributes.addFlashAttribute("error", "Invalid username or password for customer.");
             return "redirect:/CustomerLogin?error";
         }
     }
 
     /**
-     * Display the provider's login page.
+     * Displays the provider login page.
      *
-     * @return The provider login page template.
+     * @return The path to the provider login template.
      */
     @GetMapping("/ProviderLogin")
     public String showProviderLoginPage() {
-        return "frontendCode/Landing/ProvidersLogin"; // Ensure this template exists
+        return "frontendCode/Landing/ProvidersLogin"; // Maps to the provider login template
     }
 
     /**
-     * Handle provider login requests.
+     * Handles login for providers.
      *
-     * @param username           The username entered by the user.
-     * @param password           The password entered by the user.
-     * @param request           The HTTP request  to store user data.
-     * @param redirectAttributes Attributes for flash messages.
-     * @return Redirect to the appropriate dashboard based on the login result.
+     * @param username           Provider's username.
+     * @param password           Provider's password.
+     * @param request            The HTTP request to manage session.
+     * @param redirectAttributes Flash attributes for passing feedback messages.
+     * @return Redirect to the provider dashboard if successful, or back to the login page on failure.
      */
     @PostMapping("/ProviderLogin")
     public String loginProvider(@RequestParam("username") String username,
                                 @RequestParam("password") String password,
-                                HttpServletRequest request, // Inject HttpServletRequest to create a new session
+                                HttpServletRequest request,
                                 RedirectAttributes redirectAttributes) {
 
         User user = authenticationService.authenticate2(username, password);
 
         if (user != null) {
-            // Invalidate the old session to prevent session fixation
+            // Invalidate the previous session to prevent session fixation attacks
             HttpSession oldSession = request.getSession(false);
             if (oldSession != null) {
                 oldSession.invalidate();
             }
-            if(!user.isActive()){
-                redirectAttributes.addFlashAttribute("error2", "account is suspended.");
 
+            if (!user.isActive()) {
+                // If account is suspended, provide feedback to the user
+                redirectAttributes.addFlashAttribute("error2", "Account is suspended.");
                 return "redirect:/ProviderLogin";
             }
 
-            // Create a new session
+            // Create a new session for the authenticated user
             HttpSession newSession = request.getSession(true);
             newSession.setAttribute("loggedInUser", user);
 
-
+            // Redirect to the provider dashboard
             return "redirect:/ProviderDashboard";
         } else {
-            // Redirect to login page with error if login fails
-            redirectAttributes.addFlashAttribute("error", "Invalid username or password for Provider.");
+            // Provide error feedback if authentication fails
+            redirectAttributes.addFlashAttribute("error", "Invalid username or password for provider.");
             return "redirect:/ProviderLogin?error";
         }
     }
 
     /**
-     * Display the sysadmin's login page.
+     * Displays the sysadmin login page.
      *
-     * @return The sysadmin login page template.
+     * @return The path to the sysadmin login template.
      */
     @GetMapping("/SysAdminLogin")
     public String showSysAdminLoginPage() {
-        return "frontendCode/Landing/SysAdminLogin"; // Ensure this template exists
+        return "frontendCode/Landing/SysAdminLogin"; // Maps to the sysadmin login template
     }
 
     /**
-     * Handle sysadmin login requests.
+     * Handles login for sysadmins.
      *
-     * @param username           The username entered by the user.
-     * @param password           The password entered by the user.
-     * @param request            The HTTP request  to store user data.
-     * @param redirectAttributes Attributes for flash messages.
-     * @return Redirect to the appropriate dashboard based on the login result.
+     * @param username           Sysadmin's username.
+     * @param password           Sysadmin's password.
+     * @param request            The HTTP request to manage session.
+     * @param redirectAttributes Flash attributes for passing feedback messages.
+     * @return Redirect to the sysadmin dashboard if successful, or back to the login page on failure.
      */
     @PostMapping("/SysAdminLogin")
     public String loginSysAdmin(@RequestParam("username") String username,
@@ -152,21 +157,21 @@ public class LoginController {
         User user = authenticationService.authenticate3(username, password);
 
         if (user != null) {
-            // Invalidate the old session to prevent session fixation
+            // Invalidate the previous session to prevent session fixation attacks
             HttpSession oldSession = request.getSession(false);
             if (oldSession != null) {
                 oldSession.invalidate();
             }
 
-            // Create a new session
+            // Create a new session for the authenticated user
             HttpSession newSession = request.getSession(true);
             newSession.setAttribute("loggedInUser", user);
 
-
+            // Redirect to the sysadmin dashboard
             return "redirect:/SysAdminDashboard";
         } else {
-            // Redirect to login page with error if login fails
-            redirectAttributes.addFlashAttribute("error", "Invalid username or password for Provider.");
+            // Provide error feedback if authentication fails
+            redirectAttributes.addFlashAttribute("error", "Invalid username or password for sysadmin.");
             return "redirect:/SysAdminLogin?error";
         }
     }

@@ -10,6 +10,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * Service class for handling authentication-related operations.
+ * Supports authentication for customers, providers, and sysadmins.
+ */
 @Service
 public class AuthenticationService {
 
@@ -17,97 +21,102 @@ public class AuthenticationService {
     private UserRepository userRepository;
 
     /**
-     * Authenticate a customer by username and password.
+     * Authenticate a customer by verifying their username and password.
      *
      * @param username The username of the customer.
      * @param password The password of the customer.
-     * @return The authenticated User object if successful, null otherwise.
+     * @return The authenticated User object if credentials are valid, null otherwise.
      */
     public User authenticate(String username, String password) {
-        // Find the user by username
+        // Fetch the user from the repository by username
         User user = userRepository.findByUsername(username);
 
+        // Verify if the user exists and has the role CUSTOMER
         if (user != null && user.getRole() == Role.CUSTOMER) {
             // Hash the input password
             String hashedPassword = hashPassword(password);
 
-            // Check if the hashed password matches the stored password
+            // Compare the hashed input password with the stored password
             if (user.getPassword().equals(hashedPassword)) {
-                return user;
+                return user; // Authentication successful
             }
         }
 
-        return null;
+        return null; // Authentication failed
     }
 
     /**
-     * Authenticate a provider by username and password.
+     * Authenticate a provider by verifying their username and password.
      *
      * @param username The username of the provider.
      * @param password The password of the provider.
-     * @return The authenticated User object if successful, null otherwise.
+     * @return The authenticated User object if credentials are valid, null otherwise.
      */
     public User authenticate2(String username, String password) {
-        // Find the user by username
+        // Fetch the user from the repository by username
         User user = userRepository.findByUsername(username);
 
+        // Verify if the user exists and has the role PROVIDER
         if (user != null && user.getRole() == Role.PROVIDER) {
             // Hash the input password
             String hashedPassword = hashPassword(password);
 
-            // Check if the hashed password matches the stored password
+            // Compare the hashed input password with the stored password
             if (user.getPassword().equals(hashedPassword)) {
-                return user;
+                return user; // Authentication successful
             }
         }
 
-        return null;
+        return null; // Authentication failed
     }
 
     /**
-     * Authenticate a sysadmin by username and password.
+     * Authenticate a sysadmin by verifying their username and password.
      *
      * @param username The username of the sysadmin.
      * @param password The password of the sysadmin.
-     * @return The authenticated User object if successful, null otherwise.
+     * @return The authenticated User object if credentials are valid, null otherwise.
      */
     public User authenticate3(String username, String password) {
-        // Find the user by username
+        // Fetch the user from the repository by username
         User user = userRepository.findByUsername(username);
 
+        // Verify if the user exists and has the role SYSADMIN
         if (user != null && user.getRole() == Role.SYSADMIN) {
             // Hash the input password
             String hashedPassword = hashPassword(password);
 
-            // Check if the hashed password matches the stored password
+            // Compare the hashed input password with the stored password
             if (user.getPassword().equals(hashedPassword)) {
-                return user;
+                return user; // Authentication successful
             }
         }
 
-        return null;
+        return null; // Authentication failed
     }
 
     /**
-     * Hashes the password using SHA-256 algorithm.
+     * Hashes the password using the SHA-256 hashing algorithm.
      *
-     * @param password The password to be hashed.
+     * @param password The plain text password to be hashed.
      * @return The hashed password as a hexadecimal string.
      */
     private String hashPassword(String password) {
         try {
+            // Initialize the SHA-256 MessageDigest
             MessageDigest md = MessageDigest.getInstance("SHA-256");
+
+            // Generate the hashed bytes
             byte[] hashedBytes = md.digest(password.getBytes(StandardCharsets.UTF_8));
 
-            // Convert byte array into signum representation
+            // Convert the byte array to a hexadecimal string
             StringBuilder sb = new StringBuilder();
             for (byte b : hashedBytes) {
-                sb.append(String.format("%02x", b)); // Converts to hexadecimal
+                sb.append(String.format("%02x", b)); // Convert each byte to hexadecimal
             }
-            return sb.toString();
-
+            return sb.toString(); // Return the hashed password
         } catch (NoSuchAlgorithmException e) {
-            // Handle the exception or rethrow it
+            // Handle the exception or rethrow it as a runtime exception
             throw new RuntimeException("Error hashing password", e);
         }
     }
