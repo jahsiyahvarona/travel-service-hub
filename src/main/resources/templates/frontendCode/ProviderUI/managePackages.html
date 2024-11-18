@@ -42,8 +42,6 @@
             background-color: #089e45;
         }
 
-        /* Other existing styles... */
-
         /* Scrollable Description Styling */
         .package-description {
             max-height: 100px;        /* Sets the maximum height */
@@ -54,7 +52,7 @@
             margin-bottom: 15px;      /* Adds space below the description */
         }
 
-        /* Optional: Customize Scrollbar Appearance for WebKit Browsers (Chrome, Safari) */
+        /* Customize Scrollbar Appearance for WebKit Browsers (Chrome, Safari) */
         .package-description::-webkit-scrollbar {
             width: 6px;               /* Width of the scrollbar */
         }
@@ -66,7 +64,7 @@
             background-color: rgba(0, 0, 0, 0.05); /* Color of the scrollbar track */
         }
 
-        /* Responsive Adjustments (Optional) */
+        /* Responsive Adjustments  */
         @media (max-width: 768px) {
             .package-description {
                 max-height: 80px;     /* Reduces max-height on smaller screens */
@@ -379,28 +377,35 @@
 <!-- Feather icons -->
 <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js"></script>
 <script th:inline="javascript">
-    /* Initialize Feather Icons */
+    // Initialize Feather Icons for consistent UI icons
     feather.replace();
 
     /* JavaScript Functions */
 
+    /**
+     * Load package data into the edit package modal.
+     * @param {string} packageId - The ID of the package to load data for.
+     */
     function loadPackageData(packageId) {
         var packageCard = document.querySelector('[data-package-id="' + packageId + '"]');
         if (packageCard) {
+            // Extract package details from the data attributes of the package card
             var name = packageCard.getAttribute('data-package-name');
             var description = packageCard.getAttribute('data-package-description');
             var price = packageCard.getAttribute('data-package-price');
             var imageUrl = packageCard.getAttribute('data-package-image-url');
 
+            // Populate the edit form fields with package details
             document.getElementById('editPackageId').value = packageId;
             document.getElementById('editPackageName').value = name;
             document.getElementById('editPackageDescription').value = description;
             document.getElementById('editPackagePrice').value = price;
 
+            // Display the current image if it exists, or leave blank
             var currentImage = document.getElementById('currentPackageImage');
-            currentImage.src = imageUrl ? imageUrl : ''; // Display the current image
+            currentImage.src = imageUrl ? imageUrl : '';
 
-            // Clear any previously selected file and hide the preview
+            // Clear any previously selected file inputs and hide the previews
             document.getElementById('editPackageImage').value = '';
             document.getElementById('createPackageImage').value = '';
             document.getElementById('newImagePreview').src = '';
@@ -408,32 +413,40 @@
             document.getElementById('newImagePreviewContainer').style.display = 'none';
             document.getElementById('newImagePreviewContainer1').style.display = 'none';
 
+            // Show the edit package modal
             var editPackageModal = new bootstrap.Modal(document.getElementById('editPackageModal'));
             editPackageModal.show();
         } else {
+            // Log an error if package data is not found
             console.error('Package data not found for ID:', packageId);
         }
     }
 
-    // Preview the selected new image
+    /**
+     * Preview the selected new image in the edit package modal.
+     */
     document.getElementById('editPackageImage').addEventListener('change', function(event) {
         var file = event.target.files[0];
         if (file) {
             var reader = new FileReader();
             reader.onload = function(e) {
+                // Display the selected image in the preview section
                 document.getElementById('newImagePreview').src = e.target.result;
                 document.getElementById('newImagePreviewContainer').style.display = 'block'; // Show the preview
-
             };
             reader.readAsDataURL(file);
         }
     });
-    // Preview the selected new image
+
+    /**
+     * Preview the selected new image in the create package modal.
+     */
     document.getElementById('createPackageImage').addEventListener('change', function(event) {
         var file = event.target.files[0];
         if (file) {
             var reader = new FileReader();
             reader.onload = function(e) {
+                // Display the selected image in the preview section
                 document.getElementById('newImagePreview1').src = e.target.result;
                 document.getElementById('newImagePreviewContainer1').style.display = 'block'; // Show the preview
             };
@@ -441,8 +454,9 @@
         }
     });
 
-
-    // Add event listeners to all edit buttons
+    /**
+     * Add event listeners to all edit buttons to load package data into the modal.
+     */
     document.querySelectorAll('.edit-package-btn').forEach(function(button) {
         button.addEventListener('click', function() {
             var packageId = this.getAttribute('data-package-id');
@@ -450,25 +464,32 @@
         });
     });
 
-    // Function to clear the edit package form
+    /**
+     * Clear the edit package form and reset the preview image.
+     */
     function clearEditForm() {
         document.getElementById('editPackageForm').reset();
-        // Clear the current image
-        document.getElementById('currentPackageImage').src = '';
+        document.getElementById('currentPackageImage').src = ''; // Clear the current image
     }
 
-    // Function to clear the create package form (if applicable)
+    /**
+     * Clear the create package form and reset the preview image.
+     */
     function clearCreateForm() {
         document.getElementById('createPackageForm').reset();
     }
 
-    // Function to show the sign out confirmation modal (if applicable)
+    /**
+     * Show the sign out confirmation modal.
+     */
     function showSignOutModal() {
         var signOutModal = new bootstrap.Modal(document.getElementById('signOutModal'));
         signOutModal.show();
     }
 
-    // Handle sign out confirmation (if applicable)
+    /**
+     * Handle the sign out confirmation by redirecting to the login page.
+     */
     document.getElementById('confirmSignOutButton').addEventListener('click', function() {
         window.location.href = "/LoginChoice"; // Adjust the logout URL as needed
     });

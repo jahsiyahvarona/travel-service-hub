@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <!-- Required Meta Tags Always Come First -->
+    <!-- Meta tags for character encoding and responsive design -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Page title -->
     <title>Customer Login - Travel Services Hub</title>
+
+    <!-- Favicon for the browser tab -->
     <link rel="shortcut icon" href="./favicon.ico">
 
-    <!-- CSS Files -->
+    <!-- Linking various CSS files for styling the page -->
     <link th:href="@{/CSS/css/theme.css}" rel="stylesheet" type="text/css">
     <link th:href="@{/CSS/Downloads/TravelServicesHub/css/theme.css}" rel="stylesheet" type="text/css">
     <link th:href="@{/CSS/assets/vendor/bootstrap-icons/font/bootstrap-icons.css}" rel="stylesheet">
@@ -17,16 +21,21 @@
 </head>
 <body>
 <header>
+    <!-- Navigation bar section -->
     <nav class="bg-white navbar navbar-expand-lg navbar-light">
         <div class="container" style="margin-left: -24px;">
+            <!-- Brand logo linking to the home page -->
             <a class="navbar-brand" th:href="@{/welcome}">
                 <img class="navbar-brand-logo" th:src="@{/images/logo.png}" alt="Image Description">
             </a>
+            <!-- Button for toggling the navbar on smaller screens -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown-1" aria-controls="navbarNavDropdown-1" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
+            <!-- Collapsible menu items -->
             <div class="collapse navbar-collapse" id="navbarNavDropdown-1">
                 <ul class="ms-auto navbar-nav">
+                    <!-- Navigation links -->
                     <li class="nav-item">
                         <a class="active nav-link" aria-current="page" th:href="@{/welcome}">Home</a>
                     </li>
@@ -42,37 +51,34 @@
     </nav>
 </header>
 <main role="main" data-pgc-field="main">
+    <!-- Error messages displayed conditionally -->
     <div class="w-lg-75 mx-auto">
-        <!-- Error message (if login fails) -->
         <div th:if="${param.error}" class="alert alert-danger">
             Invalid username or password.
-
         </div>
     </div>
     <div class="w-lg-75 mx-auto">
-        <!-- Error message (if login fails) -->
         <div th:if="${param.error2}" class="alert alert-danger">
-            account is suspended.
-
+            Account is suspended.
         </div>
     </div>
 
     <div class="container my-5">
         <div class="row">
-            <!-- Left Side Section: Form -->
+            <!-- Login form section (left side) -->
             <div class="col-md-8">
                 <h1 class="display-4 text-center">Customer Login</h1>
                 <p class="fs-5 text-center">Welcome back to Travel Services Hub!</p>
                 <div class="row justify-content-center">
                     <div class="col-md-10">
-                        <!-- Login Form -->
+                        <!-- Form for logging in -->
                         <form th:action="@{/CustomerLogin}" method="post" id="loginForm">
-                            <!-- Username Field -->
+                            <!-- Username input field -->
                             <div class="form-group mb-3">
                                 <label for="usernameField">Username</label>
                                 <input type="text" class="form-control" name="username" id="usernameField" placeholder="Enter username" required>
                             </div>
-                            <!-- Password Field -->
+                            <!-- Password input field with toggle visibility feature -->
                             <div class="form-group mb-3">
                                 <label for="passwordField">Password</label>
                                 <div class="input-group">
@@ -82,14 +88,14 @@
                                     </button>
                                 </div>
                             </div>
-                            <!-- Submit Button -->
+                            <!-- Buttons for form submission and cancellation -->
                             <button type="submit" class="btn btn-primary">Login</button>
                             <a th:href="@{/LoginChoice}" class="btn btn-secondary ml-2">Cancel</a>
                         </form>
                     </div>
                 </div>
             </div>
-            <!-- Right Side Section -->
+            <!-- Right side section with promotional content -->
             <div class="col-md-4 d-flex flex-column justify-content-center p-5 placeholder-glow"
                  style="
                      background-color: #0abf53;
@@ -99,6 +105,7 @@
                      background-repeat: no-repeat;
                      border-radius: 0 5px 5px 0;
                  ">
+                <!-- Promotional text and features -->
                 <h5 class="mb-4" style="color: #ffffff; font-weight: bold; font-size: 22px;">
                     Build unforgettable travel experiences with:
                 </h5>
@@ -115,16 +122,17 @@
     </div>
 </main>
 
-<!-- JavaScript Files -->
+<!-- Linking JavaScript files -->
 <script th:src="@{/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js}"></script>
 <script>
+    // Function to toggle the visibility of the password field
     function togglePassword(fieldId) {
         const field = document.getElementById(fieldId);
         const toggleButton = field.nextElementSibling;
         const type = field.getAttribute('type') === 'password' ? 'text' : 'password';
         field.setAttribute('type', type);
 
-        // Change the icon
+        // Update the icon to indicate the visibility status
         const icon = toggleButton.querySelector('i');
         if (type === 'text') {
             icon.classList.remove('bi-eye');

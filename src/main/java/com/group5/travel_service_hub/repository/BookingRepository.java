@@ -12,49 +12,59 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * Repository interface for Booking entity.
+ * Repository interface for performing CRUD operations on Booking entity.
+ * Extends JpaRepository to provide default implementations for common operations.
  */
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-    long countByPkg(Package pkg);
-
 
     /**
-     * Finds all bookings made by a specific customer.
+     * Counts the number of bookings associated with a specific package.
+     *
+     * @param pkg The package entity.
+     * @return The count of bookings for the specified package.
+     */
+    long countByPkg(Package pkg);
+
+    /**
+     * Retrieves all bookings made by a specific customer.
      *
      * @param customerId The ID of the customer.
-     * @return List of Booking entities.
+     * @return A list of Booking entities made by the customer.
      */
     List<Booking> findByCustomerId(Long customerId);
 
     /**
-     * Finds all bookings for a specific package.
+     * Retrieves all bookings associated with a specific package.
      *
      * @param packageId The ID of the package.
-     * @return List of Booking entities.
+     * @return A list of Booking entities for the specified package.
      */
     List<Booking> findByPkgId(Long packageId);
 
     /**
-     * Finds all distinct bookings associated with packages offered by a specific provider.
+     * Retrieves all distinct bookings associated with packages offered by a specific provider.
      *
      * @param providerDetailsId The ID of the provider.
-     * @return List of distinct Booking entities.
+     * @return A list of distinct Booking entities linked to the provider's packages.
      */
     @Query("SELECT DISTINCT b FROM Booking b JOIN b.pkg p WHERE p.providerDetails.id = :providerDetailsId")
     List<Booking> findAllDistinctBookingsByProviderDetailsId(@Param("providerDetailsId") Long providerDetailsId);
 
-
     /**
-     * Finds all bookings with a specific status.
+     * Retrieves all bookings with a specific status.
      *
-     * @param status The booking status.
-     * @return List of Booking entities.
+     * @param status The BookingStatus enum value.
+     * @return A list of Booking entities with the specified status.
      */
     List<Booking> findByStatus(BookingStatus status);
 
+    /**
+     * Retrieves all bookings made for packages offered by a specific provider.
+     *
+     * @param provider The User entity representing the provider.
+     * @return A list of Booking entities linked to the provider's packages.
+     */
     @Query("SELECT b FROM Booking b WHERE b.pkg.providerDetails = :provider")
     List<Booking> findByProvider(@Param("provider") User provider);
-
 }
-

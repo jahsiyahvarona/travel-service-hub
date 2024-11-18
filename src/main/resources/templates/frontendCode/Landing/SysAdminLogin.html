@@ -1,28 +1,40 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
+    <!-- Meta tags for character encoding and responsive design -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Page title -->
     <title>SysAdmin Login</title>
+
+    <!-- Favicon for browser tab -->
     <link rel="shortcut icon" href="./favicon.ico">
+
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <!-- CSS Implementing Plugins -->
+
+    <!-- CSS Files -->
+    <!-- Bootstrap Icons for UI elements -->
     <link rel="stylesheet" th:href="@{CSS/assets/vendor/bootstrap-icons/font/bootstrap-icons.css}">
+    <!-- Mega Menu for enhanced navigation -->
     <link rel="stylesheet" th:href="@{CSS/assets/vendor/hs-mega-menu/dist/hs-mega-menu.min.css}">
+    <!-- Swiper for carousel functionality -->
     <link rel="stylesheet" th:href="@{/assets/vendor/swiper/swiper-bundle.min.css}">
+    <!-- Theme-specific styles -->
     <link rel="stylesheet" th:href="@{/pinekit_theme/pinekit.css}">
-    <link rel="stylesheet" th:href="@{/master_style.css}">
+    <!-- Additional CSS files -->
     <link href="/CSS/css/theme.css" rel="stylesheet" type="text/css">
     <link href="/CSS/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body style="background-color: #212428;">
 <header style="text-align: center;">
-    <!-- Header content -->
+    <!-- Placeholder for future header content -->
 </header>
 <main role="main" data-pgc-field="main">
     <div class="container content-space-2 content-space-lg-3" style="align-content: center;">
         <div class="w-lg-75 mx-auto">
-            <!-- Error message (if login fails) -->
+            <!-- Error message displayed when login fails -->
             <div th:if="${param.error}" class="alert alert-danger">
                 Invalid username or password.
             </div>
@@ -33,52 +45,55 @@
             <div class="container content-space-t-1 content-space-b-2 d-flex justify-content-center align-items-center flex-column">
                 <div class="mx-lg-auto" style="max-width: 55rem;">
                     <div class="d-flex justify-content-center align-items-center flex-column min-vh-lg-100" style="border-radius: 19px; padding: 110px 10px 80px 0px;">
-                        <!-- ========== HEADER ========== -->
+                        <!-- Header section -->
                         <header id="header" class="navbar navbar-height navbar-light mb-3">
                             <div class="container">
+                                <!-- Application logo -->
                                 <a class="navbar-brand mx-auto" href="./index.html" aria-label="Pinekit" style="padding-top: 0px; padding-left: 2px; margin-bottom: -39px;">
                                     <img class="navbar-brand-logo" src="/images/logo.png" alt="Image Description" style="width: 200px; height: auto;">
                                 </a>
                             </div>
                         </header>
-                        <!-- ========== END HEADER ========== -->
+                        <!-- End of header section -->
                         <div class="position-relative">
-                            <!-- Card -->
+                            <!-- Login card -->
                             <div class="card card-shadow card-login mx-auto" style="max-width: 700px;">
                                 <div class="row">
+                                    <!-- Login form section -->
                                     <div class="col-md-8">
                                         <div class="card-body">
-                                            <!-- Form -->
+                                            <!-- Login form -->
                                             <form action="#" th:action="@{/SysAdminLogin}" method="post" class="js-validate needs-validation" id="loginForm" novalidate="">
                                                 <div class="text-center">
                                                     <div class="mb-5">
+                                                        <!-- Login form title -->
                                                         <h3 class="card-title">Admin login</h3>
                                                     </div>
                                                 </div>
-                                                <!-- Username Field -->
+                                                <!-- Username input -->
                                                 <div class="mb-4">
                                                     <input type="text" class="form-control form-control-lg" name="username" id="usernameField" placeholder="Username" aria-label="Username" required="">
                                                     <span class="invalid-feedback">Please enter your username.</span>
                                                 </div>
-                                                <!-- Password Field -->
+                                                <!-- Password input -->
                                                 <div class="mb-4">
                                                     <input type="password" class="form-control form-control-lg" name="password" id="passwordField" placeholder="Password" aria-label="Password" required="">
                                                     <span class="invalid-feedback">Please enter your password.</span>
                                                 </div>
-                                                <!-- Submit Button -->
+                                                <!-- Submit button -->
                                                 <div class="d-grid gap-4">
                                                     <button class="btn btn-lg" type="submit" style="background-color: #0abf53; color: white;">Login</button>
                                                 </div>
                                             </form>
                                         </div>
                                     </div>
-                                    <!-- Right Side Section -->
+                                    <!-- Promotional right-side section -->
                                     <div class="bg-soft-primary col-md-4 d-md-flex flex-column justify-content-center p-8 p-md-5" style="background-color: #0abf53; background-image: url('/images/An airplane flying over the horizon, representing the ease and accessibility of travel through the p (1).jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; margin: -1px 8px -1px -11px; border-radius: 0px 6px 6px 0px;">
                                         <ul class="list-checked list-checked-primary list-py-2"></ul>
                                     </div>
                                 </div>
                             </div>
-                            <!-- End Card -->
+                            <!-- End of login card -->
                         </div>
                     </div>
                 </div>
@@ -86,7 +101,8 @@
         </div>
     </div>
 </main>
-<!-- JS Global Compulsory -->
+<!-- JavaScript files -->
+<!-- Bootstrap script -->
 <script th:src="@{/CSS/bootstrap/js/bootstrap.min.js}"></script>
 </body>
 </html>

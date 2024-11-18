@@ -6,14 +6,9 @@ import com.group5.travel_service_hub.entity.User;
 import com.group5.travel_service_hub.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -25,6 +20,7 @@ import java.util.*;
 
 /**
  * Service class for managing users.
+ * Includes user registration, account management, profile updates, and administrative actions.
  */
 @Service
 public class UserService {
@@ -32,36 +28,30 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    // Inject the upload directory from application.properties
     @Autowired
     private Environment env;
 
     /**
-     * Registers a new user.
+     * Registers a new user in the system.
+     * Ensures unique username and email, and hashes the user's password before saving.
      *
      * @param user The user to register.
-     * @return The registered user.
+     * @return The registered User object.
+     * @throws IllegalArgumentException if the username or email already exists.
      */
     @Transactional
     public User registerUser(User user) {
-        // Check if username already exists
         if (usernameExists(user.getUsername())) {
             throw new IllegalArgumentException("Username already exists.");
         }
 
-        // Check if email already exists
         if (emailExists(user.getEmail())) {
             throw new IllegalArgumentException("Email already exists.");
         }
 
-        // Hash the password before saving
-        String hashedPassword = hashPassword(user.getPassword());
-        user.setPassword(hashedPassword);
-
-        // Ensure the user is active upon registration
+        user.setPassword(hashPassword(user.getPassword()));
         user.setActive(true);
         user.setBanned(false);
-
         return userRepository.save(user);
     }
 
@@ -96,30 +86,30 @@ public class UserService {
     }
 
     /**
-     * Checks if a username already exists.
+     * Checks if a username already exists in the system.
      *
      * @param username The username to check.
-     * @return True if exists, false otherwise.
+     * @return True if the username exists, false otherwise.
      */
     public boolean usernameExists(String username) {
         return userRepository.existsByUsername(username);
     }
 
     /**
-     * Checks if an email already exists.
+     * Checks if an email already exists in the system.
      *
      * @param email The email to check.
-     * @return True if exists, false otherwise.
+     * @return True if the email exists, false otherwise.
      */
     public boolean emailExists(String email) {
         return userRepository.existsByEmail(email);
     }
 
     /**
-     * Activates a user's account.
+     * Activates a user's account by setting the active flag to true.
      *
      * @param userId The ID of the user to activate.
-     * @return The activated user.
+     * @return The updated User object.
      */
     @Transactional
     public User activateUser(Long userId) {
@@ -129,10 +119,10 @@ public class UserService {
     }
 
     /**
-     * Deactivates a user's account.
+     * Deactivates a user's account by setting the active flag to false.
      *
      * @param userId The ID of the user to deactivate.
-     * @return The deactivated user.
+     * @return The updated User object.
      */
     @Transactional
     public User deactivateUser(Long userId) {
@@ -142,50 +132,50 @@ public class UserService {
     }
 
     /**
-     * Bans a user.
+     * Bans a user by setting the banned flag to true and deactivates the account.
      *
      * @param userId The ID of the user to ban.
-     * @return The banned user.
+     * @return The updated User object.
      */
     @Transactional
     public User banUser(Long userId) {
         User user = findById(userId);
         user.setBanned(true);
-        user.setActive(false); // Optionally deactivate when banning
+        user.setActive(false);
         return userRepository.save(user);
     }
 
     /**
-     * Sends a warning to the user.
+     * Sends a warning to a user based on a report.
      *
-     * @param user   The user to warn.
-     * @param report The associated report.
+     * @param user   The User object to warn.
+     * @param report The Report object containing the warning details.
      */
     public void sendWarning(User user, Report report) {
-        // Log the warning action or send an email notification
         System.out.println("Warning issued to user: " + user.getUsername() +
                 " for reason: " + report.getReason());
     }
 
     /**
-     * Unbans a user.
+     * Unbans a user by setting the banned flag to false and activates the account.
      *
      * @param userId The ID of the user to unban.
-     * @return The unbanned user.
+     * @return The updated User object.
      */
     @Transactional
     public User unbanUser(Long userId) {
         User user = findById(userId);
         user.setBanned(false);
-        user.setActive(true); // Optionally activate when unbanning
+        user.setActive(true);
         return userRepository.save(user);
     }
 
     /**
-     * Finds a user by username.
+     * Finds a user by their username.
      *
-     * @param username The username.
-     * @return The user.
+     * @param username The username to search for.
+     * @return The User object if found.
+     * @throws IllegalArgumentException if the user is not found.
      */
     public User findByUsername(String username) {
         return Optional.ofNullable(userRepository.findByUsername(username))
@@ -193,10 +183,11 @@ public class UserService {
     }
 
     /**
-     * Finds a user by ID.
+     * Finds a user by their ID.
      *
-     * @param userId The user ID.
-     * @return The user.
+     * @param userId The ID of the user to search for.
+     * @return The User object if found.
+     * @throws IllegalArgumentException if the user is not found.
      */
     public User findById(Long userId) {
         return userRepository.findById(userId)
@@ -204,9 +195,9 @@ public class UserService {
     }
 
     /**
-     * Retrieves all users.
+     * Retrieves all users in the system.
      *
-     * @return List of all users.
+     * @return A list of all User objects.
      */
     public List<User> findAllUsers() {
         return userRepository.findAll();
@@ -218,39 +209,49 @@ public class UserService {
      * @param userId      The ID of the user.
      * @param oldPassword The current password.
      * @param newPassword The new desired password.
-     * @return The updated user.
-     * @throws IllegalArgumentException If the user is not found or old password does not match.
+     * @return The updated User object.
+     * @throws IllegalArgumentException If the user is not found or the old password does not match.
      */
     @Transactional
     public User updatePassword(Long userId, String oldPassword, String newPassword) {
+        // Find the user by ID
         User user = findById(userId);
 
-        // Verify that the old password matches
+        // Hash the old password provided by the user
         String oldPasswordHash = hashPassword(oldPassword);
+
+        // Check if the hashed old password matches the stored password
         if (!user.getPassword().equals(oldPasswordHash)) {
-            throw new IllegalArgumentException("Old password is incorrect.");
+            throw new IllegalArgumentException("Current password is incorrect.");
         }
 
-        // Update to the new password
-        String newHashedPassword = hashPassword(newPassword);
-        user.setPassword(newHashedPassword);
+        // Hash the new password
+        String newPasswordHash = hashPassword(newPassword);
+
+        // Check if the new password is different from the current password
+        if (user.getPassword().equals(newPasswordHash)) {
+            throw new IllegalArgumentException("New password must be different from the current password.");
+        }
+
+        // Update the password
+        user.setPassword(newPasswordHash);
+
+        // Save the updated user
         return userRepository.save(user);
     }
 
     /**
-     * Updates the authenticated user's profile.
+     * Updates a user's profile information such as username and email.
      *
      * @param userId      The ID of the user.
-     * @param updatedUser The user entity containing updated profile details.
-     * @return The updated user.
+     * @param updatedUser The User object containing the updated details.
+     * @return The updated User object.
      */
     @Transactional
     public User updateProfile(Long userId, User updatedUser) {
         User existingUser = findById(userId);
 
-        // Update only allowed fields (e.g., username, email)
         if (updatedUser.getUsername() != null && !updatedUser.getUsername().isEmpty()) {
-            // Check if the new username is already taken by another user
             if (!existingUser.getUsername().equals(updatedUser.getUsername()) && usernameExists(updatedUser.getUsername())) {
                 throw new IllegalArgumentException("Username already exists.");
             }
@@ -258,48 +259,38 @@ public class UserService {
         }
 
         if (updatedUser.getEmail() != null && !updatedUser.getEmail().isEmpty()) {
-            // Check if the new email is already taken by another user
             if (!existingUser.getEmail().equals(updatedUser.getEmail()) && emailExists(updatedUser.getEmail())) {
                 throw new IllegalArgumentException("Email already exists.");
             }
             existingUser.setEmail(updatedUser.getEmail());
         }
 
-        // Add other fields that can be updated as needed, excluding role, active, banned, etc.
-
         return userRepository.save(existingUser);
     }
 
     /**
-     * Updates the authenticated user's profile picture by handling file upload.
+     * Updates a user's profile picture by uploading a new file.
      *
      * @param userId The ID of the user.
-     * @param file   The profile picture file.
-     * @return The updated user.
+     * @param file   The new profile picture file.
+     * @return The updated User object.
      */
     @Transactional
     public User updateProfilePic(Long userId, MultipartFile file) {
         User user = findById(userId);
 
-        // Validate file
         if (file.isEmpty()) {
             throw new IllegalArgumentException("Uploaded file is empty.");
         }
 
-        // Optionally, validate file type (e.g., only allow JPEG and PNG)
         String contentType = file.getContentType();
         if (contentType == null || !isImage(contentType)) {
             throw new IllegalArgumentException("Only image files (JPEG, PNG) are allowed.");
         }
 
-        // Normalize file name
         String originalFilename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-
-        // Generate a unique file name to prevent collisions
         String fileExtension = getFileExtension(originalFilename);
-        String fileName = UUID.randomUUID().toString() + "." + fileExtension;
-
-        // Get the upload directory from properties
+        String fileName = UUID.randomUUID() + "." + fileExtension;
         String uploadDir = env.getProperty("file.upload-dir");
 
         try {
@@ -309,19 +300,14 @@ public class UserService {
 
             Path uploadPath = Paths.get(uploadDir);
 
-            // Create directories if not exist
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
 
-            // Copy file to the target location (Replacing existing file with the same name)
             Path filePath = uploadPath.resolve(fileName);
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            // Set the profilePic field (URL)
-            String fileUrl = "/uploads/" + fileName;
-            user.setProfilePic(fileUrl);
-
+            user.setProfilePic("/uploads/" + fileName);
             return userRepository.save(user);
         } catch (IOException ex) {
             throw new IllegalArgumentException("Could not store file. Please try again!", ex);
@@ -341,7 +327,7 @@ public class UserService {
     }
 
     /**
-     * Extracts the file extension from the filename.
+     * Extracts the file extension from a filename.
      *
      * @param filename The filename.
      * @return The file extension.
@@ -354,22 +340,11 @@ public class UserService {
         return parts.length > 1 ? parts[parts.length - 1] : "";
     }
 
-    /**
-     * Retrieves a customer User by their ID.
-     *
-     * @param userId The ID of the user.
-     * @return The User if found.
-     * @throws IllegalArgumentException if the user is not found.
-     */
-    public User getCustomerUser(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
-    }
 
 
 
 
-    //SysAdmin
+//SysAdmin
     /**
      * Deletes a user by ID.
      *
@@ -405,6 +380,7 @@ public class UserService {
       //  return userRepository.findByAccountStatus(AccountStatus.valueOf(status));
         return List.of();
     }
+
 
 }
 

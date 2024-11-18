@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpSession;
+
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
@@ -27,27 +28,26 @@ import java.util.Optional;
 public class PackageController {
 
     @Autowired
-    private PackageService packageService;
+    private PackageService packageService; // Service for package-related operations
 
     @Autowired
-    private UserService userService;
+    private UserService userService; // Service for user-related operations
 
     @Autowired
-    private BookingRepository bookingRepository;
+    private BookingRepository bookingRepository; // Repository for managing booking data
 
     @Autowired
-    private PackageRepository packageRepository;
-
-
+    private PackageRepository packageRepository; // Repository for managing package data
 
     /**
-     * Add a new Package entry.
-     * Endpoint: POST /packages/create
+     * Adds a new package entry.
      *
-     * @param name                The new Package object.
-     * @param imageUrl     The uploaded image file.
-     * @param session        The authenticated user.
-     * @param redirectAttributes Redirect attributes for flash messages.
+     * @param name                The name of the package.
+     * @param description         The description of the package.
+     * @param price               The price of the package.
+     * @param imageUrl            The uploaded image file (optional).
+     * @param session             The HTTP session for the authenticated user.
+     * @param redirectAttributes  Redirect attributes for flash messages.
      * @return Redirect to the list of all packages.
      */
     @PostMapping("/create")
@@ -57,62 +57,44 @@ public class PackageController {
                                 @RequestParam(value = "imageUrl", required = false) MultipartFile imageUrl,
                                 HttpSession session,
                                 RedirectAttributes redirectAttributes) {
-
         User loggedInUser = (User) session.getAttribute("loggedInUser");
-        String username = loggedInUser.getUsername(); // Assuming there's a getUsername() method
+        String username = loggedInUser.getUsername();
         User user = userService.findByUsername(username);
 
-
-        Package pkg = new Package();
-
-        // Verify the user has the PROVIDER or SYSADMIN role
+        // Check user role
         if (user.getRole() != Role.PROVIDER && user.getRole() != Role.SYSADMIN) {
             redirectAttributes.addFlashAttribute("error", "Access denied: Only providers can create packages.");
             return "redirect:/provider/managePackages";
         }
 
-            // Set the provider if the user is a PROVIDER
-            if (user.getRole() == Role.PROVIDER) {
-
-                pkg.setName(name);
-                pkg.setDescription(description);
-                pkg.setPrice(price);
-                pkg.setProviderDetails(user);
-
-            } else if (user.getRole() == Role.SYSADMIN) {
-                // Optionally, allow SYSADMIN to assign a provider
-                // This requires additional form fields and logic
-                // For simplicity, we'll assume SYSADMIN cannot set provider via this form
-            }
+        Package pkg = new Package();
+        pkg.setName(name);
+        pkg.setDescription(description);
+        pkg.setPrice(price);
+        pkg.setProviderDetails(user);
 
         try {
-
+            // Save the package
             packageService.createPackage(pkg);
 
-            // Handle profile picture upload
+            // Handle image upload
             if (imageUrl != null && !imageUrl.isEmpty()) {
                 packageService.updateImage(pkg.getId(), imageUrl);
             }
+
             redirectAttributes.addFlashAttribute("success", "Package created successfully.");
-
-            return "redirect:/provider/managePackages"; // Adjust as needed
-
-
+            return "redirect:/provider/managePackages";
         } catch (Exception e) {
-            // Handle registration errors
-
+            redirectAttributes.addFlashAttribute("error", "Failed to create package: " + e.getMessage());
             return "frontendCode/ProviderUI/managePackages";
         }
     }
 
-
-
     /**
-     * Get package data as JSON for editing purposes.
-     * Endpoint: GET /providers/packages/{id}/data
+     * Retrieves package data as JSON for editing.
      *
      * @param id The ID of the package.
-     * @return ResponseEntity containing Package data or 404 status.
+     * @return ResponseEntity containing package data or 404 status.
      */
     @GetMapping("/{id}/data")
     @ResponseBody
@@ -122,13 +104,14 @@ public class PackageController {
     }
 
     /**
-     * Handle the update of an existing package.
-     * Endpoint: POST /providers/packages/update/{packageId}
+     * Updates an existing package.
      *
-     *
-     *
-     *
-     *
+     * @param id                 The ID of the package to update.
+     * @param name               The updated name of the package.
+     * @param description        The updated description of the package.
+     * @param price              The updated price of the package.
+     * @param imageUrl           The new image file (optional).
+     * @param session            The HTTP session for the authenticated user.
      * @param redirectAttributes Redirect attributes for flash messages.
      * @return Redirect to the Manage Packages page.
      */
@@ -140,17 +123,12 @@ public class PackageController {
             @RequestParam("price") Double price,
             @RequestParam(value = "imageUrl", required = false) MultipartFile imageUrl,
             HttpSession session,
-            RedirectAttributes redirectAttributes ) {
-
-
-
+            RedirectAttributes redirectAttributes) {
         User loggedInUser = (User) session.getAttribute("loggedInUser");
-        String username = loggedInUser.getUsername(); // Assuming there's a getUsername() method
+        String username = loggedInUser.getUsername();
         User user = userService.findByUsername(username);
 
-
-
-        // Verify the user has the PROVIDER or SYSADMIN role
+        // Verify role
         if (user.getRole() != Role.PROVIDER && user.getRole() != Role.SYSADMIN) {
             redirectAttributes.addFlashAttribute("error", "Access denied: Only providers can update packages.");
             return "redirect:/provider/managePackages";
@@ -162,39 +140,26 @@ public class PackageController {
             pkg.setName(name);
             pkg.setDescription(description);
             pkg.setPrice(price);
-            // Update the package
-            // Process the image upload if a new image is provided
-            if (!imageUrl.isEmpty()) {
+
+            if (imageUrl != null && !imageUrl.isEmpty()) {
                 packageService.updateImage(pkg.getId(), imageUrl);
             }
 
             packageService.updatePackage(pkg);
 
             redirectAttributes.addFlashAttribute("success", "Package updated successfully.");
-
-            return "redirect:/provider/managePackages"; // Adjust as needed
-
-
-        } catch (SecurityException se) {
-            redirectAttributes.addFlashAttribute("error", "You do not have permission to update this package.");
-            return "redirect:/provider/managePackages";
-        } catch (IllegalArgumentException iae) {
-            redirectAttributes.addFlashAttribute("error", "Failed to update package: invalid file type");
             return "redirect:/provider/managePackages";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Failed to update package: " + e.getMessage());
             return "redirect:/provider/managePackages";
         }
-
-
     }
 
     /**
-     * Handle the deletion of a package.
-     * Endpoint: GET /providers/packages/delete/{packageId}
+     * Deletes a package.
      *
      * @param packageId          The ID of the package to delete.
-     * @param session         The authenticated user.
+     * @param session            The HTTP session for the authenticated user.
      * @param redirectAttributes Redirect attributes for flash messages.
      * @return Redirect to the Manage Packages page.
      */
@@ -203,19 +168,18 @@ public class PackageController {
             @PathVariable Long packageId,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
-
         User loggedInUser = (User) session.getAttribute("loggedInUser");
-        String username = loggedInUser.getUsername(); // Assuming there's a getUsername() method
+        String username = loggedInUser.getUsername();
         User user = userService.findByUsername(username);
 
         Package pkg = packageRepository.findById(packageId).orElse(null);
         long bookingCount = bookingRepository.countByPkg(pkg);
+
         if (bookingCount > 0) {
-            redirectAttributes.addFlashAttribute("error", "Cannot delete package: There are existing bookings associated with this package.");
+            redirectAttributes.addFlashAttribute("error", "Cannot delete package: Existing bookings are associated with this package.");
             return "redirect:/provider/managePackages";
         }
 
-        // Verify the user has the PROVIDER or SYSADMIN role
         if (user.getRole() != Role.PROVIDER && user.getRole() != Role.SYSADMIN) {
             redirectAttributes.addFlashAttribute("error", "Access denied: Only providers can delete packages.");
             return "redirect:/provider/managePackages";
@@ -224,10 +188,6 @@ public class PackageController {
         try {
             packageService.deletePackage(user, packageId);
             redirectAttributes.addFlashAttribute("success", "Package deleted successfully.");
-        } catch (SecurityException se) {
-            redirectAttributes.addFlashAttribute("error", "You do not have permission to delete this package.");
-        } catch (IllegalArgumentException iae) {
-            redirectAttributes.addFlashAttribute("error", "Package not found.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Failed to delete package: " + e.getMessage());
         }
@@ -236,43 +196,35 @@ public class PackageController {
     }
 
     /**
-     * Search for packages by name.
-     * Endpoint: GET /providers/packages/search?keyword=xxx
+     * Searches for packages by name.
      *
-     * @param keyword    The search keyword.
-     * @param principal  The authenticated user.
-     * @param model      The model to attach attributes.
-     * @return The view name "managePackages".
+     * @param keyword   The search keyword.
+     * @param principal The authenticated user's details.
+     * @param model     The model to attach search results.
+     * @return The view for managing packages.
      */
     @GetMapping("/search")
     public String searchPackages(
             @RequestParam String keyword,
             Principal principal,
             Model model) {
-
         User user = userService.findByUsername(principal.getName());
 
-        // Verify the user has the PROVIDER or SYSADMIN role
         if (user.getRole() != Role.PROVIDER && user.getRole() != Role.SYSADMIN) {
             model.addAttribute("error", "Access denied: Only providers can search packages.");
-            return "error"; // Ensure you have an 'error.html' template
+            return "error";
         }
 
-        List<Package> packages;
+        List<Package> packages = user.getRole() == Role.SYSADMIN
+                ? packageService.searchPackagesByName(keyword)
+                : packageService.searchPackagesByNameAndProvider(keyword, user.getId());
 
-        if (user.getRole() == Role.SYSADMIN) {
-            packages = packageService.searchPackagesByName(keyword);
-        } else {
-            packages = packageService.searchPackagesByNameAndProvider(keyword, user.getId());
-        }
-
-
-        return "frontendCode/ProviderUI/managePackages"; // Ensure this corresponds to 'managePackages.html'
+        model.addAttribute("packages", packages);
+        return "frontendCode/ProviderUI/managePackages";
     }
 
     /**
-     * Handle sign out confirmation.
-     * Endpoint: GET /logout
+     * Logs the user out and redirects to the login page.
      *
      * @return Redirect to the login page.
      */

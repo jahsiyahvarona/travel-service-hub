@@ -48,7 +48,7 @@ public class ProviderService {
         String uploadDir = "package-images/"; // Directory to save images
         String originalFilename = imageFile.getOriginalFilename();
         String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-        String newFilename = UUID.randomUUID().toString() + fileExtension;
+        String newFilename = UUID.randomUUID() + fileExtension;
         Path imagePath = Paths.get(uploadDir, newFilename);
 
         // Ensure the directory exists
@@ -60,8 +60,6 @@ public class ProviderService {
         // Return the relative path or URL to store in the database
         return "/package-images/" + newFilename;
     }
-
-    // Existing methods (createPackage, updatePackage, getPackageById, etc.)
 
     /**
      * Creates a new travel package for the provider.
@@ -101,8 +99,6 @@ public class ProviderService {
             existingPackage.setImageUrl(pkg.getImageUrl());
         }
 
-        // Update other fields as necessary
-
         packageRepository.save(existingPackage);
     }
 
@@ -117,8 +113,6 @@ public class ProviderService {
         return packageRepository.findById(packageId)
                 .orElseThrow(() -> new IllegalArgumentException("Package not found."));
     }
-
-    // Other methods remain the same
 
     /**
      * Ensures the given user ID belongs to a provider and retrieves the user.

@@ -9,19 +9,38 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Controller for managing user sign-up processes for customers and providers.
+ */
 @Controller
 public class SignUpController {
 
     @Autowired
-    private UserService userService;
+    private UserService userService; // Service for managing user-related operations
 
     // ---------------------- Customer Sign-Up ----------------------
 
+    /**
+     * Displays the Customer Sign-Up form.
+     *
+     * @return The Customer Sign-Up form template.
+     */
     @GetMapping("/CustomersSignUp")
     public String showCustomerSignUpForm() {
         return "frontendCode/Landing/CustomersSignUp"; // Ensure this matches your template name
     }
 
+    /**
+     * Handles the Customer Sign-Up form submission.
+     *
+     * @param username        The username entered by the customer.
+     * @param email           The email address entered by the customer.
+     * @param password        The password entered by the customer.
+     * @param confirmPassword The confirmation password entered by the customer.
+     * @param profilePic      An optional profile picture uploaded by the customer.
+     * @param model           The model for passing attributes to the view.
+     * @return Redirects to the login page if successful, otherwise returns to the sign-up page with errors.
+     */
     @PostMapping("/CustomersSignUp")
     public String registerCustomer(
             @RequestParam("username") String username,
@@ -65,8 +84,8 @@ public class SignUpController {
                 userService.updateProfilePic(registeredUser.getId(), profilePic);
             }
 
-            // Redirect to log in or welcome page
-            return "redirect:/CustomerLogin"; // Adjust as needed
+            // Redirect to the customer login page
+            return "redirect:/CustomerLogin";
 
         } catch (Exception e) {
             // Handle registration errors
@@ -77,11 +96,27 @@ public class SignUpController {
 
     // ---------------------- Provider Sign-Up ----------------------
 
+    /**
+     * Displays the Provider Sign-Up form.
+     *
+     * @return The Provider Sign-Up form template.
+     */
     @GetMapping("/ProvidersSignUp")
     public String showProviderSignUpForm() {
         return "frontendCode/Landing/ProvidersSignUp"; // Ensure this matches your template name
     }
 
+    /**
+     * Handles the Provider Sign-Up form submission.
+     *
+     * @param username        The username entered by the provider.
+     * @param email           The email address entered by the provider.
+     * @param password        The password entered by the provider.
+     * @param confirmPassword The confirmation password entered by the provider.
+     * @param profilePic      An optional profile picture uploaded by the provider.
+     * @param model           The model for passing attributes to the view.
+     * @return Redirects to the provider login page if successful, otherwise returns to the sign-up page with errors.
+     */
     @PostMapping("/ProvidersSignUp")
     public String registerProvider(
             @RequestParam("username") String username,
@@ -125,9 +160,8 @@ public class SignUpController {
                 userService.updateProfilePic(registeredUser.getId(), profilePic);
             }
 
-            // Redirect to log in or welcome page
-            return "redirect:/ProviderLogin"; // Adjust as needed
-
+            // Redirect to the provider login page
+            return "redirect:/ProviderLogin";
 
         } catch (Exception e) {
             // Handle registration errors
@@ -136,4 +170,3 @@ public class SignUpController {
         }
     }
 }
-

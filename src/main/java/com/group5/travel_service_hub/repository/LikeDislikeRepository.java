@@ -5,33 +5,34 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Repository interface for LikeDislike entity.
+ * Repository interface for performing CRUD operations on LikeDislike entity.
+ * Extends JpaRepository to provide built-in methods for database interactions.
  */
 @Repository
 public interface LikeDislikeRepository extends JpaRepository<LikeDislike, Long> {
 
     /**
-     * Checks if a user has already reacted (liked/disliked) to a package.
+     * Checks whether a user has already reacted (liked or disliked) to a specific package.
      *
-     * @param pkgId The ID of the package.
-     * @param userId The ID of the user.
-     * @return True if the reaction exists, else false.
+     * @param pkgId The ID of the package being checked.
+     * @param userId The ID of the user being checked.
+     * @return True if a reaction (like or dislike) exists, otherwise false.
      */
     boolean existsByPkgIdAndUserId(Long pkgId, Long userId);
 
     /**
-     * Counts the number of likes for a specific package.
+     * Counts the total number of likes for a specific package.
      *
-     * @param pkgId The ID of the package.
-     * @return The count of likes.
+     * @param pkgId The ID of the package for which likes are counted.
+     * @return The total count of likes for the specified package.
      */
     Long countByPkgIdAndIsLikeTrue(Long pkgId);
 
     /**
-     * Counts the number of dislikes for a specific package.
+     * Counts the total number of dislikes for a specific package.
      *
-     * @param pkgId The ID of the package.
-     * @return The count of dislikes.
+     * @param pkgId The ID of the package for which dislikes are counted.
+     * @return The total count of dislikes for the specified package.
      */
     Long countByPkgIdAndIsLikeFalse(Long pkgId);
 }

@@ -76,35 +76,6 @@ public class PackageService {
     }
 
     /**
-     * Saves the uploaded image and returns the image URL.
-     *
-     * @param imageFile The uploaded image file.
-     * @return The image URL.
-     * @throws IOException If an error occurs during file saving.
-     */
-    public String saveImage(MultipartFile imageFile) throws IOException {
-        String uploadDir = "src/main/resources/static/package-images/";
-        String originalFilename = imageFile.getOriginalFilename();
-        String fileExtension = "";
-
-        if (originalFilename != null && originalFilename.contains(".")) {
-            fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-        }
-
-        String newFilename = UUID.randomUUID().toString() + fileExtension;
-        Path imagePath = Paths.get(uploadDir, newFilename);
-
-        // Ensure the directory exists
-        Files.createDirectories(imagePath.getParent());
-
-        // Save the file
-        Files.copy(imageFile.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
-
-        // Return the relative path to be used in the src attribute
-        return "/package-images/" + newFilename;
-    }
-
-    /**
      * Creates a new package.
      *
      * @param pkg The Package object to create.
@@ -120,38 +91,32 @@ public class PackageService {
      * @param id The ID of the package.
      * @return Optional containing the Package if found, or empty otherwise.
      */
-    public Optional<Package> getPackageByTheId(Long id) {
-        return packageRepository.findById(id);
-    }
-    /**
-     * Retrieves a package by its ID.
-     *
-     * @param id The ID of the package.
-     * @return Optional containing the Package if found, or empty otherwise.
-     */
     public Optional<Package> getPackageById(Long id) {
         return packageRepository.findById(id);
     }
+
     /**
      * Updates an existing package.
      *
-     *
-     *
-     * @param pkg       The Package object with updated information.
+     * @param pkg The Package object with updated information.
      */
     @Transactional
     public void updatePackage(Package pkg) {
+        // Fetch the package by its ID
         Package existingPackage = packageRepository.findById(pkg.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Package not found."));
 
+        // Update package fields
         existingPackage.setName(pkg.getName());
         existingPackage.setDescription(pkg.getDescription());
         existingPackage.setPrice(pkg.getPrice());
 
+        // Update the image URL if provided
         if (pkg.getImageUrl() != null && !pkg.getImageUrl().isEmpty()) {
             existingPackage.setImageUrl(pkg.getImageUrl());
         }
 
+        // Save the updated package
         packageRepository.save(existingPackage);
     }
 
@@ -163,61 +128,47 @@ public class PackageService {
      */
     @Transactional
     public void deletePackage(User user, Long packageId) {
+        // Fetch the package by ID
         Package existingPackage = packageRepository.findById(packageId)
                 .orElseThrow(() -> new IllegalArgumentException("Package not found."));
 
-        // If user is a PROVIDER, ensure they own the package
+        // Ensure the user has permission to delete if they're a provider
         if (user.getRole() == Role.PROVIDER && !existingPackage.getProviderDetails().getId().equals(user.getId())) {
             throw new SecurityException("You do not have permission to delete this package.");
         }
 
+        // Delete the package
         packageRepository.delete(existingPackage);
     }
 
     /**
-     * Retrieves the count of new bookings for notifications.
+     * Updates the image URL of a package.
      *
-     * @param user The authenticated user.
-     * @return The number of new bookings.
-     */
-    public int getNewBookingCount(User user) {
-        // Implement logic to retrieve the count of new bookings
-        // For example:
-        return 3; // Placeholder
-    }
-
-    /**
-     * Updates the image URL of a Package entity.
-     *
-     * @param id        The ID of the Package to update.
+     * @param id        The ID of the package.
      * @param imageFile The image file to upload.
      */
     public void updateImage(Long id, MultipartFile imageFile) {
-        // Retrieve the Package entity by ID
+        // Fetch the package by ID
         Package pkg = packageRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Package not found with ID: " + id));
 
-        // Validate the file
+        // Validate the uploaded file
         if (imageFile.isEmpty()) {
             throw new IllegalArgumentException("Uploaded file is empty.");
         }
 
-        // Optionally, validate file type (e.g., only allow JPEG and PNG)
         String contentType = imageFile.getContentType();
         if (contentType == null || !isImage(contentType)) {
             throw new IllegalArgumentException("Only image files (JPEG, PNG) are allowed.");
         }
 
-        // Normalize file name
+        // Generate a unique filename
         String originalFilename = StringUtils.cleanPath(Objects.requireNonNull(imageFile.getOriginalFilename()));
-
-        // Generate a unique file name to prevent collisions
         String fileExtension = getFileExtension(originalFilename);
-        String fileName = UUID.randomUUID().toString() + "." + fileExtension;
+        String fileName = UUID.randomUUID() + "." + fileExtension;
 
-        // Get the upload directory from application properties
+        // Fetch the upload directory
         String uploadDir = env.getProperty("file.upload-dir");
-
         if (uploadDir == null) {
             throw new IllegalArgumentException("Upload directory not configured.");
         }
@@ -225,52 +176,25 @@ public class PackageService {
         Path uploadPath = Paths.get(uploadDir);
 
         try {
-            // Create directories if they do not exist
+            // Ensure the directory exists
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
 
-            // Copy file to the target location (Replacing existing file with the same name)
+            // Save the file
             Path filePath = uploadPath.resolve(fileName);
             Files.copy(imageFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            // Set the imageUrl field (URL)
-            String fileUrl = "/uploads/" + fileName;
-            pkg.setImageUrl(fileUrl);
+            // Set the image URL
+            pkg.setImageUrl("/uploads/" + fileName);
 
-            // Save the updated Package entity
+            // Save the updated package
             packageRepository.save(pkg);
         } catch (IOException ex) {
             throw new IllegalArgumentException("Could not store file. Please try again!", ex);
         }
     }
 
-    /**
-     * Inner class to represent booking notifications.
-     */
-    public static class BookingNotification {
-        private String userName;
-        private String packageName;
-        private String bookingDate;
-
-        public BookingNotification(String userName, String packageName, String bookingDate) {
-            this.userName = userName;
-            this.packageName = packageName;
-            this.bookingDate = bookingDate;
-        }
-
-        public String getUserName() {
-            return userName;
-        }
-
-        public String getPackageName() {
-            return packageName;
-        }
-
-        public String getBookingDate() {
-            return bookingDate;
-        }
-    }
     /**
      * Checks if the given content type is an image.
      *
@@ -282,6 +206,7 @@ public class PackageService {
                 contentType.equalsIgnoreCase("image/png") ||
                 contentType.equalsIgnoreCase("image/jpg");
     }
+
     /**
      * Extracts the file extension from the filename.
      *

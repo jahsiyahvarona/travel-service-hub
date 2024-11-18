@@ -1,9 +1,7 @@
 package com.group5.travel_service_hub.service;
 
+import com.group5.travel_service_hub.entity.*;
 import com.group5.travel_service_hub.entity.Package;
-import com.group5.travel_service_hub.entity.ReviewStatus;
-import com.group5.travel_service_hub.entity.Reviews;
-import com.group5.travel_service_hub.entity.User;
 import com.group5.travel_service_hub.repository.ReviewRepository;
 import com.group5.travel_service_hub.repository.PackageRepository;
 import com.group5.travel_service_hub.repository.UserRepository;
@@ -36,19 +34,19 @@ public class ReviewsService {
     private PackageRepository packageRepository;
 
     /**
-     * Retrieves all Reviews for a provider's packages.
+     * Retrieves all reviews for a provider's packages.
      *
      * @param providerId The ID of the provider.
-     * @return List of Reviews for the provider.
+     * @return List of reviews for the provider.
      */
     public List<Reviews> getReviewsByProvider(Long providerId) {
         return reviewRepository.findByProviderId(providerId);
     }
 
     /**
-     * Deletes a Review by ID.
+     * Deletes a review by its ID.
      *
-     * @param reviewId The ID of the Review to delete.
+     * @param reviewId The ID of the review to delete.
      */
     @Transactional
     public void deleteReview(Long reviewId) {
@@ -61,7 +59,7 @@ public class ReviewsService {
      * Retrieves a review by its ID.
      *
      * @param reviewId The ID of the review.
-     * @return The Review if found.
+     * @return The review if found.
      * @throws IllegalArgumentException if the review is not found.
      */
     public Reviews getReviewById(Long reviewId) {
@@ -75,18 +73,14 @@ public class ReviewsService {
      * @param userId    The ID of the user creating the review.
      * @param packageId The ID of the package being reviewed.
      * @param content   The content of the review.
-     * @return The created Reviews entity.
+     * @return The created review entity.
      */
     @Transactional
     public Reviews addReview(Long userId, Long packageId, String content) {
-        // Retrieve the user by ID
         User user = userService.findById(userId);
-
-        // Retrieve the package by ID
         Package pkg = packageService.getPackageById(packageId)
                 .orElseThrow(() -> new IllegalArgumentException("Package not found with ID: " + packageId));
 
-        // Create a new Reviews entity and set its properties
         Reviews review = new Reviews();
         review.setAuthor(user);
         review.setPkg(pkg);
@@ -94,7 +88,6 @@ public class ReviewsService {
         review.setProvider(pkg.getProviderDetails());
         review.setTimestamp(LocalDateTime.now());
 
-        // Save the review to the database
         return reviewRepository.save(review);
     }
 
@@ -109,7 +102,6 @@ public class ReviewsService {
         Reviews review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("Review not found with ID: " + reviewId));
 
-        // Only allow replying if not already replied
         if (review.getReplyContent() != null) {
             throw new IllegalStateException("Review already has a reply.");
         }
@@ -148,18 +140,16 @@ public class ReviewsService {
         Reviews review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("Review not found with ID: " + reviewId));
 
-        // Check if the review has an existing reply
         if (review.getReplyContent() == null) {
             throw new IllegalStateException("Review does not have an existing reply to edit.");
         }
 
-        // Update the reply content and timestamp
         review.setReplyContent(replyContent);
         review.setReplyTimestamp(LocalDateTime.now());
 
-        // Save the updated review
         reviewRepository.save(review);
     }
+
     /**
      * Allows a provider to delete an existing reply to a review.
      *
@@ -172,17 +162,13 @@ public class ReviewsService {
         Reviews review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("Review not found with ID: " + reviewId));
 
-        // Check if the review has an existing reply
         if (review.getReplyContent() == null) {
             throw new IllegalStateException("Review does not have an existing reply to delete.");
         }
 
-        // Remove the reply content and timestamp
         review.setReplyContent(null);
         review.setReplyTimestamp(null);
 
-        // Save the updated review
         reviewRepository.save(review);
     }
-
 }
