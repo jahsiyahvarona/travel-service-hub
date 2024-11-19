@@ -1,4 +1,3 @@
-
 package com.group5.travel_service_hub.controller;
 
 import com.group5.travel_service_hub.entity.Booking;
@@ -16,7 +15,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/customer")
@@ -78,12 +79,41 @@ public class CustomerController {
             return "redirect:/login";
         }
 
-        // List<Package> packages = packageService.findAllPackages();
-        //   model.addAttribute("packages", packages);
+        List<Package> packages = packageService.getAllPackages();
+        model.addAttribute("packages", packages);
 
         return "frontendCode/CustomerUI/customerViewPackages";
     }
 
+    /**
+     * Handles booking a package.
+     */
+    @PostMapping("/bookPackage")
+    public String bookPackage(HttpSession session,
+                              @RequestParam Long packageId,
+                              Model model) {
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/login";
+        }
+
+        Optional<Package> selectedPackage = packageService.getPackageById(packageId);
+        if (selectedPackage.isEmpty()) {
+            model.addAttribute("errorMessage", "Selected package not found.");
+            return "redirect:/customer/packages";
+        }
+
+        bookingService.createBooking(loggedInUser.getId(), packageId, LocalDate.now(), LocalDate.now().plusDays(7));
+
+        return "redirect:/customer/bookings";
+    }
+    @GetMapping("/packages/search")
+    public String searchPackages(@RequestParam("query") String query, Model model) {
+        List<Package> packages = packageService.searchPackagesByName(query);
+        model.addAttribute("packages", packages);
+        model.addAttribute("packagesEmpty", packages.isEmpty());
+        return "frontendCode/CustomerUI/viewPackages"; // Ensure this path matches your view template
+    }
     /**
      * Displays the Leave a Review page.
      */
@@ -94,9 +124,14 @@ public class CustomerController {
             return "redirect:/login";
         }
 
-        //  List<Booking> recentBookings = bookingService.getRecentBookingsByCustomerId(loggedInUser.getId());
-        //  model.addAttribute("recentBookings", recentBookings);
+        // Fetch the booked packages for the logged-in customer
+        List<Booking> bookedPackages = bookingService.getBookingsByCustomerId(loggedInUser.getId());
 
+        if (bookedPackages.isEmpty()) {
+            model.addAttribute("errorMessage", "You currently have no booked packages to review.");
+        }
+
+        model.addAttribute("bookedPackages", bookedPackages);
         return "frontendCode/CustomerUI/customerLeaveReview";
     }
 
@@ -104,13 +139,15 @@ public class CustomerController {
      * Submits a review for a booking.
      */
     @PostMapping("/reviews/submit")
-    public String submitReview(@RequestParam Long bookingId, @RequestParam String reviewContent, HttpSession session) {
+    public String submitReview(@RequestParam Long bookingId,
+                               @RequestParam String reviewContent,
+                               HttpSession session) {
         User loggedInUser = (User) session.getAttribute("loggedInUser");
         if (loggedInUser == null) {
             return "redirect:/login";
         }
 
-        //  bookingService.addReviewToBooking(bookingId, reviewContent);
+        // Placeholder for submitting review logic
         return "redirect:/customer/reviews?success";
     }
 
@@ -124,7 +161,7 @@ public class CustomerController {
             return "redirect:/login";
         }
 
-        model.addAttribute("user", loggedInUser);
+        model.addAttribute("loggedInUser", loggedInUser);
         return "frontendCode/CustomerUI/customerProfile";
     }
 
@@ -132,7 +169,9 @@ public class CustomerController {
      * Updates the customer's profile.
      */
     @PostMapping("/profile/update")
-    public String updateProfile(@RequestParam Long userId, @ModelAttribute User userDetails, HttpSession session) {
+    public String updateProfile(@RequestParam Long userId,
+                                @ModelAttribute User userDetails,
+                                HttpSession session) {
         User updatedUser = userService.updateProfile(userId, userDetails);
         session.setAttribute("loggedInUser", updatedUser);
         return "redirect:/customer/profile";
@@ -142,7 +181,9 @@ public class CustomerController {
      * Updates the customer's profile picture.
      */
     @PostMapping("/profile/updatePic")
-    public String updateProfilePic(@RequestParam Long userId, @RequestParam("file") MultipartFile file, HttpSession session) {
+    public String updateProfilePic(@RequestParam Long userId,
+                                   @RequestParam("file") MultipartFile file,
+                                   HttpSession session) {
         User updatedUser = userService.updateProfilePic(userId, file);
         session.setAttribute("loggedInUser", updatedUser);
         return "redirect:/customer/profile";
@@ -164,7 +205,5 @@ public class CustomerController {
     public ResponseEntity<User> registerCustomer(@RequestBody User user) {
         User registeredUser = userService.registerUser(user);
         return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
-
     }
-
 }
