@@ -124,6 +124,14 @@ public class CustomerController {
             return "redirect:/login";
         }
 
+        // Fetch the booked packages for the logged-in customer
+        List<Booking> bookedPackages = bookingService.getBookingsByCustomerId(loggedInUser.getId());
+
+        if (bookedPackages.isEmpty()) {
+            model.addAttribute("errorMessage", "You currently have no booked packages to review.");
+        }
+
+        model.addAttribute("bookedPackages", bookedPackages);
         return "frontendCode/CustomerUI/customerLeaveReview";
     }
 
