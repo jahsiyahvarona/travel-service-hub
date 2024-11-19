@@ -15,7 +15,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/customer")
@@ -77,11 +79,33 @@ public class CustomerController {
             return "redirect:/login";
         }
 
-        // Fetch all packages
         List<Package> packages = packageService.getAllPackages();
         model.addAttribute("packages", packages);
 
         return "frontendCode/CustomerUI/customerViewPackages";
+    }
+
+    /**
+     * Handles booking a package.
+     */
+    @PostMapping("/bookPackage")
+    public String bookPackage(HttpSession session,
+                              @RequestParam Long packageId,
+                              Model model) {
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/login";
+        }
+
+        Optional<Package> selectedPackage = packageService.getPackageById(packageId);
+        if (selectedPackage.isEmpty()) {
+            model.addAttribute("errorMessage", "Selected package not found.");
+            return "redirect:/customer/packages";
+        }
+
+        bookingService.createBooking(loggedInUser.getId(), packageId, LocalDate.now(), LocalDate.now().plusDays(7));
+
+        return "redirect:/customer/bookings";
     }
 
     /**
@@ -101,12 +125,15 @@ public class CustomerController {
      * Submits a review for a booking.
      */
     @PostMapping("/reviews/submit")
-    public String submitReview(@RequestParam Long bookingId, @RequestParam String reviewContent, HttpSession session) {
+    public String submitReview(@RequestParam Long bookingId,
+                               @RequestParam String reviewContent,
+                               HttpSession session) {
         User loggedInUser = (User) session.getAttribute("loggedInUser");
         if (loggedInUser == null) {
             return "redirect:/login";
         }
 
+        // Placeholder for submitting review logic
         return "redirect:/customer/reviews?success";
     }
 
@@ -128,7 +155,9 @@ public class CustomerController {
      * Updates the customer's profile.
      */
     @PostMapping("/profile/update")
-    public String updateProfile(@RequestParam Long userId, @ModelAttribute User userDetails, HttpSession session) {
+    public String updateProfile(@RequestParam Long userId,
+                                @ModelAttribute User userDetails,
+                                HttpSession session) {
         User updatedUser = userService.updateProfile(userId, userDetails);
         session.setAttribute("loggedInUser", updatedUser);
         return "redirect:/customer/profile";
@@ -138,7 +167,9 @@ public class CustomerController {
      * Updates the customer's profile picture.
      */
     @PostMapping("/profile/updatePic")
-    public String updateProfilePic(@RequestParam Long userId, @RequestParam("file") MultipartFile file, HttpSession session) {
+    public String updateProfilePic(@RequestParam Long userId,
+                                   @RequestParam("file") MultipartFile file,
+                                   HttpSession session) {
         User updatedUser = userService.updateProfilePic(userId, file);
         session.setAttribute("loggedInUser", updatedUser);
         return "redirect:/customer/profile";
@@ -161,5 +192,4 @@ public class CustomerController {
         User registeredUser = userService.registerUser(user);
         return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
     }
-
 }
