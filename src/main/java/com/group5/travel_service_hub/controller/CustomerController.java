@@ -161,7 +161,7 @@ public class CustomerController {
             return "redirect:/login";
         }
 
-        model.addAttribute("user", loggedInUser);
+        model.addAttribute("loggedInUser", loggedInUser);
         return "frontendCode/CustomerUI/customerProfile";
     }
 
