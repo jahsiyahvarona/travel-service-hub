@@ -4,26 +4,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Bookings · Travel Services Hub</title>
-  <!-- Bootstrap core CSS -->
+
   <link th:href="@{/CSS/bootstrap_theme/bootstrap.css}" rel="stylesheet" type="text/css">
   <link th:href="@{/CSS/dashboard.css}" rel="stylesheet">
   <style>
-    .card {
-        margin-bottom: 20px;
+    .bordered-img {
+      border: 2px solid #0abf53;
+      padding: 2px;
+      border-radius: 10%;
     }
+
     .btn-custom {
-        background-color: #0abf53;
-        color: white;
-        border: none;
+      background-color: #0abf53;
+      color: white;
+      border: none;
     }
+
     .btn-custom:hover {
-        background-color: #089e45;
+      background-color: #089e45;
     }
   </style>
 </head>
 <body>
 <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
   <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">My Bookings</a>
+  <img th:src="@{/images/logo.png}" alt="Company Logo" class="mx-auto d-block" style="height: 100px; width: auto;">
   <ul class="navbar-nav px-3">
     <li class="nav-item text-nowrap">
       <a class="nav-link" href="#" onclick="showSignOutModal()">Sign out</a>
@@ -33,7 +38,6 @@
 
 <div class="container-fluid">
   <div class="row">
-    <!-- Sidebar Navigation -->
     <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
       <div class="position-sticky pt-3">
         <ul class="nav flex-column">

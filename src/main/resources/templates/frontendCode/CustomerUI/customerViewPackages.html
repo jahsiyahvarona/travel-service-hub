@@ -13,11 +13,13 @@
       padding: 2px;
       border-radius: 10%;
     }
+
     .btn-custom {
       background-color: #0abf53;
       color: white;
       border: none;
     }
+
     .btn-custom:hover {
       background-color: #089e45;
     }
@@ -61,11 +63,20 @@
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
       <h1 class="h2">Available Packages</h1>
 
+      <!-- Search Bar -->
+      <form th:action="@{/customer/packages/search}" method="get" class="mb-4">
+        <div class="input-group">
+          <input type="text" class="form-control" name="query" placeholder="Search packages by name..." aria-label="Search packages">
+          <button class="btn btn-custom" type="submit">Search</button>
+        </div>
+      </form>
+
       <div class="row">
-        <div th:if="${packagesempty}" class="col-12">
+        <div th:if="${packagesEmpty}" class="col-12">
           <p>No packages available at the moment.</p>
         </div>
 
+        <!-- Package Cards -->
         <div class="col-md-4 mb-4" th:each="pkg : ${packages}">
           <div class="card h-100 shadow-sm">
             <img th:src="${pkg.imageUrl}" class="card-img-top bordered-img" alt="Package Image">

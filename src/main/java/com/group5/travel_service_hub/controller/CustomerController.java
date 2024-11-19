@@ -107,7 +107,13 @@ public class CustomerController {
 
         return "redirect:/customer/bookings";
     }
-
+    @GetMapping("/packages/search")
+    public String searchPackages(@RequestParam("query") String query, Model model) {
+        List<Package> packages = packageService.searchPackagesByName(query);
+        model.addAttribute("packages", packages);
+        model.addAttribute("packagesEmpty", packages.isEmpty());
+        return "frontendCode/CustomerUI/viewPackages"; // Ensure this path matches your view template
+    }
     /**
      * Displays the Leave a Review page.
      */
