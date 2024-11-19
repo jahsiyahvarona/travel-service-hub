@@ -179,8 +179,9 @@
                                 <h5 class="card-title pricing-card-title" th:text="${mostLikedPackage.name}">Package Name</h5>
                                 <ul class="list-unstyled mt-3 mb-4">
                                     <li><strong>Likes:</strong> <span th:text="${likesCount}">0</span></li>
-                                    <li><strong>Bookings:</strong> <span th:text="${bookingsCountForMostLiked}">0</span></li>
-                                    <li><strong>Status:</strong> <span th:text="${packageStatusForMostLiked}">Active</span></li>
+                                    <li><strong>Bookings:</strong> <span th:text="${mostLikedPackage.getBookings().size()}">0</span></li>
+                                    <!--<li><strong>Status:</strong> <span th:text="${packageStatusForMostLiked}">Active</span></li>-->
+                                    <li><strong>Status:</strong> <span th:text="'Active'">Active</span></li>
                                 </ul>
                             </div>
                             <!-- Display 'No likes' message if likesCount is null or zero -->
@@ -203,8 +204,10 @@
                                 <h5 class="card-title pricing-card-title" th:text="${mostBookedPackage.name}">Package Name</h5>
                                 <ul class="list-unstyled mt-3 mb-4">
                                     <li><strong>Bookings:</strong> <span th:text="${bookingsCountForMostBooked}">0</span></li>
-                                    <li><strong>Likes:</strong> <span th:text="${likesCountForMostBooked}">0</span></li>
-                                    <li><strong>Status:</strong> <span th:text="${packageStatusForMostBooked}">Active</span></li>
+                                    <li><strong>Likes:</strong> <span th:text="${mostBookedPackage.getLikeDislikes().size()}">0</span></li>
+                                   <!-- <li><strong>Status:</strong> <span th:text="${packageStatusForMostBooked}">Active</span></li>-->
+                                    <li><strong>Status:</strong> <span th:text="'Active'">Active</span></li>
+
                                 </ul>
                             </div>
                             <!-- Display 'No bookings' message if bookingsCountForMostBooked is null or zero -->

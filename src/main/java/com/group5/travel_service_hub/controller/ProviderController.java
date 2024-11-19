@@ -229,6 +229,7 @@ public class ProviderController {
                 .toList();
 
         // Add bookings to the model
+
         model.addAttribute("newAndPendingBookings", newAndPendingBookings);
         model.addAttribute("confirmedBookings", confirmedBookings);
         model.addAttribute("bookings", bookings);

@@ -120,6 +120,8 @@ public class LoginController {
             // Create a new session for the authenticated user
             HttpSession newSession = request.getSession(true);
             newSession.setAttribute("loggedInUser", user);
+            int timeoutInSeconds = 30 * 60; // For a 30-minute timeout
+            newSession.setMaxInactiveInterval(timeoutInSeconds);
 
             // Redirect to the provider dashboard
             return "redirect:/ProviderDashboard";
