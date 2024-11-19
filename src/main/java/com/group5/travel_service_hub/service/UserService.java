@@ -1,6 +1,5 @@
 package com.group5.travel_service_hub.service;
 
-import com.group5.travel_service_hub.entity.AccountStatus;
 import com.group5.travel_service_hub.entity.Report;
 import com.group5.travel_service_hub.entity.User;
 import com.group5.travel_service_hub.repository.UserRepository;
@@ -209,11 +208,10 @@ public class UserService {
      * @param userId      The ID of the user.
      * @param oldPassword The current password.
      * @param newPassword The new desired password.
-     * @return The updated User object.
      * @throws IllegalArgumentException If the user is not found or the old password does not match.
      */
     @Transactional
-    public User updatePassword(Long userId, String oldPassword, String newPassword) {
+    public void updatePassword(Long userId, String oldPassword, String newPassword) {
         // Find the user by ID
         User user = findById(userId);
 
@@ -237,7 +235,7 @@ public class UserService {
         user.setPassword(newPasswordHash);
 
         // Save the updated user
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 
     /**

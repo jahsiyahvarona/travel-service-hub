@@ -236,7 +236,7 @@
                                 Package Name
                             </a>
                         </td>
-                        <td th:text="${booking.startDate}">2024-09-15</td>
+                        <td th:text="${booking.timestamp}">2024-09-15</td>
                         <td th:text="${booking.status}">Unconfirmed</td>
                         <td>
                             <form th:action="@{/provider/confirmBooking}" method="post" style="display:inline;">
@@ -295,7 +295,7 @@
                                 Package Name
                             </a>
                         </td>
-                        <td th:text="${booking.startDate}">2024-09-12</td>
+                        <td th:text="${booking.timestamp}">2024-09-12</td>
                         <td th:text="${booking.status}">Confirmed</td>
                         <td>
                             <!-- Add Unconfirm Button -->
