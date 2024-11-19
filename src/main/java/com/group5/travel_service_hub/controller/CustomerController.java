@@ -1,4 +1,3 @@
-
 package com.group5.travel_service_hub.controller;
 
 import com.group5.travel_service_hub.entity.Booking;
@@ -78,8 +77,9 @@ public class CustomerController {
             return "redirect:/login";
         }
 
-        // List<Package> packages = packageService.findAllPackages();
-        //   model.addAttribute("packages", packages);
+        // Fetch all packages
+        List<Package> packages = packageService.getAllPackages();
+        model.addAttribute("packages", packages);
 
         return "frontendCode/CustomerUI/customerViewPackages";
     }
@@ -94,9 +94,6 @@ public class CustomerController {
             return "redirect:/login";
         }
 
-        //  List<Booking> recentBookings = bookingService.getRecentBookingsByCustomerId(loggedInUser.getId());
-        //  model.addAttribute("recentBookings", recentBookings);
-
         return "frontendCode/CustomerUI/customerLeaveReview";
     }
 
@@ -110,7 +107,6 @@ public class CustomerController {
             return "redirect:/login";
         }
 
-        //  bookingService.addReviewToBooking(bookingId, reviewContent);
         return "redirect:/customer/reviews?success";
     }
 
@@ -164,7 +160,6 @@ public class CustomerController {
     public ResponseEntity<User> registerCustomer(@RequestBody User user) {
         User registeredUser = userService.registerUser(user);
         return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
-
     }
 
 }
