@@ -73,10 +73,10 @@
                 <!-- Booked Packages Section -->
                 <div class="col-md-4 mb-4" th:each="pkg : ${bookedPackages}">
                     <div class="card h-100 shadow-sm fixed-card">
-                        <img th:src="${pkg.imageUrl}" class="package-image" alt="Package Image">
+                        <img th:src="${pkg.pkg.imageUrl}" class="package-image" alt="Package Image">
                         <div class="card-body">
-                            <h5 class="card-title" th:text="${pkg.name}">Package Name</h5>
-                            <p class="card-text" th:text="${pkg.description}">Package Description</p>
+                            <h5 class="card-title" th:text="${pkg.pkg.name}">Package Name</h5>
+                            <p class="card-text" th:text="${pkg.pkg.description}">Package Description</p>
 
                             <!-- Review Form -->
                             <form th:action="@{/customer/submitReview}" method="post" class="review-section">

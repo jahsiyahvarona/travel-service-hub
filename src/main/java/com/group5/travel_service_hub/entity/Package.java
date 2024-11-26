@@ -25,6 +25,11 @@ public class Package {
     @Column(length = 1000)
     private String description;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "city_id", nullable = false)
+    private City location;
+
+
     // Price of the package (cannot be null)
     @Column(nullable = false)
     private Double price;
@@ -59,19 +64,23 @@ public class Package {
      * @param description     The description of the package.
      * @param price           The price of the package.
      * @param imageUrl        The URL of the package's image.
+     * @param location        the location of the package.
      * @param providerDetails The provider offering the package.
      * @param reviews         The reviews associated with the package.
      * @param likeDislikes    The likes and dislikes associated with the package.
      */
-    public Package(Long id, String name, String description, Double price, String imageUrl, User providerDetails, Set<Reviews> reviews, Set<LikeDislike> likeDislikes) {
+    public Package(Long id, String name, String description, Double price, String imageUrl, City location, User providerDetails, Set<Reviews> reviews, Set<LikeDislike> likeDislikes) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
         this.imageUrl = imageUrl;
+        this.location = location;
         this.providerDetails = providerDetails;
         Reviews = reviews;
         this.likeDislikes = likeDislikes;
+
+
     }
 
     /**
@@ -81,13 +90,15 @@ public class Package {
      * @param description     The description of the package.
      * @param price           The price of the package.
      * @param imageUrl        The URL of the package's image.
+     * @param location        the location of the package.
      * @param providerDetails The provider offering the package.
      */
-    public Package(String name, String description, Double price, String imageUrl, User providerDetails) {
+    public Package(String name, String description, Double price, String imageUrl, City location, User providerDetails) {
         this.name = name;
         this.description = description;
         this.price = price;
         this.imageUrl = imageUrl;
+        this.location = location;
         this.providerDetails = providerDetails;
     }
 
@@ -137,6 +148,14 @@ public class Package {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public City getLocation() {
+        return location;
+    }
+
+    public void setLocation(City location) {
+        this.location = location;
     }
 
     public User getProviderDetails() {
