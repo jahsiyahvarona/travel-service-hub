@@ -63,10 +63,25 @@
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
       <h1 class="h2">Available Packages</h1>
 
-      <!-- Search Bar -->
-      <form th:action="@{/customer/packages/search}" method="get" class="mb-4">
+      <!-- Search Form -->
+      <form th:action="@{/customer/packages/search}" method="get" class="mb-4" onsubmit="return checkCitySelection()">
         <div class="input-group">
-          <input type="text" class="form-control" name="query" placeholder="Search packages by name..." aria-label="Search packages">
+          <!-- Search by Name -->
+          <input type="text" class="form-control" name="query" placeholder="Search packages by name..."
+                 th:value="${param.query}" aria-label="Search packages">
+
+          <!-- Search by City -->
+          <select class="form-control" id="citySelect" name="cityId">
+            <option value="" th:selected="${param.cityId == null}">All Cities</option>
+            <th:block th:each="city : ${cities}">
+              <option th:value="${city.id}"
+                      th:text="${city.name + (city.state != null ? ', ' + city.state : '') + ', ' + city.country}"
+                      th:selected="${city.id == param.cityId}">
+              </option>
+            </th:block>
+          </select>
+
+          <!-- Search Button -->
           <button class="btn btn-custom" type="submit">Search</button>
         </div>
       </form>
@@ -84,6 +99,10 @@
               <h5 class="card-title" th:text="${pkg.name}">Package Name</h5>
               <p class="card-text" th:text="${pkg.description}">Package Description</p>
               <p><strong>Price:</strong> $<span th:text="${pkg.price}">0</span></p>
+              <p><strong>Likes:</strong> <span th:text="${pkg.getLikeDislikes().size()}">0</span></p>
+              <p><strong>Location:</strong>
+                <span th:text="${pkg.location.name + (pkg.location.state != null ? ', ' + pkg.location.state : '') + ', ' + pkg.location.country}"></span>
+              </p>
 
               <!-- Book Now Button -->
               <form th:action="@{/customer/bookPackage}" method="post">
@@ -121,6 +140,20 @@
     var signOutModal = new bootstrap.Modal(document.getElementById('signOutModal'));
     signOutModal.show();
   }
+</script>
+<script>
+  function checkCitySelection() {
+    var citySelect = document.getElementById('citySelect');
+    if (citySelect.value === '') {
+      citySelect.disabled = true; // Disable the field so it doesn't get submitted
+    }
+    return true; // Proceed with form submission
+  }
+  // Sign Out Button Handler
+  document.getElementById('confirmSignOutButton').addEventListener('click', function () {
+    // Redirect to the sign-out page
+    window.location.href = "/LoginChoice";
+  });
 </script>
 </body>
 </html>

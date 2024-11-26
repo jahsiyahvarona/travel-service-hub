@@ -362,6 +362,12 @@
         var signOutModal = new bootstrap.Modal(document.getElementById('signOutModal'));
         signOutModal.show(); // Show the modal
     }
+
+    // Sign Out Button Handler
+    document.getElementById('confirmSignOutButton').addEventListener('click', function () {
+        // Redirect to the sign-out page
+        window.location.href = "/LoginChoice";
+    });
     /*]]>*/
 </script>
 </body>

@@ -366,6 +366,7 @@
                     <img th:src="${booking.pkg.imageUrl != null ? booking.pkg.imageUrl : '/images/default-package.png'}"
                          alt="Package Image" class="img-fluid mb-3 package-image"> <!-- Added package-image class -->
                     <p><strong>Package Name:</strong> <span th:text="${booking.pkg.name}">Package Name</span></p>
+                    <p><strong>Package Location:</strong> <span th:text="${booking.pkg.location.name + (booking.pkg.location.state != null ? ', ' + booking.pkg.location.state : '') + ', ' + booking.pkg.location.country}">Package Name</span></p>
                     <p><strong>Price:</strong> $<span th:text="${booking.price}">2,500</span></p>
 
                     <!-- Description Label -->

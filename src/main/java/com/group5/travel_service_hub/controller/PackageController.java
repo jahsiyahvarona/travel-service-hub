@@ -1,9 +1,11 @@
 package com.group5.travel_service_hub.controller;
 
+import com.group5.travel_service_hub.entity.City;
 import com.group5.travel_service_hub.entity.Package;
 import com.group5.travel_service_hub.entity.Role;
 import com.group5.travel_service_hub.entity.User;
 import com.group5.travel_service_hub.repository.BookingRepository;
+import com.group5.travel_service_hub.repository.CityRepository;
 import com.group5.travel_service_hub.repository.PackageRepository;
 import com.group5.travel_service_hub.service.PackageService;
 import com.group5.travel_service_hub.service.UserService;
@@ -17,6 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpSession;
 
 import java.security.Principal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,27 +42,33 @@ public class PackageController {
     @Autowired
     private PackageRepository packageRepository; // Repository for managing package data
 
+    @Autowired
+    private CityRepository cityRepository;
+
     /**
      * Adds a new package entry.
      *
      * @param name                The name of the package.
      * @param description         The description of the package.
      * @param price               The price of the package.
+     * @param cityId            The location of the package.
      * @param imageUrl            The uploaded image file (optional).
      * @param session             The HTTP session for the authenticated user.
      * @param redirectAttributes  Redirect attributes for flash messages.
      * @return Redirect to the list of all packages.
      */
     @PostMapping("/create")
-    public String addNewPackage(@RequestParam("name") String name,
-                                @RequestParam("description") String description,
-                                @RequestParam("price") double price,
-                                @RequestParam(value = "imageUrl", required = false) MultipartFile imageUrl,
-                                HttpSession session,
-                                RedirectAttributes redirectAttributes) {
+    public String addNewPackage(
+            @RequestParam("name") String name,
+            @RequestParam("description") String description,
+            @RequestParam("price") double price,
+            @RequestParam("cityId") Long cityId,
+            @RequestParam(value = "imageUrl", required = false) MultipartFile imageUrl,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+
         User loggedInUser = (User) session.getAttribute("loggedInUser");
-        String username = loggedInUser.getUsername();
-        User user = userService.findByUsername(username);
+        User user = userService.findByUsername(loggedInUser.getUsername());
 
         // Check user role
         if (user.getRole() != Role.PROVIDER && user.getRole() != Role.SYSADMIN) {
@@ -67,10 +76,17 @@ public class PackageController {
             return "redirect:/provider/managePackages";
         }
 
+        City city = cityRepository.findById(cityId).orElse(null);
+        if (city == null) {
+            redirectAttributes.addFlashAttribute("error", "Invalid location selected.");
+            return "redirect:/provider/managePackages";
+        }
+
         Package pkg = new Package();
         pkg.setName(name);
         pkg.setDescription(description);
         pkg.setPrice(price);
+        pkg.setLocation(city);
         pkg.setProviderDetails(user);
 
         try {
@@ -86,44 +102,22 @@ public class PackageController {
             return "redirect:/provider/managePackages";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Failed to create package: " + e.getMessage());
-            return "frontendCode/ProviderUI/managePackages";
+            return "redirect:/provider/managePackages";
         }
     }
 
-    /**
-     * Retrieves package data as JSON for editing.
-     *
-     * @param id The ID of the package.
-     * @return ResponseEntity containing package data or 404 status.
-     */
-    @GetMapping("/{id}/data")
-    @ResponseBody
-    public ResponseEntity<Package> getPackageData(@PathVariable Long id) {
-        Optional<Package> pkgOpt = packageService.getPackageById(id);
-        return pkgOpt.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-    }
 
-    /**
-     * Updates an existing package.
-     *
-     * @param id                 The ID of the package to update.
-     * @param name               The updated name of the package.
-     * @param description        The updated description of the package.
-     * @param price              The updated price of the package.
-     * @param imageUrl           The new image file (optional).
-     * @param session            The HTTP session for the authenticated user.
-     * @param redirectAttributes Redirect attributes for flash messages.
-     * @return Redirect to the Manage Packages page.
-     */
     @PostMapping("/update")
     public String updatePackage(
             @RequestParam("id") Long id,
             @RequestParam("name") String name,
             @RequestParam("description") String description,
             @RequestParam("price") Double price,
+            @RequestParam("cityId") Long cityId,
             @RequestParam(value = "imageUrl", required = false) MultipartFile imageUrl,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
+
         User loggedInUser = (User) session.getAttribute("loggedInUser");
         String username = loggedInUser.getUsername();
         User user = userService.findByUsername(username);
@@ -134,17 +128,34 @@ public class PackageController {
             return "redirect:/provider/managePackages";
         }
 
+        City city = cityRepository.findById(cityId).orElse(null);
+        if (city == null) {
+            redirectAttributes.addFlashAttribute("error", "Invalid location selected.");
+            return "redirect:/provider/managePackages";
+        }
+
         try {
-            Package pkg = new Package();
-            pkg.setId(id);
+            // Retrieve the existing package
+            Optional<Package> optionalPackage = packageService.getPackageById(id);
+            if (optionalPackage.isEmpty()) {
+                redirectAttributes.addFlashAttribute("error", "Package not found.");
+                return "redirect:/provider/managePackages";
+            }
+
+            Package pkg = optionalPackage.get();
+
+            // Update package details
             pkg.setName(name);
             pkg.setDescription(description);
             pkg.setPrice(price);
+            pkg.setLocation(city); // Update the location
 
             if (imageUrl != null && !imageUrl.isEmpty()) {
+                // Handle image upload
                 packageService.updateImage(pkg.getId(), imageUrl);
             }
 
+            // Save the updated package
             packageService.updatePackage(pkg);
 
             redirectAttributes.addFlashAttribute("success", "Package updated successfully.");
@@ -154,6 +165,8 @@ public class PackageController {
             return "redirect:/provider/managePackages";
         }
     }
+
+
 
     /**
      * Deletes a package.
@@ -232,4 +245,6 @@ public class PackageController {
     public String logoutPage() {
         return "redirect:/login?logout";
     }
+
+
 }

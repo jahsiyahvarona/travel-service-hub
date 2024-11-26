@@ -2,6 +2,7 @@ package com.group5.travel_service_hub.controller;
 
 import com.group5.travel_service_hub.entity.*;
 import com.group5.travel_service_hub.entity.Package;
+import com.group5.travel_service_hub.repository.CityRepository;
 import com.group5.travel_service_hub.service.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
  */
 @Controller
 @RequestMapping("/provider")
-public class ProviderController {
+public class  ProviderController {
 
     @Autowired
     private ProviderService providerService;
@@ -35,6 +36,8 @@ public class ProviderController {
     private BookingService bookingService;
     @Autowired
     private  ReviewsService ReviewsService;
+    @Autowired
+    private CityRepository cityRepository;
 
 
     /**
@@ -237,6 +240,7 @@ public class ProviderController {
         return "frontendCode/ProviderUI/manageBookings"; // Ensure you have a manageBookings.html file
     }
 
+
     @GetMapping("/managePackages")
     public String getPackagesByProvider(Model model, HttpSession session) {
 
@@ -263,7 +267,13 @@ public class ProviderController {
             counts.put("dislikes", dislikeCount);
             packageLikeDislikeMap.put(pkg, counts);
         }
+       // Add the list of cities to the model
+        List<City> cities = cityRepository.findAll();
 
+        // Sort the cities alphabetically by name
+        cities.sort(Comparator.comparing(City::getName));
+
+        model.addAttribute("cities", cities);
         model.addAttribute("packageLikeDislikeMap", packageLikeDislikeMap);
 
         return "frontendCode/ProviderUI/managePackages"; // Name of your Thymeleaf template

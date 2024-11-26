@@ -71,6 +71,15 @@
             }
         }
     </style>
+
+    <!-- Include Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <!-- Include jQuery (if not already included) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Include Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
 </head>
 <body>
 <!-- Header -->
@@ -209,7 +218,7 @@
             <!-- Package Cards -->
             <div class="row">
                 <!-- Check if packages list is empty -->
-                <div class="col-12" th:if="${#lists.isEmpty(packageLikeDislikeMap)}">
+                <div class="col-12" th:if="${#maps.isEmpty(packageLikeDislikeMap)}">
                     <p>No packages found.</p>
                 </div>
 
@@ -217,25 +226,27 @@
                 <div class="col-md-4 mb-4" th:each="entry : ${packageLikeDislikeMap}" th:unless="${#lists.isEmpty(packageLikeDislikeMap)}">
                     <div class="card h-100 min-vh-60"
                          th:attr="data-package-id=${entry.key.id},
-                  data-package-name=${entry.key.name},
-                  data-package-description=${entry.key.description},
-                  data-package-price=${entry.key.price},
-                  data-package-image-url=${entry.key.imageUrl}">
+                      data-package-name=${entry.key.name},
+                      data-package-description=${entry.key.description},
+                      data-package-price=${entry.key.price},
+                      data-package-image-url=${entry.key.imageUrl},
+                      data-package-city-id=${entry.key.location.id}">
                         <img th:src="${entry.key.imageUrl}" class="card-img-top h-50" style="min-height: 50px;" alt="Package Image">
 
                         <div class="card-body">
                             <h5 class="card-title" th:text="${entry.key.name}">Package Name</h5>
                             <p class="card-text package-description" th:text="${entry.key.description}">Package Description</p>
+                            <p><strong>Location:</strong>
+                                <span th:text="${entry.key.location.name + (entry.key.location.state != null ? ', ' + entry.key.location.state : '') + ', ' + entry.key.location.country}"></span>
+                            </p>
                             <p><strong>Price:</strong> $<span th:text="${entry.key.price}">0</span></p>
                             <p><strong>Likes:</strong> <span th:text="${entry.value['likes']}">0</span></p>
-                            <p><strong>Dislikes:</strong> <span th:text="${entry.value['dislikes']}">0</span></p> <!-- Display dislike count -->
+                            <p><strong>Dislikes:</strong> <span th:text="${entry.value['dislikes']}">0</span></p>
                             <!-- Edit Button -->
                             <button type="button" class="btn btn-sm btn-outline-secondary"
                                     th:onclick="'loadPackageData(' + ${entry.key.id} + ')'">
                                 Edit Package
                             </button>
-                            <!-- View Details Link -->
-                            <a th:href="@{/Package/{id}(id=${entry.key.id})}"></a>
                             <!-- Delete Button -->
                             <a th:href="@{/packages/delete/{id}(id=${entry.key.id})}"
                                class="btn btn-sm btn-outline-danger"
@@ -260,32 +271,40 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="clearCreateForm()"></button>
                 </div>
                 <div class="modal-body">
-
-
                     <!-- Form Fields -->
                     <div class="mb-3">
                         <label for="createPackageName" class="form-label">Package Name</label>
-                        <input type="text" class="form-control" id="createPackageName" name="name" placeholder="Enter package name " maxlength="50"  >
+                        <input type="text" class="form-control" id="createPackageName" name="name" placeholder="Enter package name" maxlength="50" required>
                     </div>
                     <div class="mb-3">
                         <label for="createPackageDescription" class="form-label">Description</label>
-                        <textarea class="form-control" id="createPackageDescription" name="description" rows="3"
-                                  placeholder="Enter description"  maxlength="1000" ></textarea>
+                        <textarea class="form-control" id="createPackageDescription" name="description" rows="3" placeholder="Enter description" maxlength="1000" required></textarea>
                     </div>
                     <div class="mb-3">
                         <label for="createPackagePrice" class="form-label">Price</label>
-                        <input type="number" step="0.01" class="form-control" id="createPackagePrice" name="price"
-                               placeholder="Enter price" >
+                        <input type="number" step="0.01" class="form-control" id="createPackagePrice" name="price" placeholder="Enter price" required>
+                    </div>
+                    <!-- New Location Field -->
+                    <div class="mb-3">
+                        <label for="createPackageLocation" class="form-label">Location</label>
+                        <select class="form-control" id="createPackageLocation" name="cityId" required>
+                            <option value="" disabled selected>Select a city</option>
+                            <th:block th:each="city : ${cities}">
+                                <option th:value="${city.id}"
+                                        th:text="${city.name + (city.state != null ? ', ' + city.state : '') + ', ' + city.country}">
+                                </option>
+                            </th:block>
+                        </select>
                     </div>
                     <div class="mb-3">
-                        <label for="editPackageImage" class="form-label">Upload Package Image</label>
+                        <label for="createPackageImage" class="form-label">Upload Package Image</label>
                         <input type="file" class="form-control" id="createPackageImage" name="imageUrl" accept=".jpeg, .jpg, .png">
                         <small class="form-text text-muted">Only JPEG, JPG, and PNG files are allowed.</small>
                     </div>
                     <!-- New Image Preview (hidden initially) -->
                     <div class="mb-3" id="newImagePreviewContainer1" style="display: none;">
                         <label class="form-label">Preview:</label>
-                        <img id="newImagePreview1" src="" alt="New Image Preview" class="img-fluid bordered-img" style="max-height: 200px; max-width: 200px; min-height: 200px; min-width: 200px; object-fit: cover;">
+                        <img id="newImagePreview1" src="" alt="New Image Preview" class="img-fluid bordered-img" style="max-height: 200px; max-width: 200px; object-fit: cover;">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -302,7 +321,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <!-- Ensure action points to the correct endpoint and method is POST -->
-            <form id="editPackageForm" th:action="@{/packages/update}" method="post" enctype="multipart/form-data">
+            <form id="editPackageForm" action="/packages/update" method="post" enctype="multipart/form-data">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editPackageModalLabel">Edit Package</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="clearEditForm()"></button>
@@ -311,17 +330,27 @@
                     <input type="hidden" id="editPackageId" name="id" />
                     <div class="mb-3">
                         <label for="editPackageName" class="form-label">Package Name</label>
-                        <input type="text" class="form-control" id="editPackageName" name="name" placeholder="Enter package name" maxlength="35" required>
+                        <input type="text" class="form-control" id="editPackageName" name="name" placeholder="Enter package name" maxlength="50" required>
                     </div>
                     <div class="mb-3">
                         <label for="editPackageDescription" class="form-label">Description</label>
-                        <textarea class="form-control" id="editPackageDescription" name="description" rows="3"
-                                  placeholder="Enter description" maxlength="1000" required></textarea>
+                        <textarea class="form-control" id="editPackageDescription" name="description" rows="3" placeholder="Enter description" maxlength="1000" required></textarea>
                     </div>
                     <div class="mb-3">
                         <label for="editPackagePrice" class="form-label">Price</label>
-                        <input type="number" step="0.01" class="form-control" id="editPackagePrice" name="price"
-                               placeholder="Enter price" required>
+                        <input type="number" step="0.01" class="form-control" id="editPackagePrice" name="price" placeholder="Enter price" required>
+                    </div>
+                    <!-- New Location Field -->
+                    <div class="mb-3">
+                        <label for="editPackageLocation" class="form-label">Location</label>
+                        <select class="form-control" id="editPackageLocation" name="cityId" required>
+                            <option value="" disabled>Select a city</option>
+                            <th:block th:each="city : ${cities}">
+                                <option th:value="${city.id}"
+                                        th:text="${city.name + (city.state != null ? ', ' + city.state : '') + ', ' + city.country}">
+                                </option>
+                            </th:block>
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="editPackageImage" class="form-label">Upload Package Image</label>
@@ -331,14 +360,13 @@
                     <!-- New Image Preview (hidden initially) -->
                     <div class="mb-3" id="newImagePreviewContainer" style="display: none;">
                         <label class="form-label">Preview:</label>
-                        <img id="newImagePreview" src="" alt="New Image Preview" class="img-fluid bordered-img" style="max-height: 200px; max-width: 200px; min-height: 200px; min-width: 200px; object-fit: cover;">
+                        <img id="newImagePreview" src="" alt="New Image Preview" class="img-fluid bordered-img" style="max-height: 200px; max-width: 200px; object-fit: cover;">
                     </div>
                     <!-- Current Image Display -->
                     <div class="mb-3">
                         <label class="form-label">Current:</label>
-                        <img id="currentPackageImage" src="" alt="Current Package Image" class="img-fluid bordered-img" style="max-height: 200px; max-width: 200px; min-height: 200px; min-width: 200px; object-fit: cover;">
+                        <img id="currentPackageImage" src="" alt="Current Package Image" class="img-fluid bordered-img" style="max-height: 200px; max-width: 200px; object-fit: cover;">
                     </div>
-
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="clearEditForm()">Cancel</button>
@@ -349,7 +377,6 @@
         </div>
     </div>
 </div>
-
 
 <!-- Sign Out Confirmation Modal -->
 <div class="modal fade" id="signOutModal" tabindex="-1" aria-labelledby="signOutModalLabel" aria-hidden="true">
@@ -371,7 +398,6 @@
 </div>
 
 <!-- JavaScript Dependencies -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Bootstrap Bundle JS (includes Popper) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Feather icons -->
@@ -380,7 +406,13 @@
     // Initialize Feather Icons for consistent UI icons
     feather.replace();
 
-    /* JavaScript Functions */
+    $(document).ready(function() {
+        // Initialize Select2 on the location dropdowns
+        $('#createPackageLocation, #editPackageLocation').select2({
+            placeholder: 'Select a city',
+            allowClear: true
+        });
+    });
 
     /**
      * Load package data into the edit package modal.
@@ -393,6 +425,7 @@
             var name = packageCard.getAttribute('data-package-name');
             var description = packageCard.getAttribute('data-package-description');
             var price = packageCard.getAttribute('data-package-price');
+            var cityId = packageCard.getAttribute('data-package-city-id'); // New attribute for city ID
             var imageUrl = packageCard.getAttribute('data-package-image-url');
 
             // Populate the edit form fields with package details
@@ -401,17 +434,17 @@
             document.getElementById('editPackageDescription').value = description;
             document.getElementById('editPackagePrice').value = price;
 
+            // Set the selected city in the dropdown
+            $('#editPackageLocation').val(cityId).trigger('change');
+
             // Display the current image if it exists, or leave blank
             var currentImage = document.getElementById('currentPackageImage');
             currentImage.src = imageUrl ? imageUrl : '';
 
             // Clear any previously selected file inputs and hide the previews
             document.getElementById('editPackageImage').value = '';
-            document.getElementById('createPackageImage').value = '';
             document.getElementById('newImagePreview').src = '';
-            document.getElementById('newImagePreview1').src = '';
             document.getElementById('newImagePreviewContainer').style.display = 'none';
-            document.getElementById('newImagePreviewContainer1').style.display = 'none';
 
             // Show the edit package modal
             var editPackageModal = new bootstrap.Modal(document.getElementById('editPackageModal'));
@@ -455,21 +488,12 @@
     });
 
     /**
-     * Add event listeners to all edit buttons to load package data into the modal.
-     */
-    document.querySelectorAll('.edit-package-btn').forEach(function(button) {
-        button.addEventListener('click', function() {
-            var packageId = this.getAttribute('data-package-id');
-            loadPackageData(packageId);
-        });
-    });
-
-    /**
      * Clear the edit package form and reset the preview image.
      */
     function clearEditForm() {
         document.getElementById('editPackageForm').reset();
         document.getElementById('currentPackageImage').src = ''; // Clear the current image
+        $('#editPackageLocation').val(null).trigger('change'); // Reset Select2 dropdown
     }
 
     /**
@@ -477,6 +501,9 @@
      */
     function clearCreateForm() {
         document.getElementById('createPackageForm').reset();
+        $('#createPackageLocation').val(null).trigger('change'); // Reset Select2 dropdown
+        document.getElementById('newImagePreview1').src = '';
+        document.getElementById('newImagePreviewContainer1').style.display = 'none';
     }
 
     /**

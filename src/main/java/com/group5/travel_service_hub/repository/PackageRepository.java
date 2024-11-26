@@ -1,5 +1,6 @@
 package com.group5.travel_service_hub.repository;
 
+import com.group5.travel_service_hub.entity.City;
 import com.group5.travel_service_hub.entity.Package;
 import com.group5.travel_service_hub.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -41,4 +42,13 @@ public interface PackageRepository extends JpaRepository<Package, Long> {
      * @return A list of Package objects matching the criteria.
      */
     List<Package> findByProviderDetailsIdAndNameContainingIgnoreCase(Long providerId, String name);
+
+
+        List<Package> findByLocation(City city);
+
+
+    List<Package> findByLocationId(Long cityId);
+
+    List<Package> findByNameContainingIgnoreCaseAndLocationId(String name, Long cityId);
+
 }

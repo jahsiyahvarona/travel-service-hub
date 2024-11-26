@@ -1,8 +1,9 @@
 package com.group5.travel_service_hub.controller;
 
-import com.group5.travel_service_hub.entity.Booking;
+import com.group5.travel_service_hub.entity.*;
 import com.group5.travel_service_hub.entity.Package;
-import com.group5.travel_service_hub.entity.User;
+import com.group5.travel_service_hub.repository.CityRepository;
+import com.group5.travel_service_hub.repository.PackageRepository;
 import com.group5.travel_service_hub.service.BookingService;
 import com.group5.travel_service_hub.service.PackageService;
 import com.group5.travel_service_hub.service.UserService;
@@ -16,12 +17,17 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+
+
 
 @Controller
 @RequestMapping("/customer")
 public class CustomerController {
+    @Autowired
+    private CityRepository cityRepository;
 
     private final UserService userService;
     private final BookingService bookingService;
@@ -34,6 +40,7 @@ public class CustomerController {
         this.packageService = packageService;
     }
 
+
     /**
      * Displays the Customer Dashboard.
      */
@@ -41,7 +48,7 @@ public class CustomerController {
     public String showDashboard(HttpSession session, Model model) {
         User loggedInUser = (User) session.getAttribute("loggedInUser");
         if (loggedInUser == null) {
-            return "redirect:/login";
+            return "redirect:/CustomerLogin";
         }
 
         User customer = userService.findByUsername(loggedInUser.getUsername());
@@ -60,7 +67,7 @@ public class CustomerController {
     public String viewBookings(HttpSession session, Model model) {
         User loggedInUser = (User) session.getAttribute("loggedInUser");
         if (loggedInUser == null) {
-            return "redirect:/login";
+            return "redirect:/CustomerLogin";
         }
 
         List<Booking> bookings = bookingService.getBookingsByCustomerId(loggedInUser.getId());
@@ -74,13 +81,21 @@ public class CustomerController {
      */
     @GetMapping("/packages")
     public String viewPackages(HttpSession session, Model model) {
+        // Ensure the user is logged in
         User loggedInUser = (User) session.getAttribute("loggedInUser");
         if (loggedInUser == null) {
-            return "redirect:/login";
+            return "redirect:/CustomerLogin"; // Redirect to login if the user is not authenticated
         }
 
+        // Fetch all packages
         List<Package> packages = packageService.getAllPackages();
         model.addAttribute("packages", packages);
+        model.addAttribute("packagesEmpty", packages.isEmpty()); // Check if no packages are available
+
+        // Fetch all cities for dropdown
+        List<City> cities = cityRepository.findAll();
+        cities.sort(Comparator.comparing(City::getName)); // Sort cities alphabetically by name
+        model.addAttribute("cities", cities);
 
         return "frontendCode/CustomerUI/customerViewPackages";
     }
@@ -94,7 +109,7 @@ public class CustomerController {
                               Model model) {
         User loggedInUser = (User) session.getAttribute("loggedInUser");
         if (loggedInUser == null) {
-            return "redirect:/login";
+            return "redirect:/CustomerLogin";
         }
 
         Optional<Package> selectedPackage = packageService.getPackageById(packageId);
@@ -107,13 +122,57 @@ public class CustomerController {
 
         return "redirect:/customer/bookings";
     }
+
     @GetMapping("/packages/search")
-    public String searchPackages(@RequestParam("query") String query, Model model) {
-        List<Package> packages = packageService.searchPackagesByName(query);
+    public String searchPackages(
+            HttpSession session,
+            @RequestParam(value = "query", required = false) String query,
+            @RequestParam(value = "cityId", required = false) String cityIdStr,
+            Model model) {
+
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/CustomerLogin";
+        }
+
+        List<Package> packages;
+
+        // Parse cityIdStr to Long if it's not null or empty
+        Long cityId = null;
+        if (cityIdStr != null && !cityIdStr.isEmpty()) {
+            try {
+                cityId = Long.parseLong(cityIdStr);
+            } catch (NumberFormatException e) {
+                // Handle invalid cityId parameter
+                model.addAttribute("error", "Invalid city selection.");
+                // Optionally, return to the packages view with an error message
+                return "frontendCode/CustomerUI/customerViewPackages";
+            }
+        }
+
+        // Determine which search method to use based on parameters
+        if ((query != null && !query.isEmpty()) && cityId != null) {
+            packages = packageService.findByNameContainingIgnoreCaseAndLocationId(query, cityId);
+        } else if (query != null && !query.isEmpty()) {
+            packages = packageService.findByNameContainingIgnoreCase(query);
+        } else if (cityId != null) {
+            packages = packageService.findByLocationId(cityId);
+        } else {
+            packages = packageService.getAllPackages();
+        }
+
         model.addAttribute("packages", packages);
         model.addAttribute("packagesEmpty", packages.isEmpty());
-        return "frontendCode/CustomerUI/viewPackages"; // Ensure this path matches your view template
+
+        // Add cities for the dropdown
+        List<City> cities = cityRepository.findAll();
+        cities.sort(Comparator.comparing(City::getName)); // Sort alphabetically
+        model.addAttribute("cities", cities);
+
+        return "frontendCode/CustomerUI/customerViewPackages"; // Ensure correct template path
     }
+
+
     /**
      * Displays the Leave a Review page.
      */
@@ -121,17 +180,21 @@ public class CustomerController {
     public String leaveReview(HttpSession session, Model model) {
         User loggedInUser = (User) session.getAttribute("loggedInUser");
         if (loggedInUser == null) {
-            return "redirect:/login";
+            return "redirect:/CustomerLogin";
         }
 
         // Fetch the booked packages for the logged-in customer
         List<Booking> bookedPackages = bookingService.getBookingsByCustomerId(loggedInUser.getId());
 
+        // Filter bookings to include only confirmed bookings
+        List<Booking> confirmedBookedPackages = bookedPackages.stream()
+                .filter(booking -> booking.getStatus().equals(BookingStatus.CONFIRMED))
+                .toList();
         if (bookedPackages.isEmpty()) {
             model.addAttribute("errorMessage", "You currently have no booked packages to review.");
         }
 
-        model.addAttribute("bookedPackages", bookedPackages);
+        model.addAttribute("bookedPackages", confirmedBookedPackages);
         return "frontendCode/CustomerUI/customerLeaveReview";
     }
 
@@ -144,7 +207,7 @@ public class CustomerController {
                                HttpSession session) {
         User loggedInUser = (User) session.getAttribute("loggedInUser");
         if (loggedInUser == null) {
-            return "redirect:/login";
+            return "redirect:/CustomerLogin";
         }
 
         // Placeholder for submitting review logic
@@ -158,7 +221,7 @@ public class CustomerController {
     public String viewProfile(HttpSession session, Model model) {
         User loggedInUser = (User) session.getAttribute("loggedInUser");
         if (loggedInUser == null) {
-            return "redirect:/login";
+            return "redirect:/CustomerLogin";
         }
 
         model.addAttribute("loggedInUser", loggedInUser);
@@ -172,8 +235,10 @@ public class CustomerController {
     public String updateProfile(@RequestParam Long userId,
                                 @ModelAttribute User userDetails,
                                 HttpSession session) {
-        User updatedUser = userService.updateProfile(userId, userDetails);
-        session.setAttribute("loggedInUser", updatedUser);
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/CustomerLogin";
+        }
         return "redirect:/customer/profile";
     }
 
@@ -184,8 +249,11 @@ public class CustomerController {
     public String updateProfilePic(@RequestParam Long userId,
                                    @RequestParam("file") MultipartFile file,
                                    HttpSession session) {
-        User updatedUser = userService.updateProfilePic(userId, file);
-        session.setAttribute("loggedInUser", updatedUser);
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/CustomerLogin";
+        }
+
         return "redirect:/customer/profile";
     }
 
@@ -195,7 +263,8 @@ public class CustomerController {
     @PostMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
-        return "redirect:/login?logout";
+        return "redirect:/CustomerLogin";
+
     }
 
     /**

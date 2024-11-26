@@ -1,5 +1,6 @@
 package com.group5.travel_service_hub.service;
 
+import com.group5.travel_service_hub.entity.City;
 import com.group5.travel_service_hub.entity.Package;
 import com.group5.travel_service_hub.entity.Role;
 import com.group5.travel_service_hub.entity.User;
@@ -220,4 +221,39 @@ public class PackageService {
         String[] parts = filename.split("\\.");
         return parts.length > 1 ? parts[parts.length - 1] : "";
     }
+
+    public List<Package> findPackagesByCity(City city) {
+        return packageRepository.findByLocation(city);
+    }
+    /**
+     * Retrieves all packages containing a specific name.
+     * @param name the package name or partial name to search for.
+     * @return a list of packages matching the search criteria.
+     */
+    public List<Package> findByNameContainingIgnoreCase(String name) {
+        return packageRepository.findByNameContainingIgnoreCase(name);
+    }
+
+    /**
+     * Retrieves all packages by location.
+     * @param cityId the ID of the city to search packages for.
+     * @return a list of packages in the specified city.
+     */
+    public List<Package> findByLocationId(Long cityId) {
+        return packageRepository.findByLocationId(cityId);
+    }
+
+    /**
+     * Retrieves all packages containing a specific name and located in a specific city.
+     * @param name the package name or partial name to search for.
+     * @param cityId the ID of the city to search packages for.
+     * @return a list of packages matching the criteria.
+     */
+    public List<Package> findByNameContainingIgnoreCaseAndLocationId(String name, Long cityId) {
+        return packageRepository.findByNameContainingIgnoreCaseAndLocationId(name, cityId);
+    }
+
+
+
+
 }
