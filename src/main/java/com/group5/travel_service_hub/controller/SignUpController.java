@@ -2,7 +2,10 @@ package com.group5.travel_service_hub.controller;
 
 import com.group5.travel_service_hub.entity.Role;
 import com.group5.travel_service_hub.entity.User;
+import com.group5.travel_service_hub.service.AuthenticationService;
 import com.group5.travel_service_hub.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +20,9 @@ public class SignUpController {
 
     @Autowired
     private UserService userService; // Service for managing user-related operations
+
+    @Autowired
+    private AuthenticationService authenticationService; // Handles user authentication logic
 
     // ---------------------- Customer Sign-Up ----------------------
 
@@ -124,7 +130,7 @@ public class SignUpController {
             @RequestParam("password") String password,
             @RequestParam("confirmPassword") String confirmPassword,
             @RequestParam(value = "profilePic", required = false) MultipartFile profilePic,
-            Model model) {
+            Model model, HttpServletRequest request) {
 
         // Validate passwords match
         if (!password.equals(confirmPassword)) {
@@ -160,8 +166,24 @@ public class SignUpController {
                 userService.updateProfilePic(registeredUser.getId(), profilePic);
             }
 
-            // Redirect to the provider login page
-            return "redirect:/ProviderLogin";
+            User user1 = authenticationService.authenticate2(username, password);
+
+            if (user1 != null) {
+                // Invalidate the previous session to prevent session fixation attacks
+                HttpSession oldSession = request.getSession(false);
+                if (oldSession != null) {
+                    oldSession.invalidate();
+                }
+
+            }
+            // Create a new session for the authenticated user
+            HttpSession newSession = request.getSession(true);
+            newSession.setAttribute("loggedInUser", user1);
+            int timeoutInSeconds = 30 * 60; // For a 30-minute timeout
+            newSession.setMaxInactiveInterval(timeoutInSeconds);
+            // Redirect to the provider newProvider page
+            return "redirect:/newProvider";
+
 
         } catch (Exception e) {
             // Handle registration errors
