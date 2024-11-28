@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- Meta Tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Provider Dashboard · Travel Services Hub</title>
+    <!-- Bootstrap CSS -->
+    <link href="/CSS/bootstrap_theme/bootstrap.css" rel="stylesheet" type="text/css">
+    <link href="/CSS/dashboard.css" rel="stylesheet">
+    <link href="/CSS/BellDropdown.css" rel="stylesheet">
+    <style>
+        /* Consistent button styling */
+        .btn-custom {
+            background-color: #0abf53;
+            color: white;
+            border: none;
+        }
+        .btn-custom:hover {
+            background-color: #089e45;
+        }
+
+        /* Styles for Popup Arrow */
+        .arrow {
+            position: relative;
+            margin: 20px auto;
+            width: 50px;
+            height: 50px;
+            animation: bounce 2s infinite;
+            cursor: pointer;
+        }
+
+        .arrow img {
+            width: 100%;
+            height: auto;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-20px);
+            }
+            60% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Modal Customization */
+        .modal-intro {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .modal-backdrop.show {
+            opacity: 0.8;
+        }
+
+        /* Adjust modal content */
+        .modal-content {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        /* Make each slide more exciting */
+        .carousel-item {
+            background-color: #f8f9fa;
+            padding: 30px;
+        }
+
+        .carousel-item:nth-child(odd) {
+            background-color: #e9ecef;
+        }
+
+        .carousel-item h5 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #0abf53;
+        }
+
+        .carousel-item p {
+            font-size: 18px;
+        }
+
+        /* Add images to slides */
+        .feature-image {
+            max-width: 100px;
+            margin: 0 auto 20px auto;
+        }
+
+        /* Close button styling */
+        .modal-header .btn-close {
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            opacity: 0.8;
+        }
+
+        .modal-header .btn-close:hover {
+            opacity: 1;
+        }
+
+        /* Adjust carousel indicators */
+        .carousel-indicators [data-bs-target] {
+            background-color: #0abf53;
+        }
+
+        /* Close button styling */
+        .modal-header .btn-close {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%230abf53' viewBox='0 0 16 16'%3E%3Cpath d='M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 1 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+            background-size: 1em;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 1em;
+            height: 1em;
+            padding: 0.25em;
+            opacity: 1;
+            border: none;
+        }
+
+        .modal-header .btn-close:hover {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23089e45' viewBox='0 0 16 16'%3E%3Cpath d='M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 1 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+        }
+
+
+    </style>
+</head>
+<body>
+<!-- Header -->
+<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+    <!-- Navbar Brand -->
+    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">Provider Dashboard</a>
+    <!-- Sidebar Toggle Button for Mobile -->
+    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
+            data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false"
+            aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <!-- Logo Image -->
+    <img src="/images/logo.png" alt="Company Logo" class="mx-auto d-block" style="height: 100px; width: auto;">
+    <!-- Navbar Items -->
+    <ul class="navbar-nav px-3">
+        <!-- Notification Bell -->
+        <li class="nav-item dropdown text-nowrap">
+            <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button"
+               data-bs-toggle="dropdown" aria-expanded="false">
+                <!-- Feather Icons Bell -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell">
+                    <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                <!-- Dynamic Badge for Notifications -->
+                <span class="badge bg-danger" th:text="${newBookings}">0</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+                <li><h6 class="dropdown-header">New Bookings</h6></li>
+                <!-- Loop through new bookings -->
+                <li th:each="booking : ${newBookings}">
+                    <a class="dropdown-item" th:href="@{/provider/manageBookings}">
+                        <span th:text="${booking.customer.name}">Customer Name</span> - <span th:text="${booking.pkg.name}">Package Name</span>
+                        <br><small th:text="'Booking Date: ' + ${#dates.format(booking.bookingDate, 'yyyy-MM-dd')}">Booking Date</small>
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item btn btn-primary btn-custom" th:href="@{/provider/manageBookings}">Go to Manage Bookings</a></li>
+            </ul>
+        </li>
+        <!-- Sign Out Link -->
+        <li class="nav-item text-nowrap">
+            <a class="nav-link" href="#" onclick="showSignOutModal()">Sign out</a>
+        </li>
+    </ul>
+</header>
+<!-- Main Container -->
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar Navigation -->
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" th:href="@{/provider/dashboard}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/ProviderDashboard}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            Dashboard
+                        </a>
+                    </li>
+                    <!-- Manage Bookings Link in Sidebar -->
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/provider/manageBookings}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            Manage Bookings
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/provider/managePackages}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layers">
+                                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                                <polyline points="2 17 12 22 22 17"></polyline>
+                                <polyline points="2 12 12 17 22 12"></polyline>
+                            </svg>
+                            Manage Packages
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/provider/replyToReviews}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users">
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                            Reviews
+                        </a>
+                    </li>
+                    <!-- Profile Link in Sidebar -->
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/provider/profile}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
+                                <path d="M20.5 18.5a6 6 0 0 0-9 0"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            Profile
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <!-- Main Content Area -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <!-- Page Header -->
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <div class="d-flex align-items-center">
+                    <!-- Profile Picture -->
+                    <img th:src="${profilePicUrl != null} ? ${profilePicUrl} : '/images/default-profile.png'"
+                         alt="Profile Picture"
+                         class="rounded-circle me-3"
+                         style="width: 50px; height: 50px; object-fit: cover;">
+                    <!-- Provider Name -->
+                    <h1 class="h2" th:text="${providerName} + '\'s'+' Dashboard'">Provider's Dashboard</h1>
+                </div>
+            </div>
+
+            <!-- Row for Cards -->
+            <div class="row card-group-equal">
+                <!-- Total Sales Card -->
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header text-center">
+                            <h4 class="my-0 fw-normal">Total Revenue</h4>
+                        </div>
+                        <div class="card-body d-flex align-items-center justify-content-center">
+                            <h1 class="display-1" style="color: #0abf53;" th:text="'$' + ${totalSales}">Total Revenue Amount</h1>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Most Liked Package Card -->
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h4 class="my-0 fw-normal">Most Liked Package</h4>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <!-- Display package details if likesCount > 0 -->
+                            <div  style="min-height: 128px;" th:if="${likesCount != null and likesCount > 0}">
+                                <h5 class="card-title pricing-card-title" th:text="${mostLikedPackage.name}">Package Name</h5>
+                                <ul class="list-unstyled mt-3 mb-4">
+                                    <li><strong>Likes:</strong> <span th:text="${likesCount}">0</span></li>
+                                    <li><strong>Bookings:</strong> <span th:text="${mostLikedPackage.getBookings().size()}">0</span></li>
+                                    <!--<li><strong>Status:</strong> <span th:text="${packageStatusForMostLiked}">Active</span></li>-->
+                                    <li><strong>Status:</strong> <span th:text="'Active'">Active</span></li>
+                                </ul>
+                            </div>
+                            <!-- Display 'No likes' message if likesCount is null or zero -->
+                            <div  style="min-height: 128px;" th:if="${likesCount == null or likesCount == 0}" class="mt-auto mb-auto text-center">
+                                <h5 class="card-title pricing-card-title">No likes</h5>
+                            </div>
+                            <a class="btn btn-lg btn-custom mt-auto" th:href="@{/provider/managePackages}">Packages</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Most Booked Package Card -->
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h4 class="my-0 fw-normal">Most Booked Package</h4>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <!-- Display package details if bookingsCountForMostBooked > 0 -->
+                            <div style="min-height: 128px;" th:if="${bookingsCountForMostBooked != null and bookingsCountForMostBooked > 0}">
+                                <h5 class="card-title pricing-card-title" th:text="${mostBookedPackage.name}">Package Name</h5>
+                                <ul class="list-unstyled mt-3 mb-4">
+                                    <li><strong>Bookings:</strong> <span th:text="${bookingsCountForMostBooked}">0</span></li>
+                                    <li><strong>Likes:</strong> <span th:text="${mostBookedPackage.getLikeDislikes().size()}">0</span></li>
+                                    <!-- <li><strong>Status:</strong> <span th:text="${packageStatusForMostBooked}">Active</span></li>-->
+                                    <li><strong>Status:</strong> <span th:text="'Active'">Active</span></li>
+
+                                </ul>
+                            </div>
+                            <!-- Display 'No bookings' message if bookingsCountForMostBooked is null or zero -->
+                            <div style="min-height: 128px;" th:if="${bookingsCountForMostBooked == null or bookingsCountForMostBooked == 0}" class="mt-auto mb-auto text-center">
+                                <h5 class="card-title pricing-card-title">No bookings</h5>
+                            </div>
+                            <a class="btn btn-lg btn-custom mt-auto" th:href="@{/provider/manageBookings}">Bookings</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Booking Performance Chart -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header">
+                    <h4 class="my-0 fw-normal">Booking Performance</h4>
+                </div>
+                <div class="card-body">
+                    <canvas id="bookingChart"></canvas>
+                </div>
+            </div>
+            <!-- Sales Performance Chart -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header">
+                    <h4 class="my-0 fw-normal">Sales Performance</h4>
+                </div>
+                <div class="card-body">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Introductory Modal -->
+<div class="modal fade" id="introModal" tabindex="-1" aria-labelledby="introModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Modal Header with Close Button -->
+            <div class="modal-header">
+                <h5 class="modal-title">Welcome to Travel Service Hub</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <!-- Modal Body with Carousel -->
+            <div class="modal-body">
+                <div id="introCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="false">
+                    <div class="carousel-inner">
+                        <!-- Slide 1 -->
+                        <div class="carousel-item active">
+                            <div class="modal-intro">
+                                <!-- Introduction Text -->
+                                <h5>Welcome!</h5>
+                                <p>Discover the features available to you as a provider.</p>
+                                <!-- Image -->
+                                <img src="/images/logo.png" alt="Welcome" class="feature-image">
+                                <!-- Arrow -->
+                                <div class="arrow" onclick="nextSlide()">
+                                    <img src="/images/arrow.png" alt="Next">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 2 -->
+                        <div class="carousel-item">
+                            <div class="modal-intro">
+                                <h5>Manage Your Packages</h5>
+                                <!-- Image -->
+                                <img src="/images/logo.png" alt="Manage Packages" class="feature-image">
+                                <p>Create, edit, and delete your travel packages to offer the best experiences to your customers.</p>
+                                <div class="arrow" onclick="nextSlide()">
+                                    <img src="/images/arrow.png" alt="Next">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 3 -->
+                        <div class="carousel-item">
+                            <div class="modal-intro">
+                                <h5>Track and Manage Bookings</h5>
+                                <!-- Image -->
+                                <img src="/images/logo.png" alt="Manage Bookings" class="feature-image">
+                                <p>Stay updated on customer bookings.</p>
+                                <div class="arrow" onclick="nextSlide()">
+                                    <img src="/images/arrow.png" alt="Next">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 4 -->
+                        <div class="carousel-item">
+                            <div class="modal-intro">
+                                <h5>Respond to Customer Reviews</h5>
+                                <!-- Image -->
+                                <img src="/images/logo.png" alt="Customer Reviews" class="feature-image">
+                                <p>Engage with your customers by responding to their reviews and feedback.</p>
+                                <div class="arrow" onclick="nextSlide()">
+                                    <img src="/images/arrow.png" alt="Next">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 5 -->
+                        <div class="carousel-item">
+                            <div class="modal-intro">
+                                <h5>View Performance Metrics</h5>
+                                <!-- Image -->
+                                <img src="/images/logo.png" alt="Performance Metrics" class="feature-image">
+                                <p>Analyze your sales and booking data to improve your services.</p>
+                                <div class="arrow" onclick="closeIntroModal()">
+                                    <img src="/images/arrow.png" alt="Finish">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Carousel Indicators -->
+                    <div class="carousel-indicators">
+                        <button type="button" data-bs-target="#introCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                        <button type="button" data-bs-target="#introCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                        <button type="button" data-bs-target="#introCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                        <button type="button" data-bs-target="#introCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                        <button type="button" data-bs-target="#introCarousel" data-bs-slide-to="4" aria-label="Slide 5"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sign Out Confirmation Modal -->
+<div class="modal fade" id="signOutModal" tabindex="-1" aria-labelledby="signOutModalLabel" aria-hidden="true">
+    <!-- Existing sign-out modal content -->
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="signOutModalLabel">Confirm Sign Out</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to sign out?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                <button type="button" class="btn btn-danger" id="confirmSignOutButton">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS (including Popper.js) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Feather Icons -->
+<script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+<!-- Custom JavaScript -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    (function () {
+        'use strict';
+        // Initialize Feather Icons
+        feather.replace();
+
+        // Get data from the model
+        var months = /*[[${months}]]*/ ["Jan", "Feb", "Mar"];
+        var bookingData = /*[[${bookingData}]]*/ [10, 5, 15];
+        var salesData = /*[[${salesData}]]*/ [500, 300, 1500];
+
+        // Booking Performance Chart
+        var ctx = document.getElementById('bookingChart').getContext('2d');
+        var bookingChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Bookings',
+                    data: bookingData,
+                    lineTension: 0,
+                    backgroundColor: 'rgba(10, 191, 83, 0.2)',
+                    borderColor: '#0abf53',
+                    borderWidth: 4,
+                    pointBackgroundColor: '#0abf53',
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: { display: true }
+                }
+            }
+        });
+
+        // Sales Performance Chart
+        var salesCtx = document.getElementById('salesChart').getContext('2d');
+        var salesChart = new Chart(salesCtx, {
+            type: 'bar',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Sales ($)',
+                    data: salesData,
+                    backgroundColor: '#0abf53',
+                    borderColor: '#0abf53',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: { display: true }
+                }
+            }
+        });
+
+        // Show the introductory modal on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            var introModal = new bootstrap.Modal(document.getElementById('introModal'));
+            introModal.show();
+        });
+    })();
+
+    function showSignOutModal() {
+        var signOutModal = new bootstrap.Modal(document.getElementById('signOutModal'));
+        signOutModal.show();
+    }
+
+    // Function to go to the next slide in the carousel
+    function nextSlide() {
+        var carouselElement = document.getElementById('introCarousel');
+        var carousel = bootstrap.Carousel.getOrCreateInstance(carouselElement);
+        carousel.next();
+    }
+
+    // Function to close the intro modal
+    function closeIntroModal() {
+        var introModal = bootstrap.Modal.getInstance(document.getElementById('introModal'));
+        introModal.hide();
+    }
+
+    // Redirect on sign out confirmation
+    document.getElementById('confirmSignOutButton').addEventListener('click', function() {
+        window.location.href = "/LoginChoice";
+    });
+    /*]]>*/
+</script>
+</body>
+</html>
