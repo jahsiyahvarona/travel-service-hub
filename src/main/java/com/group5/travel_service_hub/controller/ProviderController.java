@@ -40,6 +40,8 @@ public class  ProviderController {
     @Autowired
     private CityRepository cityRepository;
 
+    @Autowired NotificationService notificationService;
+
 
     /**
      * Handles the creation of a new package.----------------no
@@ -167,6 +169,21 @@ public class  ProviderController {
             return "redirect:/ProviderLogin";
         }
 
+        // Fetch notifications for the user
+        List<Notification> notifications = notificationService.getNotificationsForUser(loggedInUser);
+
+        // Count unread notifications
+        long unreadNotificationsCount = notifications.stream().filter(n -> !n.isRead()).count();
+
+        // Filter to include only unread notifications
+        List<Notification> unseenNotifications = notifications.stream()
+                .filter(n -> !n.isRead()) // Keep only notifications where isRead is false
+                .toList();
+
+        // Add to model
+        model.addAttribute("notifications", unseenNotifications);
+        model.addAttribute("unreadNotificationsCount", unreadNotificationsCount);
+
         // Add the logged-in user to the model for Thymeleaf to access
         model.addAttribute("loggedInUser", loggedInUser);
 
@@ -197,8 +214,25 @@ public class  ProviderController {
             return "redirect:/ProviderLogin"; // Redirect to login if user details are missing
         }
 
+
         // Fetch all reviews for the provider's packages
         List<Reviews> reviews = ReviewsService.getReviewsByProvider(user.getId());
+
+        // Fetch notifications for the user
+        List<Notification> notifications = notificationService.getNotificationsForUser(loggedInUser);
+
+        // Count unread notifications
+        long unreadNotificationsCount = notifications.stream().filter(n -> !n.isRead()).count();
+
+        // Filter to include only unread notifications
+        List<Notification> unseenNotifications = notifications.stream()
+                .filter(n -> !n.isRead()) // Keep only notifications where isRead is false
+                .toList();
+
+        // Add to model
+        model.addAttribute("notifications", unseenNotifications);
+        model.addAttribute("unreadNotificationsCount", unreadNotificationsCount);
+
 
         // Add reviews to the model
         model.addAttribute("reviews", reviews);
@@ -231,6 +265,22 @@ public class  ProviderController {
         List<Booking> confirmedBookings = bookings.stream()
                 .filter(booking -> booking.getStatus().equals(BookingStatus.CONFIRMED))
                 .toList();
+
+        // Fetch notifications for the user
+        List<Notification> notifications = notificationService.getNotificationsForUser(loggedInUser);
+
+        // Count unread notifications
+        long unreadNotificationsCount = notifications.stream().filter(n -> !n.isRead()).count();
+
+        // Filter to include only unread notifications
+        List<Notification> unseenNotifications = notifications.stream()
+                .filter(n -> !n.isRead()) // Keep only notifications where isRead is false
+                .toList();
+
+        // Add to model
+        model.addAttribute("notifications", unseenNotifications);
+        model.addAttribute("unreadNotificationsCount", unreadNotificationsCount);
+
 
         // Add bookings to the model
 
@@ -273,6 +323,22 @@ public class  ProviderController {
 
         // Sort the cities alphabetically by name
         cities.sort(Comparator.comparing(City::getName));
+
+        // Fetch notifications for the user
+        List<Notification> notifications = notificationService.getNotificationsForUser(loggedInUser);
+
+        // Count unread notifications
+        long unreadNotificationsCount = notifications.stream().filter(n -> !n.isRead()).count();
+
+        // Filter to include only unread notifications
+        List<Notification> unseenNotifications = notifications.stream()
+                .filter(n -> !n.isRead()) // Keep only notifications where isRead is false
+                .toList();
+
+        // Add to model
+        model.addAttribute("notifications", unseenNotifications);
+        model.addAttribute("unreadNotificationsCount", unreadNotificationsCount);
+
 
         model.addAttribute("cities", cities);
         model.addAttribute("packageLikeDislikeMap", packageLikeDislikeMap);

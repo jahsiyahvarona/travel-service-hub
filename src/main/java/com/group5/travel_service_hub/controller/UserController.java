@@ -1,8 +1,11 @@
 package com.group5.travel_service_hub.controller;
 
+import com.group5.travel_service_hub.entity.Notification;
 import com.group5.travel_service_hub.entity.Package;
 import com.group5.travel_service_hub.entity.Role;
 import com.group5.travel_service_hub.entity.User;
+import com.group5.travel_service_hub.repository.NotificationRepository;
+import com.group5.travel_service_hub.service.NotificationService;
 import com.group5.travel_service_hub.service.UserService;
 import com.group5.travel_service_hub.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
@@ -29,6 +32,11 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository; // Repository for direct database interaction
+
+    @Autowired
+    private NotificationService notificationService;
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     /**
      * Registers a new user.
@@ -211,5 +219,20 @@ public class UserController {
         }
 
         return "redirect:/provider/profile";
+    }
+
+    @GetMapping("/notifications/{id}/markAsRead")
+    public String markNotificationAsRead(@PathVariable Long id, HttpSession session) {
+        User user = (User) session.getAttribute("loggedInUser");
+        if (user == null) {
+            return "redirect:/login"; // Adjust as necessary
+        }
+        Notification notification = notificationRepository.getById(id);
+        if (notification != null && notification.getNotifee().getId().equals(user.getId())) {
+            notificationService.markAsRead(notification);
+            // Redirect to the notification's target URL
+            return "redirect:" + notification.getTargetUrl();
+        }
+        return "redirect:/";
     }
 }
