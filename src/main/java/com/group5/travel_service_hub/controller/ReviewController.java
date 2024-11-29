@@ -1,7 +1,11 @@
 package com.group5.travel_service_hub.controller;
 
+import com.group5.travel_service_hub.entity.NotificationReason;
 import com.group5.travel_service_hub.entity.Reviews;
 import com.group5.travel_service_hub.entity.User;
+import com.group5.travel_service_hub.repository.ReportRepository;
+import com.group5.travel_service_hub.repository.ReviewRepository;
+import com.group5.travel_service_hub.service.NotificationService;
 import com.group5.travel_service_hub.service.ReviewsService;
 import com.group5.travel_service_hub.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -26,6 +30,14 @@ public class ReviewController {
 
     @Autowired
     private UserService userService; // Service for managing user-related operations
+
+    @Autowired
+private NotificationService notificationService;
+
+    @Autowired
+    ReportRepository reportRepository;
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     /**
      * Handles the submission of a reply to a review.
@@ -57,6 +69,11 @@ public class ReviewController {
 
             // Submit the reply to the review
             reviewsService.replyToReview(reviewId, replyContent);
+
+            String message = "You have a new reply from " + loggedInUser.getUsername();
+            String targetUrl = "/customer/reviews"; // Booking details page
+            //create notification
+            notificationService.createNotification(loggedInUser,review.getAuthor(), NotificationReason.REPLIED,message,targetUrl);
 
             redirectAttributes.addFlashAttribute("successMessage", "Reply submitted successfully.");
             return "redirect:/provider/replyToReviews";
@@ -175,5 +192,19 @@ public class ReviewController {
             redirectAttributes.addFlashAttribute("errorMessage", "An unexpected error occurred.");
             return "redirect:/provider/replyToReviews";
         }
+    }
+
+    @GetMapping("/replyToReviews/{reviewId}")
+    public String viewReviewDetails(@PathVariable Long reviewId, Model model, HttpSession session) {
+        User provider = (User) session.getAttribute("loggedInUser");
+        Reviews review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("Review not found with id: " + reviewId));
+
+        // Check if the review is for the provider's package
+        if (review != null && review.getPkg().getProviderDetails().getId().equals(provider.getId())) {
+            model.addAttribute("review", review);
+            return "redirect:/provider/replyToReviews"; // Thymeleaf template for review details
+        }
+        return "redirect:/provider/replyToReviews";
     }
 }

@@ -1,8 +1,13 @@
 package com.group5.travel_service_hub.controller;
 
+import com.group5.travel_service_hub.entity.Booking;
 import com.group5.travel_service_hub.entity.BookingStatus;
+import com.group5.travel_service_hub.entity.NotificationReason;
+import com.group5.travel_service_hub.entity.User;
 import com.group5.travel_service_hub.service.BookingService;
+import com.group5.travel_service_hub.service.NotificationService;
 import com.group5.travel_service_hub.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller; // Indicates this class serves web requests
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +24,9 @@ public class BookingController {
     private BookingService bookingService; // Service for managing booking operations
 
     @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
     private UserService userService; // Service for managing user-related operations
 
     /**
@@ -30,10 +38,22 @@ public class BookingController {
      */
     @PostMapping("/unconfirmBooking") // Handles POST requests to "/provider/unconfirmBooking"
     public String unconfirmBooking(@RequestParam Long bookingId,
-                                   RedirectAttributes redirectAttributes) {
+                                   RedirectAttributes redirectAttributes, HttpSession session) {
+        // Retrieve the logged-in user from the session
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/ProviderLogin"; // Redirect to login if user is not found in the session
+        }
+
         try {
             // Update the status of the booking to UNCONFIRMED
             bookingService.updateBookingStatus(bookingId, BookingStatus.UNCONFIRMED);
+
+            String message = "Your booking has been Unconfirmed";
+            String targetUrl = "/customer/bookings"; // Booking details page
+            //create notification
+            notificationService.createNotification(loggedInUser,bookingService.getBookingById(bookingId).get().getCustomer(), NotificationReason.UNCONFIRMED_BOOKING,message,targetUrl);
+
             redirectAttributes.addFlashAttribute("successMessage", "Booking unconfirmed successfully.");
         } catch (Exception e) {
             // Handle errors and provide feedback to the user
@@ -51,10 +71,23 @@ public class BookingController {
      */
     @PostMapping("/confirmBooking") // Handles POST requests to "/provider/confirmBooking"
     public String confirmBooking(@RequestParam Long bookingId,
-                                 RedirectAttributes redirectAttributes) {
+                                 RedirectAttributes redirectAttributes, HttpSession session) {
+
+        // Retrieve the logged-in user from the session
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/ProviderLogin"; // Redirect to login if user is not found in the session
+        }
+
         try {
             // Update the status of the booking to CONFIRMED
             bookingService.updateBookingStatus(bookingId, BookingStatus.CONFIRMED);
+
+            String message = "Your booking has been Confirmed";
+            String targetUrl = "/customer/bookings"; // Booking details page
+            //create notification
+            notificationService.createNotification(loggedInUser,bookingService.getBookingById(bookingId).get().getCustomer(), NotificationReason.CONFIRMED_BOOKING,message,targetUrl);
+
             redirectAttributes.addFlashAttribute("successMessage", "Booking confirmed successfully.");
         } catch (Exception e) {
             // Handle errors and provide feedback to the user
@@ -72,10 +105,23 @@ public class BookingController {
      */
     @PostMapping("/denyBooking") // Handles POST requests to "/provider/denyBooking"
     public String denyBooking(@RequestParam Long bookingId,
-                              RedirectAttributes redirectAttributes) {
+                              RedirectAttributes redirectAttributes, HttpSession session) {
+
+        // Retrieve the logged-in user from the session
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/ProviderLogin"; // Redirect to login if user is not found in the session
+        }
+
         try {
             // Update the status of the booking to DENIED
             bookingService.updateBookingStatus(bookingId, BookingStatus.DENIED);
+
+            String message = "Your booking has been Denied";
+            String targetUrl = "/customer/bookings"; // Booking details page
+            //create notification
+            notificationService.createNotification(loggedInUser,bookingService.getBookingById(bookingId).get().getCustomer(), NotificationReason.DENIED_BOOKING,message,targetUrl);
+
             redirectAttributes.addFlashAttribute("successMessage", "Booking denied successfully.");
         } catch (Exception e) {
             // Handle errors and provide feedback to the user
@@ -93,7 +139,7 @@ public class BookingController {
      */
     @PostMapping("/reportBooking") // Handles POST requests to "/provider/reportBooking"
     public String reportBooking(@RequestParam Long bookingId,
-                                RedirectAttributes redirectAttributes) {
+                                RedirectAttributes redirectAttributes, HttpSession session) {
         try {
             // Update the status of the booking to REPORTED
             bookingService.updateBookingStatus(bookingId, BookingStatus.REPORTED);

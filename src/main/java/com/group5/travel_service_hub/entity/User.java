@@ -48,6 +48,14 @@ public class User {
     @OneToMany(mappedBy = "providerDetails", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Package> packages;
 
+    // Notifications sent by the user
+    @OneToMany(mappedBy = "notifier")
+    private List<Notification> sentNotifications;
+
+    // Notifications received by the user
+    @OneToMany(mappedBy = "notifee")
+    private List<Notification> receivedNotifications;
+
     // Constructors
 
     /**
@@ -122,6 +130,7 @@ public class User {
 
     // Getters and Setters
 
+
     public Long getId() {
         return id;
     }
@@ -194,4 +203,19 @@ public class User {
         this.packages = packages;
     }
 
+    public List<Notification> getSentNotifications() {
+        return sentNotifications;
+    }
+
+    public void setSentNotifications(List<Notification> sentNotifications) {
+        this.sentNotifications = sentNotifications;
+    }
+
+    public List<Notification> getReceivedNotifications() {
+        return receivedNotifications;
+    }
+
+    public void setReceivedNotifications(List<Notification> receivedNotifications) {
+        this.receivedNotifications = receivedNotifications;
+    }
 }

@@ -5,6 +5,7 @@ import com.group5.travel_service_hub.entity.Package;
 import com.group5.travel_service_hub.repository.CityRepository;
 import com.group5.travel_service_hub.repository.PackageRepository;
 import com.group5.travel_service_hub.service.BookingService;
+import com.group5.travel_service_hub.service.NotificationService;
 import com.group5.travel_service_hub.service.PackageService;
 import com.group5.travel_service_hub.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -28,6 +29,9 @@ import java.util.Optional;
 public class CustomerController {
     @Autowired
     private CityRepository cityRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
     private final UserService userService;
     private final BookingService bookingService;
@@ -73,6 +77,22 @@ public class CustomerController {
         List<Booking> bookings = bookingService.getBookingsByCustomerId(loggedInUser.getId());
         model.addAttribute("bookings", bookings);
 
+        // Fetch notifications for the user
+        List<Notification> notifications = notificationService.getNotificationsForUser(loggedInUser);
+
+        // Count unread notifications
+        long unreadNotificationsCount = notifications.stream().filter(n -> !n.isRead()).count();
+
+        // Filter to include only unread notifications
+        List<Notification> unseenNotifications = notifications.stream()
+                .filter(n -> !n.isRead()) // Keep only notifications where isRead is false
+                .toList();
+
+        // Add to model
+        model.addAttribute("notifications", unseenNotifications);
+        model.addAttribute("unreadNotificationsCount", unreadNotificationsCount);
+
+
         return "frontendCode/CustomerUI/customerViewBookings";
     }
 
@@ -97,6 +117,21 @@ public class CustomerController {
         cities.sort(Comparator.comparing(City::getName)); // Sort cities alphabetically by name
         model.addAttribute("cities", cities);
 
+// Fetch notifications for the user
+        List<Notification> notifications = notificationService.getNotificationsForUser(loggedInUser);
+
+        // Count unread notifications
+        long unreadNotificationsCount = notifications.stream().filter(n -> !n.isRead()).count();
+
+        // Filter to include only unread notifications
+        List<Notification> unseenNotifications = notifications.stream()
+                .filter(n -> !n.isRead()) // Keep only notifications where isRead is false
+                .toList();
+
+        // Add to model
+        model.addAttribute("notifications", unseenNotifications);
+        model.addAttribute("unreadNotificationsCount", unreadNotificationsCount);
+
         return "frontendCode/CustomerUI/customerViewPackages";
     }
 
@@ -120,6 +155,10 @@ public class CustomerController {
 
         bookingService.createBooking(loggedInUser.getId(), packageId, LocalDate.now(), LocalDate.now().plusDays(7));
 
+        String message = "You have a new booking request from " + loggedInUser.getUsername();
+        String targetUrl = "/provider/manageBookings"; // Booking details page
+        //create notification
+        notificationService.createNotification(loggedInUser,selectedPackage.get().getProviderDetails(), NotificationReason.NEW_BOOKING,message,targetUrl);
         return "redirect:/customer/bookings";
     }
 
@@ -194,6 +233,22 @@ public class CustomerController {
             model.addAttribute("errorMessage", "You currently have no booked packages to review.");
         }
 
+        // Fetch notifications for the user
+        List<Notification> notifications = notificationService.getNotificationsForUser(loggedInUser);
+
+        // Count unread notifications
+        long unreadNotificationsCount = notifications.stream().filter(n -> !n.isRead()).count();
+
+        // Filter to include only unread notifications
+        List<Notification> unseenNotifications = notifications.stream()
+                .filter(n -> !n.isRead()) // Keep only notifications where isRead is false
+                .toList();
+
+        // Add to model
+        model.addAttribute("notifications", unseenNotifications);
+        model.addAttribute("unreadNotificationsCount", unreadNotificationsCount);
+
+
         model.addAttribute("bookedPackages", confirmedBookedPackages);
         return "frontendCode/CustomerUI/customerLeaveReview";
     }
@@ -223,6 +278,22 @@ public class CustomerController {
         if (loggedInUser == null) {
             return "redirect:/CustomerLogin";
         }
+
+        // Fetch notifications for the user
+        List<Notification> notifications = notificationService.getNotificationsForUser(loggedInUser);
+
+        // Count unread notifications
+        long unreadNotificationsCount = notifications.stream().filter(n -> !n.isRead()).count();
+
+        // Filter to include only unread notifications
+        List<Notification> unseenNotifications = notifications.stream()
+                .filter(n -> !n.isRead()) // Keep only notifications where isRead is false
+                .toList();
+
+        // Add to model
+        model.addAttribute("notifications", unseenNotifications);
+        model.addAttribute("unreadNotificationsCount", unreadNotificationsCount);
+
 
         model.addAttribute("loggedInUser", loggedInUser);
         return "frontendCode/CustomerUI/customerProfile";

@@ -4,6 +4,7 @@ import com.group5.travel_service_hub.entity.*;
 import com.group5.travel_service_hub.entity.Package;
 import com.group5.travel_service_hub.repository.BookingRepository;
 import com.group5.travel_service_hub.repository.PackageRepository;
+import com.group5.travel_service_hub.service.NotificationService;
 import com.group5.travel_service_hub.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,9 @@ public class DashboardController {
 
     @Autowired
     private UserService userService; // Service for managing user-related operations
+
+    @Autowired
+    private NotificationService notificationService;
 
     /**
      * Displays the customer dashboard with aggregated booking and spending data.
@@ -66,6 +70,21 @@ public class DashboardController {
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
                 .orElse(null);
+
+        // Fetch notifications for the user
+        List<Notification> notifications = notificationService.getNotificationsForUser(loggedInUser);
+
+        // Count unread notifications
+        long unreadNotificationsCount = notifications.stream().filter(n -> !n.isRead()).count();
+
+        // Filter to include only unread notifications
+        List<Notification> unseenNotifications = notifications.stream()
+                .filter(n -> !n.isRead()) // Keep only notifications where isRead is false
+                .toList();
+
+        // Add to model
+        model.addAttribute("notifications", unseenNotifications);
+        model.addAttribute("unreadNotificationsCount", unreadNotificationsCount);
 
         // Pass the data to the model
         model.addAttribute("userName", customer.getUsername());
@@ -153,6 +172,21 @@ public class DashboardController {
                 .orElse(null);
 
         long bookingsCountForMostBooked = mostBookedPackage != null ? bookingsCountByPackage.get(mostBookedPackage) : 0;
+
+        // Fetch notifications for the user
+        List<Notification> notifications = notificationService.getNotificationsForUser(provider);
+
+        // Count unread notifications
+        long unreadNotificationsCount = notifications.stream().filter(n -> !n.isRead()).count();
+
+        // Filter to include only unread notifications
+        List<Notification> unseenNotifications = notifications.stream()
+                .filter(n -> !n.isRead()) // Keep only notifications where isRead is false
+                .toList();
+
+        // Add to model
+        model.addAttribute("notifications", unseenNotifications);
+        model.addAttribute("unreadNotificationsCount", unreadNotificationsCount);
 
         // Pass the data to the model
         model.addAttribute("profilePicUrl", provider.getProfilePic());

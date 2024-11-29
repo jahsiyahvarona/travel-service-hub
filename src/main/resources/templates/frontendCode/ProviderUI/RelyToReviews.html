@@ -168,50 +168,49 @@
 <body>
 <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
     <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">Reply to Reviews</a>
-    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+    <!-- Sidebar Toggle Button for Mobile -->
+    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
+            data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false"
+            aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <!-- Logo Image -->
     <img src="/images/logo.png" alt="Company Logo" class="mx-auto d-block" style="height: 100px; width: auto;">
+    <!-- Navbar Items -->
     <ul class="navbar-nav px-3">
+        <!-- In your navbar HTML file -->
         <li class="nav-item dropdown text-nowrap">
-            <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell">
+            <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button"
+               data-bs-toggle="dropdown" aria-expanded="false">
+                <!-- Feather Icons Bell -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell">
                     <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
                     <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                 </svg>
-                <span class="badge bg-danger">3</span>
+                <!-- Dynamic Badge for Unread Notifications -->
+                <span class="badge bg-danger" th:text="${unreadNotificationsCount > 0} ? ${unreadNotificationsCount} : ''"></span>
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
-                <li>
-                    <h6 class="dropdown-header">New Bookings</h6>
+                <li><h6 class="dropdown-header">Notifications</h6></li>
+                <!-- Check if there are any notifications -->
+                <li th:if="${#lists.isEmpty(notifications)}">
+                    <a class="dropdown-item">No notifications</a>
                 </li>
-                <li>
-                    <a class="dropdown-item" href="manageBookings.html">
-                        John Doe - Luxury Beach Escape <br>
-                        <small>Booking Date: 2024-09-15</small>
+                <!-- Loop through notifications -->
+                <li th:each="notification : ${notifications}">
+                    <a th:href="@{/api/users/notifications/{id}/markAsRead(id=${notification.id})}" class="dropdown-item"
+                       th:classappend="${!notification.isRead()} ? 'fw-bold' : ''">
+                        <span th:text="${notification.message}">Notification Message</span>
+                        <br>
+                        <small th:text="${notification.createdAt}">Timestamp</small>
                     </a>
                 </li>
-                <li>
-                    <a class="dropdown-item" href="manageBookings.html">
-                        Jane Smith - Mountain Adventure <br>
-                        <small>Booking Date: 2024-09-16</small>
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item" href="manageBookings.html">
-                        Michael Johnson - City Tour <br>
-                        <small>Booking Date: 2024-09-17</small>
-                    </a>
-                </li>
-                <li>
-                    <hr class="dropdown-divider">
-                </li>
-                <li>
-                    <a class="dropdown-item btn btn-primary btn-custom" href="manageBookings.html">Go to Manage Bookings</a>
-                </li>
+                <li><hr class="dropdown-divider"></li>
+
             </ul>
         </li>
+        <!-- Sign Out Link -->
         <li class="nav-item text-nowrap">
             <a class="nav-link" href="#" onclick="showSignOutModal()">Sign out</a>
         </li>
