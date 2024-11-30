@@ -7,6 +7,9 @@
 
     <link th:href="@{/CSS/bootstrap_theme/bootstrap.css}" rel="stylesheet" type="text/css">
     <link th:href="@{/CSS/dashboard.css}" rel="stylesheet">
+    <link href="/CSS/bootstrap_theme/bootstrap.css" rel="stylesheet" type="text/css">
+    <link href="/CSS/dashboard.css" rel="stylesheet">
+    <link href="/CSS/BellDropdown.css" rel="stylesheet">
     <style>
         .bordered-img {
           border: 2px solid #0abf53;
@@ -199,6 +202,11 @@
         var signOutModal = new bootstrap.Modal(document.getElementById('signOutModal'));
         signOutModal.show();
     }
+    // Sign Out Button Handler
+    document.getElementById('confirmSignOutButton').addEventListener('click', function () {
+        // Redirect to the sign-out page
+        window.location.href = "/LoginChoice";
+    });
 </script>
 </body>
 </html>
