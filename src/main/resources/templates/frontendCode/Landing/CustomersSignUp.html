@@ -121,12 +121,10 @@
                                 <small class="form-text text-muted">Only JPEG, JPG, and PNG files are allowed.</small>
                             </div>
 
-                            <!-- Profile picture preview -->
-                            <div class="mb-3" id="profilePicPreviewContainer" style="display: none;">
-                                <label class="form-label">Profile Picture Preview:</label>
-                                <img id="profilePicPreview" src="" alt="Profile Picture Preview"
-                                     class="img-fluid bordered-preview"
-                                     style="max-height: 200px; max-width: 200px; min-height: 200px; min-width: 200px; object-fit: cover;">
+                            <!-- New Image Preview (hidden initially) -->
+                            <div class="mb-3" id="newImagePreviewContainer" style="display: none;">
+                                <label class="form-label">Preview:</label>
+                                <img id="newImagePreview" src="" alt="New Image Preview" class="img-fluid bordered-preview" style="max-height: 200px; max-width: 200px; min-height: 200px; min-width: 200px; object-fit: cover;">
                             </div>
 
                             <!-- Submit and Cancel buttons -->
@@ -164,9 +162,135 @@
 
 <!-- JavaScript for form handling and validations -->
 <script th:src="@{/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/provider-signup-validation.js}"></script>
 <script>
-    // JavaScript functions to handle profile picture preview and form validations
-    // Included in the script section for maintainability and clarity.
+    /**
+     * Toggles the visibility of the password fields
+     * @param {string} fieldId - The ID of the input field to toggle
+     */
+    function togglePassword(fieldId) {
+        const field = document.getElementById(fieldId);
+        const type = field.getAttribute('type') === 'password' ? 'text' : 'password';
+        field.setAttribute('type', type);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const signupForm = document.getElementById('signupForm');
+
+        // Event listener for profile picture preview
+        const profilePicInput = document.getElementById('profilePic');
+        const previewContainer = document.getElementById('newImagePreviewContainer');
+        const previewImage = document.getElementById('newImagePreview');
+
+        profilePicInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file && (file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewContainer.style.display = 'block'; // Show preview
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('Please select a valid image file (JPEG, JPG, PNG).');
+                previewContainer.style.display = 'none'; // Hide preview
+                event.target.value = ''; // Reset input
+            }
+        });
+
+        // Form submission validation
+        signupForm.addEventListener('submit', function (event) {
+            let isValid = true;
+            const username = document.getElementById('username');
+            const email = document.getElementById('email');
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+            const termsCheckbox = document.getElementById('termsCheckbox');
+
+            // Clear previous error messages
+            clearError(username);
+            clearError(email);
+            clearError(password);
+            clearError(confirmPassword);
+            clearError(termsCheckbox);
+
+            // Validate username
+            if (username.value.trim() === '') {
+                showError(username, 'Username is required');
+                isValid = false;
+            } else if (username.value.length > 15 || username.value.length < 6) {
+                showError(username, 'Username must be 6-15 characters');
+                isValid = false;
+            }
+
+            // Validate email
+            if (email.value.trim() === '' || !validateEmail(email.value.trim())) {
+                showError(email, 'Please enter a valid email address');
+                isValid = false;
+            }
+
+            // Validate password
+            if (password.value.trim() === '' || password.value.length < 8) {
+                showError(password, 'Password must be at least 8 characters');
+                isValid = false;
+            }
+
+            // Validate confirm password
+            if (confirmPassword.value.trim() === '' || password.value !== confirmPassword.value) {
+                showError(confirmPassword, 'Passwords do not match');
+                isValid = false;
+            }
+
+            // Validate terms checkbox
+            if (!termsCheckbox.checked) {
+                showError(termsCheckbox.parentElement, 'You must accept the Terms and Conditions');
+                isValid = false;
+            }
+
+            // Prevent form submission if validation fails
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+
+        /**
+         * Displays an error message for an input element
+         * @param {HTMLElement} element - The input element to show an error for
+         * @param {string} message - The error message to display
+         */
+        function showError(element, message) {
+            const formGroup = element.parentElement;
+            let error = formGroup.querySelector('.error-message');
+            if (!error) {
+                error = document.createElement('div');
+                error.className = 'error-message mt-1';
+                formGroup.appendChild(error);
+            }
+            error.innerText = message;
+        }
+
+        /**
+         * Clears any error messages for an input element
+         * @param {HTMLElement} element - The input element to clear errors for
+         */
+        function clearError(element) {
+            const formGroup = element.parentElement;
+            const error = formGroup.querySelector('.error-message');
+            if (error) {
+                error.remove();
+            }
+        }
+
+        /**
+         * Validates an email address format
+         * @param {string} email - The email address to validate
+         * @returns {boolean} - Returns true if the email is valid, otherwise false
+         */
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+    });
 </script>
 </body>
 </html>
