@@ -26,6 +26,28 @@
     .btn-custom:hover {
       background-color: #089e45;
     }
+
+    /* Scrollable Description Styling */
+    .package-description {
+      max-height: 100px;        /* Sets the maximum height */
+      overflow-y: auto;         /* Enables vertical scrollbar when content exceeds max-height */
+      padding-right: 10px;      /* Adds space for the scrollbar to prevent content overlap */
+      word-wrap: break-word;    /* Ensures long words break to avoid overflow */
+      overflow-wrap: break-word;/* Ensures words break as needed */
+      margin-bottom: 15px;      /* Adds space below the description */
+    }
+
+    /* Customize Scrollbar Appearance for WebKit Browsers (Chrome, Safari) */
+    .package-description::-webkit-scrollbar {
+      width: 6px;               /* Width of the scrollbar */
+    }
+    .package-description::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.2); /* Color of the scrollbar thumb */
+      border-radius: 4px;       /* Rounded corners for the scrollbar thumb */
+    }
+    .package-description::-webkit-scrollbar-track {
+      background-color: rgba(0, 0, 0, 0.05); /* Color of the scrollbar track */
+    }
   </style>
 </head>
 <body>
@@ -65,7 +87,7 @@
              th:classappend="${!notification.isRead()} ? 'fw-bold' : ''">
             <span th:text="${notification.message}">Notification Message</span>
             <br>
-            <small th:text="${notification.createdAt}">Timestamp</small>
+            <small class="text-muted" th:text="${#temporals.format(notification.getCreatedAt(), 'dd MMM yyyy HH:mm')}">Date</small>
           </a>
         </li>
         <li><hr class="dropdown-divider"></li>
@@ -181,18 +203,18 @@
             <img th:src="${pkg.imageUrl}" class="card-img-top bordered-img" alt="Package Image">
             <div class="card-body">
               <h5 class="card-title" th:text="${pkg.name}">Package Name</h5>
-              <p class="card-text" th:text="${pkg.description}">Package Description</p>
+              <p class="card-text package-description" th:text="${pkg.description}">Package Description</p>
               <p><strong>Price:</strong> $<span th:text="${pkg.price}">0</span></p>
               <p><strong>Likes:</strong> <span th:text="${pkg.getLikeDislikes().size()}">0</span></p>
               <p><strong>Location:</strong>
                 <span th:text="${pkg.location.name + (pkg.location.state != null ? ', ' + pkg.location.state : '') + ', ' + pkg.location.country}"></span>
               </p>
 
-              <!-- Book Now Button -->
-              <form th:action="@{/customer/bookPackage}" method="post">
-                <input type="hidden" name="packageId" th:value="${pkg.id}">
-                <button type="submit" class="btn btn-custom">Book Now</button>
-              </form>
+              <!-- View Details Button -->
+              <a class="btn btn-custom" th:href="@{/customer/packageDetails/{id}(id=${pkg.id})}">
+                View Details
+              </a>
+
             </div>
           </div>
         </div>

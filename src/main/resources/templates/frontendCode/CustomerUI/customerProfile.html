@@ -70,7 +70,7 @@
                        th:classappend="${!notification.isRead()} ? 'fw-bold' : ''">
                         <span th:text="${notification.message}">Notification Message</span>
                         <br>
-                        <small th:text="${notification.createdAt}">Timestamp</small>
+                        <small class="text-muted" th:text="${#temporals.format(notification.getCreatedAt(), 'dd MMM yyyy HH:mm')}">Date</small>
                     </a>
                 </li>
                 <li><hr class="dropdown-divider"></li>

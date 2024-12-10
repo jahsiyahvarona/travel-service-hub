@@ -4,6 +4,8 @@ import com.group5.travel_service_hub.entity.LikeDislike;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * Repository interface for performing CRUD operations on LikeDislike entity.
  * Extends JpaRepository to provide built-in methods for database interactions.
@@ -35,4 +37,6 @@ public interface LikeDislikeRepository extends JpaRepository<LikeDislike, Long> 
      * @return The total count of dislikes for the specified package.
      */
     Long countByPkgIdAndIsLikeFalse(Long pkgId);
+
+    Optional<LikeDislike> findByPkgIdAndUserId(Long pkgId, Long userId);
 }

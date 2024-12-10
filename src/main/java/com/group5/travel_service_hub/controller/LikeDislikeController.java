@@ -1,76 +1,122 @@
 package com.group5.travel_service_hub.controller;
 
-import com.group5.travel_service_hub.entity.LikeDislike;
+import com.group5.travel_service_hub.entity.NotificationReason;
+import com.group5.travel_service_hub.entity.User;
 import com.group5.travel_service_hub.service.LikeDislikeService;
+import com.group5.travel_service_hub.service.NotificationService;
+import com.group5.travel_service_hub.service.PackageService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * REST Controller for managing likes and dislikes on packages.
+ * MVC Controller for managing likes and dislikes on packages.
  */
-@RestController
-@RequestMapping("/api/like-dislikes") // Maps all endpoints in this controller to URLs starting with "/api/like-dislikes"
+@Controller
+@RequestMapping("/like-dislikes")
 public class LikeDislikeController {
 
     @Autowired
-    private LikeDislikeService likeDislikeService; // Service for managing LikeDislike-related operations
-
+    private LikeDislikeService likeDislikeService;
+    @Autowired
+    private PackageService packageService;
+@Autowired
+    NotificationService notificationService;
     /**
-     * Adds a like or dislike to a package.
-     *
-     * @param userId    The ID of the user who is reacting.
-     * @param packageId The ID of the package being liked or disliked.
-     * @param isLike    True if the reaction is a like, false if it is a dislike.
-     * @return A ResponseEntity containing the created LikeDislike object with a CREATED (201) status.
+     * Handles the "Like" button click.
+     * Toggles between like/unlike if the user already liked or disliked the package.
      */
-    @PostMapping("/add") // Handles POST requests to "/api/like-dislikes/add"
-    public ResponseEntity<LikeDislike> addLikeDislike(
-            @RequestParam Long userId,
+    @PostMapping("/like")
+    public String likePackage(
             @RequestParam Long packageId,
-            @RequestParam boolean isLike) {
-        // Call the service method to add the like or dislike
-        LikeDislike createdLikeDislike = likeDislikeService.addLikeDislike(userId, packageId, isLike);
-        return new ResponseEntity<>(createdLikeDislike, HttpStatus.CREATED);
+            HttpSession session,
+            Model model) {
+
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/CustomerLogin";
+        }
+
+        try {
+            // Call a method that handles toggling the like status
+            likeDislikeService.handleLike(loggedInUser.getId(), packageId);
+        } catch (Exception e) {
+            // If there's an error (e.g., user already reacted or no such package), show error message
+            model.addAttribute("errorMessage", e.getMessage());
+        }
+
+        String message = "your package: " + packageService.getPackageById(packageId).orElseThrow().getName() + ", was liked by: " + loggedInUser.getUsername();
+        String targetUrl = "/provider/managePackages"; // Booking details page
+        //create notification
+        notificationService.createNotification(loggedInUser,packageService.getPackageById(packageId).orElseThrow().getProviderDetails(), NotificationReason.LIKED,message,targetUrl);
+
+
+        // Redirect back to package details page
+        return "redirect:/customer/packageDetails/" + packageId;
     }
 
     /**
-     * Counts the number of likes for a specific package.
-     *
-     * @param packageId The ID of the package for which likes are being counted.
-     * @return A ResponseEntity containing the count of likes with an OK (200) status.
+     * Handles the "Dislike" button click.
+     * Toggles between dislike/undislike if the user already disliked or liked the package.
      */
-    @GetMapping("/{packageId}/likes") // Handles GET requests to "/api/like-dislikes/{packageId}/likes"
-    public ResponseEntity<Long> countLikes(@PathVariable Long packageId) {
-        // Call the service method to get the like count
+    @PostMapping("/dislike")
+    public String dislikePackage(
+            @RequestParam Long packageId,
+            HttpSession session,
+            Model model) {
+
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/CustomerLogin";
+        }
+
+        try {
+            // Call a method that handles toggling the dislike status
+            likeDislikeService.handleDislike(loggedInUser.getId(), packageId);
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", e.getMessage());
+        }
+
+
+        // Redirect back to package details page
+        return "redirect:/customer/packageDetails/" + packageId;
+    }
+
+    /**
+     * Removes a like or dislike by ID.
+     */
+    @PostMapping("/remove")
+    public String removeLikeDislike(
+            @RequestParam Long likeDislikeId,
+            @RequestParam Long packageId,
+            HttpSession session,
+            Model model) {
+
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/CustomerLogin";
+        }
+
+        try {
+            likeDislikeService.removeLikeDislike(likeDislikeId);
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", e.getMessage());
+        }
+
+        return "redirect:/customer/packageDetails/" + packageId;
+    }
+
+    /**
+     * Optionally: Endpoint to display like/dislike counts, if needed.
+     */
+    @GetMapping("/counts")
+    public String getLikeDislikeCounts(@RequestParam Long packageId, Model model) {
         Long likeCount = likeDislikeService.countLikes(packageId);
-        return new ResponseEntity<>(likeCount, HttpStatus.OK);
-    }
-
-    /**
-     * Counts the number of dislikes for a specific package.
-     *
-     * @param packageId The ID of the package for which dislikes are being counted.
-     * @return A ResponseEntity containing the count of dislikes with an OK (200) status.
-     */
-    @GetMapping("/{packageId}/dislikes") // Handles GET requests to "/api/like-dislikes/{packageId}/dislikes"
-    public ResponseEntity<Long> countDislikes(@PathVariable Long packageId) {
-        // Call the service method to get the dislike count
         Long dislikeCount = likeDislikeService.countDislikes(packageId);
-        return new ResponseEntity<>(dislikeCount, HttpStatus.OK);
-    }
-
-    /**
-     * Removes a like or dislike based on its ID.
-     *
-     * @param likeDislikeId The ID of the like or dislike to remove.
-     * @return A ResponseEntity containing a success message with an OK (200) status.
-     */
-    @DeleteMapping("/remove/{likeDislikeId}") // Handles DELETE requests to "/api/like-dislikes/remove/{likeDislikeId}"
-    public ResponseEntity<String> removeLikeDislike(@PathVariable Long likeDislikeId) {
-        // Call the service method to remove the like or dislike
-        likeDislikeService.removeLikeDislike(likeDislikeId);
-        return new ResponseEntity<>("Like/Dislike removed successfully.", HttpStatus.OK);
+        model.addAttribute("likeCount", likeCount);
+        model.addAttribute("dislikeCount", dislikeCount);
+        return "someFragmentOrView";
     }
 }
