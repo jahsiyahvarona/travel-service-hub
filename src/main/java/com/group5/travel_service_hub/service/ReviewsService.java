@@ -44,6 +44,16 @@ public class ReviewsService {
     }
 
     /**
+     * Retrieves all reviews for a specific package.
+     *
+     * @param packageId The ID of the package.
+     * @return List of reviews for the given package.
+     */
+    public List<Reviews> getReviewsByPackage(Long packageId) {
+        return reviewRepository.findByPkgId(packageId);
+    }
+
+    /**
      * Deletes a review by its ID.
      *
      * @param reviewId The ID of the review to delete.

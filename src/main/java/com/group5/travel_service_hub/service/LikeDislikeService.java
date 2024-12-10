@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 /**
  * Service class for managing likes and dislikes for packages.
  */
@@ -31,11 +33,10 @@ public class LikeDislikeService {
      * @param userId    The ID of the user.
      * @param packageId The ID of the package.
      * @param isLike    True for like, false for dislike.
-     * @return The created LikeDislike object.
      * @throws IllegalArgumentException If the user has already reacted to the package.
      */
     @Transactional
-    public LikeDislike addLikeDislike(Long userId, Long packageId, boolean isLike) {
+    public void addLikeDislike(Long userId, Long packageId, boolean isLike) {
         // Check if the user has already reacted to this package
         if (likeDislikeRepository.existsByPkgIdAndUserId(packageId, userId)) {
             throw new IllegalArgumentException("User has already reacted to this package.");
@@ -51,7 +52,7 @@ public class LikeDislikeService {
 
         // Create and save a new LikeDislike entity
         LikeDislike likeDislike = new LikeDislike(isLike, pkg, user, pkg.getProviderDetails());
-        return likeDislikeRepository.save(likeDislike);
+        likeDislikeRepository.save(likeDislike);
     }
 
     /**
@@ -90,5 +91,50 @@ public class LikeDislikeService {
 
         // Delete the LikeDislike entity
         likeDislikeRepository.delete(likeDislike);
+    }
+
+    public Optional<LikeDislike> findUserReaction(Long userId, Long packageId) {
+        // Query your repository for an existing like/dislike from this user for this package
+        // This assumes you have a custom query or can add a method like:
+        // Optional<LikeDislike> findByPkgIdAndUserId(Long pkgId, Long userId);
+        return likeDislikeRepository.findByPkgIdAndUserId(packageId, userId);
+    }
+
+    @Transactional
+    public void handleLike(Long userId, Long packageId) {
+        Optional<LikeDislike> userReaction = likeDislikeRepository.findByPkgIdAndUserId(packageId, userId);
+        if (userReaction.isPresent()) {
+            LikeDislike reaction = userReaction.get();
+            if (reaction.isLike()) {
+                // User already liked, so remove the like
+                likeDislikeRepository.delete(reaction);
+            } else {
+                // User had disliked, remove dislike, then add like
+                likeDislikeRepository.delete(reaction);
+                addLikeDislike(userId, packageId, true);
+            }
+        } else {
+            // No previous reaction, add a like
+            addLikeDislike(userId, packageId, true);
+        }
+    }
+
+    @Transactional
+    public void handleDislike(Long userId, Long packageId) {
+        Optional<LikeDislike> userReaction = likeDislikeRepository.findByPkgIdAndUserId(packageId, userId);
+        if (userReaction.isPresent()) {
+            LikeDislike reaction = userReaction.get();
+            if (!reaction.isLike()) {
+                // User already disliked, remove the dislike
+                likeDislikeRepository.delete(reaction);
+            } else {
+                // User had liked, remove like, then add dislike
+                likeDislikeRepository.delete(reaction);
+                addLikeDislike(userId, packageId, false);
+            }
+        } else {
+            // No previous reaction, add a dislike
+            addLikeDislike(userId, packageId, false);
+        }
     }
 }

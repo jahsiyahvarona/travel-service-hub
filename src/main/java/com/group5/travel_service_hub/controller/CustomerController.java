@@ -4,10 +4,7 @@ import com.group5.travel_service_hub.entity.*;
 import com.group5.travel_service_hub.entity.Package;
 import com.group5.travel_service_hub.repository.CityRepository;
 import com.group5.travel_service_hub.repository.PackageRepository;
-import com.group5.travel_service_hub.service.BookingService;
-import com.group5.travel_service_hub.service.NotificationService;
-import com.group5.travel_service_hub.service.PackageService;
-import com.group5.travel_service_hub.service.UserService;
+import com.group5.travel_service_hub.service.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,6 +26,12 @@ import java.util.Optional;
 public class CustomerController {
     @Autowired
     private CityRepository cityRepository;
+
+    @Autowired
+    private LikeDislikeService likeDislikeService;
+
+    @Autowired
+    private ReviewsService reviewsService;
 
     @Autowired
     private NotificationService notificationService;
@@ -266,6 +269,12 @@ public class CustomerController {
         }
 
         // Placeholder for submitting review logic
+
+        String message =  loggedInUser.getUsername() + " has left a review on your package: " + bookingService.getBookingById(bookingId).orElseThrow().getPkg();
+        String targetUrl = "/provider/RelyToReviews"; // Booking details page
+        //create notification
+        notificationService.createNotification(loggedInUser,bookingService.getBookingById(bookingId).orElseThrow().getPkg().getProviderDetails(), NotificationReason.NEW_REVIEW,message,targetUrl);
+
         return "redirect:/customer/reviews?success";
     }
 
@@ -345,5 +354,64 @@ public class CustomerController {
     public ResponseEntity<User> registerCustomer(@RequestBody User user) {
         User registeredUser = userService.registerUser(user);
         return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/packageDetails/{id}")
+    public String viewPackageDetails(@PathVariable Long id, HttpSession session, Model model) {
+        // Ensure the user is logged in
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/CustomerLogin";
+        }
+
+        // Fetch the package details by id
+        Optional<Package> optionalPackage = packageService.getPackageById(id);
+        if (optionalPackage.isEmpty()) {
+            // If package is not found, show an error page
+            model.addAttribute("errorMessage", "The requested package was not found.");
+            return "frontendCode/CustomerUI/error";
+        }
+
+        Package pkg = optionalPackage.get();
+        model.addAttribute("package", pkg);
+
+        // Fetch the reviews for this package
+        List<Reviews> reviews = reviewsService.getReviewsByPackage(id);
+        model.addAttribute("reviews", reviews);
+
+        // Determine like/dislike counts
+        long likeCount = pkg.getLikeDislikes().stream().filter(LikeDislike::isLike).count();
+        long dislikeCount = pkg.getLikeDislikes().size() - likeCount;
+        model.addAttribute("likeCount", likeCount);
+        model.addAttribute("dislikeCount", dislikeCount);
+
+        // Check if the user already liked or disliked this package
+        Optional<LikeDislike> userReaction = likeDislikeService.findUserReaction(loggedInUser.getId(), id);
+        boolean userLiked = false;
+        boolean userDisliked = false;
+        if (userReaction.isPresent()) {
+            userLiked = userReaction.get().isLike();
+            userDisliked = !userReaction.get().isLike();
+        }
+
+        // Fetch notifications for the user
+        List<Notification> notifications = notificationService.getNotificationsForUser(loggedInUser);
+
+        // Count unread notifications
+        long unreadNotificationsCount = notifications.stream().filter(n -> !n.isRead()).count();
+
+        // Filter to include only unread notifications
+        List<Notification> unseenNotifications = notifications.stream()
+                .filter(n -> !n.isRead()) // Keep only notifications where isRead is false
+                .toList();
+
+        // Add to model
+        model.addAttribute("notifications", unseenNotifications);
+        model.addAttribute("unreadNotificationsCount", unreadNotificationsCount);
+
+        model.addAttribute("userLiked", userLiked);
+        model.addAttribute("userDisliked", userDisliked);
+
+        return "frontendCode/CustomerUI/packageDetails";
     }
 }
