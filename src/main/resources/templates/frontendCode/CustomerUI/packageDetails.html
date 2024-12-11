@@ -44,6 +44,11 @@
             background-color: #089e45;
         }
 
+        /* Align back button */
+        .back-button {
+            margin-bottom: 20px;
+        }
+
         /* Scrollable reviews section */
         .reviews-section {
             max-height: 300px;
@@ -210,7 +215,7 @@
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
             <!-- Back Button -->
             <div class="back-button">
-                <a href="/customer/packages" class="btn btn-sm btn-success">
+                <a href="/customer/packages" class="btn btn-sm btn-custom">
                     <i class="bi bi-arrow-left-circle"></i> Back to Packages
                 </a>
             </div>
@@ -233,6 +238,35 @@
                         <p th:text="${package.description}">Package Description</p>
                     </div>
 
+                    <!-- Like/Dislike Buttons with Counts -->
+                    <div class="d-flex gap-2 mb-3">
+                        <!-- Like Button -->
+                        <form th:action="@{/like-dislikes/like}" method="post">
+                            <input type="hidden" name="packageId" th:value="${package.id}">
+                            <button type="submit"
+                                    class="btn btn-sm"
+                                    th:classappend="${userLiked} ? 'btn-secondary' : 'btn-custom'">
+                                <i class="bi bi-hand-thumbs-up-fill btn-icon"></i>
+                                <span th:text="${userLiked} ? 'Liked' : 'Like'"></span>
+                                <!-- Like Count -->
+                                <span class="badge bg-light text-dark ms-2" th:text="${likeCount}">0</span>
+                            </button>
+                        </form>
+
+                        <!-- Dislike Button -->
+                        <form th:action="@{/like-dislikes/dislike}" method="post">
+                            <input type="hidden" name="packageId" th:value="${package.id}">
+                            <button type="submit"
+                                    class="btn btn-sm"
+                                    th:classappend="${userDisliked} ? 'btn-secondary' : 'btn-custom'">
+                                <i class="bi bi-hand-thumbs-down-fill btn-icon"></i>
+                                <span th:text="${userDisliked} ? 'Disliked' : 'Dislike'"></span>
+                                <!-- Dislike Count -->
+                                <span class="badge bg-light text-dark ms-2" th:text="${dislikeCount}">0</span>
+                            </button>
+                        </form>
+                    </div>
+
                     <!-- Price and Location -->
                     <p><strong>Price:</strong> $<span th:text="${package.price}">0</span></p>
                     <p><strong>Location:</strong>
@@ -242,41 +276,13 @@
                     <!-- Created by Section with Modal Trigger -->
                     <p><strong>Created by:</strong>
                         <a href="#" class="btn btn-link" data-bs-toggle="modal"
-                           th:data-bs-target="'#providerModal' + ${package.providerDetails.id}"
+                           th:data-bs-target="'#providerModal'+${package.providerDetails.id}"
                            style="color: #0abf53;">
                             <span th:text="${package.providerDetails.username}">Customer Name</span>
                         </a>
                     </p>
 
 
-                    <!-- Like/Dislike Buttons with Counts -->
-                    <div class="btn-group mb-3" role="group">
-                        <!-- Like Button -->
-                        <form th:action="@{/like-dislikes/like}" method="post" style="display:inline;">
-                            <input type="hidden" name="packageId" th:value="${package.id}">
-                            <button type="submit"
-                                    class="btn btn-sm"
-                                    th:classappend="${userLiked} ? 'btn-secondary' : 'btn-success'">
-                                <i class="bi bi-hand-thumbs-up-fill btn-icon"></i>
-                                <span th:text="${userLiked} ? 'Liked' : 'Like'"></span>
-                                <!-- Like Count -->
-                                <span class="badge bg-light text-dark ms-2" th:text="${likeCount}">0</span>
-                            </button>
-                        </form>
-
-                        <!-- Dislike Button -->
-                        <form th:action="@{/like-dislikes/dislike}" method="post" style="display:inline;">
-                            <input type="hidden" name="packageId" th:value="${package.id}">
-                            <button type="submit"
-                                    class="btn btn-sm"
-                                    th:classappend="${userDisliked} ? 'btn-secondary' : 'btn-success'">
-                                <i class="bi bi-hand-thumbs-down-fill btn-icon"></i>
-                                <span th:text="${userDisliked} ? 'Disliked' : 'Dislike'"></span>
-                                <!-- Dislike Count -->
-                                <span class="badge bg-light text-dark ms-2" th:text="${dislikeCount}">0</span>
-                            </button>
-                        </form>
-                    </div>
 
                     <!-- Book Now Form -->
                     <form th:action="@{/customer/bookPackage}" method="post">
