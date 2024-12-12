@@ -181,4 +181,37 @@ public class ReviewsService {
 
         reviewRepository.save(review);
     }
+
+
+
+    /**
+     * Allows a customer to edit their own review.
+     *
+     * @param reviewId The ID of the review to edit.
+     * @param content  The updated review content.
+     */
+    @Transactional
+    public void editReview(Long reviewId, String content) {
+        Reviews review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("Review not found with ID: " + reviewId));
+
+
+
+        review.setContent(content);
+        review.setTimestamp(LocalDateTime.now());
+
+        reviewRepository.save(review);
+    }
+
+    /**
+     * Retrieves all reviews written by a specific author.
+     *
+     * @param authorId The ID of the user who authored the reviews.
+     * @return List of Reviews entities created by the specified author.
+     */
+    public List<Reviews> getReviewsByAuthor(Long authorId) {
+        return reviewRepository.findByAuthorId(authorId);
+    }
+
+
 }
