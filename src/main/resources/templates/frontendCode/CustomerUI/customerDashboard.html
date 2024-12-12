@@ -146,79 +146,67 @@
                 </ul>
             </div>
         </nav>
-
         <!-- Main Content Area -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <h1 class="h2">Welcome, Customer</h1>
+            <h1 class="h2" th:text="'Welcome, ' + ${userName}">Welcome, Customer</h1>
             <div class="row">
                 <!-- Total Bookings -->
                 <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow-sm">
+                    <div class="card shadow-sm">
                         <div class="card-header">
                             <h4>Total Bookings</h4>
                         </div>
-                        <div class="card-body text-center">
-                            <h1>10</h1>
+                        <div class="card-body">
+                            <h1 th:text="${totalBookings}">0</h1>
                         </div>
                     </div>
                 </div>
+
                 <!-- Total Spending -->
                 <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow-sm">
+                    <div class="card shadow-sm">
                         <div class="card-header">
                             <h4>Total Spending</h4>
                         </div>
-                        <div class="card-body text-center">
-                            <h1>$4300</h1>
+                        <div class="card-body">
+                            <h1 th:text="'$' + ${totalSpending}">$0</h1>
                         </div>
                     </div>
                 </div>
+
                 <!-- Favorite Package -->
                 <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow-sm">
+                    <div class="card shadow
+                    -sm">
                         <div class="card-header">
                             <h4>Favorite Package</h4>
                         </div>
-                        <div class="card-body text-center">
-                            <h5>Jamaica</h5>
+                        <div class="card-body">
+                            <h1 th:text="${favoritePackage}">N/A</h1>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Recommended Trips -->
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header">
-                    <h4>Recommended Trips</h4>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="card h-100">
-                                <img src="/images/trip1.jpg" class="card-img-top bordered-img" alt="Trip Image 1">
-                                <div class="card-body">
-                                    <h5 class="card-title">Tropical Paradise</h5>
-                                    <p class="card-text">Experience the beauty of tropical islands with this amazing package.</p>
-                                    <p><strong>Price:</strong> $1200</p>
-                                    <a href="#" class="btn btn-custom">View Details</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card h-100">
-                                <img src="/images/trip2.jpg" class="card-img-top bordered-img" alt="Trip Image 2">
-                                <div class="card-body">
-                                    <h5 class="card-title">Mountain Adventure</h5>
-                                    <p class="card-text">Explore the majestic mountains with our exclusive adventure package.</p>
-                                    <p><strong>Price:</strong> $1500</p>
-                                    <a href="#" class="btn btn-custom">View Details</a>
-                                </div>
-                            </div>
-                        </div>
+            <!-- Upcoming Confirmed Booking -->
+            <div class="col-md-12 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h4>Upcoming Confirmed Booking</h4>
+                    </div>
+                    <div class="card-body" th:if="${nextBooking != null}">
+                        <h5 class="card-title" th:text="${nextBooking.pkg.name}">Package Name</h5>
+                        <p><strong>Start Date:</strong> <span th:text="${nextBooking.startDate}">Start Date</span></p>
+                        <p><strong>End Date:</strong> <span th:text="${nextBooking.endDate}">End Date</span></p>
+                        <p><strong>Status:</strong> <span th:text="${nextBooking.status}">Status</span></p>
+                    </div>
+                    <div class="card-body text-center" th:if="${nextBooking == null}">
+                        <h5>No confirmed bookings yet!</h5>
+                        <a href="/customer/packages" class="btn btn-custom">Explore Packages</a>
                     </div>
                 </div>
             </div>
-        </main>
+    </main>
     </div>
 </div>
 
@@ -248,9 +236,7 @@
         var signOutModal = new bootstrap.Modal(document.getElementById('signOutModal'));
         signOutModal.show();
     }
-    // Sign Out Button Handler
     document.getElementById('confirmSignOutButton').addEventListener('click', function () {
-        // Redirect to the sign-out page
         window.location.href = "/LoginChoice";
     });
 </script>

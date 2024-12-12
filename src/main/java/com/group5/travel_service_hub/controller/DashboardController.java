@@ -54,6 +54,14 @@ public class DashboardController {
         // Fetch all bookings for the logged-in customer
         List<Booking> customerBookings = bookingRepository.findByCustomerId(customer.getId());
 
+        List<Booking> confirmedBookings = bookingRepository.findByCustomerId(customer.getId()).stream()
+                .filter(booking -> booking.getStatus() == BookingStatus.CONFIRMED)
+                .sorted(Comparator.comparing(Booking::getStartDate)) // Sort by start date
+                .toList();
+
+        Booking nextBooking = confirmedBookings.isEmpty() ? null : confirmedBookings.get(0); // Get the earliest booking
+
+
         // Calculate the total spending of the customer
         double totalSpending = customerBookings.stream()
                 .mapToDouble(booking -> booking.getPkg().getPrice())
@@ -71,6 +79,8 @@ public class DashboardController {
                 .map(Map.Entry::getKey)
                 .orElse(null);
 
+
+
         // Fetch notifications for the user
         List<Notification> notifications = notificationService.getNotificationsForUser(loggedInUser);
 
@@ -86,7 +96,7 @@ public class DashboardController {
         model.addAttribute("notifications", unseenNotifications);
         model.addAttribute("unreadNotificationsCount", unreadNotificationsCount);
 
-        // Pass the data to the model
+
         model.addAttribute("userName", customer.getUsername());
         model.addAttribute("totalSpending", totalSpending);
         model.addAttribute("totalBookings", totalBookings);
