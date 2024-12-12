@@ -3,6 +3,7 @@ package com.group5.travel_service_hub.controller;
 import com.group5.travel_service_hub.entity.*;
 import com.group5.travel_service_hub.entity.Package;
 import com.group5.travel_service_hub.repository.CityRepository;
+import com.group5.travel_service_hub.repository.LikeDislikeRepository;
 import com.group5.travel_service_hub.repository.PackageRepository;
 import com.group5.travel_service_hub.service.*;
 import jakarta.servlet.http.HttpSession;
@@ -13,12 +14,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import com.group5.travel_service_hub.service.LikeDislikeService;
+
 
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -36,6 +39,8 @@ public class CustomerController {
     @Autowired
     private NotificationService notificationService;
 
+    @Autowired private LikeDislikeRepository likeDislikeRepository;
+
     private final UserService userService;
     private final BookingService bookingService;
     private final PackageService packageService;
@@ -47,25 +52,6 @@ public class CustomerController {
         this.packageService = packageService;
     }
 
-
-    /**
-     * Displays the Customer Dashboard.
-     */
-    @GetMapping("/dashboard")
-    public String showDashboard(HttpSession session, Model model) {
-        User loggedInUser = (User) session.getAttribute("loggedInUser");
-        if (loggedInUser == null) {
-            return "redirect:/CustomerLogin";
-        }
-
-        User customer = userService.findByUsername(loggedInUser.getUsername());
-        model.addAttribute("customer", customer);
-        model.addAttribute("totalSpending", 4300);  // Example value
-        model.addAttribute("totalBookings", 10);    // Example value
-        model.addAttribute("favoritePackage", "Jamaica"); // Example value
-
-        return "frontendCode/CustomerUI/customerDashboard";
-    }
 
     /**
      * Displays the customer's bookings.
@@ -260,23 +246,55 @@ public class CustomerController {
      * Submits a review for a booking.
      */
     @PostMapping("/reviews/submit")
-    public String submitReview(@RequestParam Long bookingId,
+    public String submitReview(@RequestParam Long packageId,
                                @RequestParam String reviewContent,
-                               HttpSession session) {
+                               HttpSession session,
+                               Model model) {
         User loggedInUser = (User) session.getAttribute("loggedInUser");
         if (loggedInUser == null) {
             return "redirect:/CustomerLogin";
         }
 
-        // Placeholder for submitting review logic
+        Optional<Package> optionalPackage = packageService.getPackageById(packageId);
+        if (optionalPackage.isEmpty()) {
+            model.addAttribute("errorMessage", "Selected package not found.");
+            return "frontendCode/CustomerUI/customerLeaveReview";
+        }
 
-        String message =  loggedInUser.getUsername() + " has left a review on your package: " + bookingService.getBookingById(bookingId).orElseThrow().getPkg();
-        String targetUrl = "/provider/RelyToReviews"; // Booking details page
-        //create notification
-        notificationService.createNotification(loggedInUser,bookingService.getBookingById(bookingId).orElseThrow().getPkg().getProviderDetails(), NotificationReason.NEW_REVIEW,message,targetUrl);
+        reviewsService.addReview(loggedInUser.getId(), packageId, reviewContent);
+
+        String message = loggedInUser.getUsername() + " has left a review on your package: " + optionalPackage.get().getName();
+        String targetUrl = "/provider/ReplyToReviews";
+        notificationService.createNotification(loggedInUser, optionalPackage.get().getProviderDetails(), NotificationReason.NEW_REVIEW, message, targetUrl);
 
         return "redirect:/customer/reviews?success";
     }
+    @GetMapping("/reviews/{packageId}")
+    public String viewPackageReviews(@PathVariable Long packageId, HttpSession session, Model model) {
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/CustomerLogin";
+        }
+
+        Optional<Package> optionalPackage = packageService.getPackageById(packageId);
+        if (optionalPackage.isEmpty()) {
+            model.addAttribute("errorMessage", "Selected package not found.");
+            return "frontendCode/CustomerUI/customerViewPackages";
+        }
+
+        List<Reviews> reviews = reviewsService.getReviewsByPackage(packageId);
+        model.addAttribute("reviews", reviews);
+        model.addAttribute("package", optionalPackage.get());
+
+        // Fetch notifications for the user
+        List<Notification> notifications = notificationService.getNotificationsForUser(loggedInUser);
+        long unreadNotificationsCount = notifications.stream().filter(n -> !n.isRead()).count();
+        model.addAttribute("notifications", notifications);
+        model.addAttribute("unreadNotificationsCount", unreadNotificationsCount);
+
+        return "frontendCode/CustomerUI/viewpackagereviews";
+    }
+
 
     /**
      * Displays the customer's profile.
@@ -414,4 +432,5 @@ public class CustomerController {
 
         return "frontendCode/CustomerUI/packageDetails";
     }
+
 }
