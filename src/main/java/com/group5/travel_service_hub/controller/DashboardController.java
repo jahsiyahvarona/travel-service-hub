@@ -31,8 +31,43 @@ public class DashboardController {
 
 
     @GetMapping("/CostumerDashboard")
-    public String showDashboard() {
-        return "frontendCode/CustomerUI/customerDashboard"; // This is assuming you're using Thymeleaf
+    public String showCustomerDashboard(HttpSession session, Model model) {
+        // Retrieve the logged-in user from the session
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/login"; // Redirect to login if user is not found in the session
+        }
+
+        User customer = userService.findByUsername(loggedInUser.getUsername());
+
+        // Fetch all bookings for the logged-in customer
+        List<Booking> customerBookings = bookingRepository.findByCustomerId(customer.getId());
+
+        // Calculate total spending
+        double totalSpending = customerBookings.stream()
+                .mapToDouble(booking -> booking.getPkg().getPrice())
+                .sum();
+
+        // Calculate total bookings
+        long totalBookings = customerBookings.size();
+
+        // Find the most booked package for the customer
+        Map<Package, Long> bookingsCountByPackage = customerBookings.stream()
+                .collect(Collectors.groupingBy(Booking::getPkg, Collectors.counting()));
+
+        Package favoritePackage = bookingsCountByPackage.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
+
+        // Pass data to the model
+        model.addAttribute("userName", customer.getUsername());
+        model.addAttribute("totalSpending", totalSpending);
+        model.addAttribute("totalBookings", totalBookings);
+        model.addAttribute("favoritePackage", favoritePackage != null ? favoritePackage.getName() : "N/A");
+        model.addAttribute("profilePicUrl", customer.getProfilePic());
+
+        return "frontendCode/CustomerUI/customerDashboard";
     }
 
     @GetMapping("/ProviderDashboard")

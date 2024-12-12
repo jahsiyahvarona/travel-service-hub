@@ -1,99 +1,169 @@
 package com.group5.travel_service_hub.controller;
 
-import com.group5.travel_service_hub.entity.User;
-import com.group5.travel_service_hub.service.UserService;
+import com.group5.travel_service_hub.entity.*;
+import com.group5.travel_service_hub.entity.Package;
+import com.group5.travel_service_hub.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 
-/**
- * REST controller for managing User as Customer.
- */
 @RestController
-@RequestMapping("/api/customer")
+@RequestMapping("/customers")
 public class CustomerController {
 
-    private final UserService userService;
+    @Autowired
+    private UserService userService;
 
     @Autowired
-    public CustomerController(UserService userService) {
-        this.userService = userService;
+    private PackageService packageService;
+
+    @Autowired
+    private BookingService bookingService;
+
+    @Autowired
+    private ReviewsService reviewsService;
+
+    @Autowired
+    private LikeDislikeService likeDislikeService;
+    @Autowired
+    private ReportService reportService;
+    /**
+     * Create a new Customer profile.
+     *
+     * @param customer The Customer entity.
+     * @return The created Customer object.
+     */
+    @PostMapping("")
+    public ResponseEntity<User> createCustomerProfile(@RequestBody User customer) {
+        customer.setRole(Role.CUSTOMER);
+        User createdProvider = userService.registerUser(customer);
+        return ResponseEntity.ok(createdProvider);
     }
 
     /**
-     * Registers a new customer.
+     * Get Customer profile by CustomerId.
      *
-     * @param user The User object with customer details.
-     * @return The created User object.
+     * @param CustomerId The ID of the Customer.
+     * @return The Provider object.
      */
-    @PostMapping("/register")
-    public ResponseEntity<User> registerCustomer(@RequestBody User user) {
-        User registeredUser = userService.registerUser(user);
-        return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
+    @GetMapping("/{CustomerId}")
+    public ResponseEntity<User> getCustomerProfile(@PathVariable Long CustomerId) {
+        User customer = userService.findById(CustomerId);
+        return ResponseEntity.ok(customer);
     }
 
     /**
-     * Retrieves all users.
+     * Update Customer profile.
      *
-     * @return List of all User objects.
+     * @param customerId The ID of the customer.
+     * @param customer   The updated Customer details.
+     * @return The updated Customer object.
      */
-    @GetMapping("/all")
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.findAllUsers();
-        return new ResponseEntity<>(users, HttpStatus.OK);
+    @PutMapping("/{customerId}")
+    public ResponseEntity<User> updateCustomerProfile(
+            @PathVariable Long customerId,
+            @RequestBody User customer) {
+        User updatedCustomer = userService.updateProfile(customerId, customer);
+        return ResponseEntity.ok(updatedCustomer);
     }
 
     /**
-     * Retrieves a customer's details by user ID.
+     * Delete Customer profile.
      *
-     * @param userId The ID of the user.
-     * @return User object.
+     * @param customerId The ID of the customer.
+     * @return A confirmation message.
      */
-    @GetMapping("/details/{userId}")
-    public ResponseEntity<User> getUserDetails(@PathVariable Long userId) {
-        User user = userService.findById(userId);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+    @DeleteMapping("/{customerId}")
+    public ResponseEntity<String> deleteCustomerProfile(@PathVariable Long customerId) {
+        userService.deactivateUser(customerId);
+        return ResponseEntity.ok("Customer profile deactivated successfully.");
+    }
+    /**
+     * Subscribe to a service by creating a new booking.
+     *
+     * @param customerId The ID of the customer.
+     * @param packageId  The ID of the package.
+     * @param startDate  The start date of the booking.
+     * @param endDate    The end date of the booking.
+     * @return The created Booking object.
+     */
+    @PostMapping("/{customerId}/subscribe")
+    public ResponseEntity<Object> subscribeToService(
+            @PathVariable Long customerId,
+            @RequestParam Long packageId,
+            @RequestParam String startDate,
+            @RequestParam String endDate) {
+
+        Booking newBooking = bookingService.createBooking(
+                customerId,
+                packageId,
+                LocalDate.parse(startDate),
+                LocalDate.parse(endDate)
+        );
+
+        return ResponseEntity.status(201).body(newBooking);
     }
 
     /**
-     * Updates a customer's profile.
+     * Get all bookings for a specific customer.
      *
-     * @param userId      The ID of the user.
-     * @param userDetails The User object with updated profile details.
-     * @return The updated User object.
+     * @param customerId The ID of the customer.
+     * @return List of Booking objects.
      */
-    @PutMapping("/update/{userId}")
-    public ResponseEntity<User> updateUserDetails(@PathVariable Long userId, @RequestBody User userDetails) {
-        User updatedUser = userService.updateProfile(userId, userDetails);
-        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    @GetMapping("/{customerId}/bookings")
+    public ResponseEntity<List<Booking>> getAllBookingsForCustomer(@PathVariable Long customerId) {
+        List<Booking> bookings = bookingService.getBookingsByCustomerId(customerId);
+        return ResponseEntity.ok(bookings);
     }
-
     /**
-     * Updates the customer's profile picture.
+     * Update an existing Package.
      *
-     * @param userId The ID of the user.
-     * @param file   The profile picture file.
-     * @return The updated User object.
+     * @param providerId The ID of the provider.
+     * @param packageId  The ID of the package to update.
+     * @param pkg        The updated Package details.
+     * @return The updated Package object.
      */
-    @PutMapping("/updateProfilePic/{userId}")
-    public ResponseEntity<User> updateProfilePic(@PathVariable Long userId, @RequestParam("file") MultipartFile file) {
-        User updatedUser = userService.updateProfilePic(userId, file);
-        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    @PutMapping("/{providerId}/packages/{packageId}")
+    public ResponseEntity<com.group5.travel_service_hub.entity.Package> updatePackage(
+            @PathVariable Long providerId,
+            @PathVariable Long packageId,
+            @RequestBody com.group5.travel_service_hub.entity.Package pkg) {
+        Package existingPackage = packageService.getPackageById(packageId)
+                .orElseThrow(() -> new IllegalArgumentException("Package not found."));
+        if (!existingPackage.getProviderDetails().getId().equals(providerId)) {
+            return ResponseEntity.status(403).build();
+        }
+        pkg.setId(packageId);
+        pkg.setProviderDetails(existingPackage.getProviderDetails());
+        packageService.updatePackage(pkg);
+        return ResponseEntity.ok(pkg);
     }
-
     /**
-     * Deletes the user's account.
+     * Write a review for a subscribed service.
      *
-     * @param userId The ID of the user.
-     * @return Response message indicating successful deletion.
+     * @param customerId The ID of the customer writing the review.
+     * @param packageId  The ID of the package being reviewed.
+     * @param content    The review content.
+     * @return The created Review object.
      */
-    @DeleteMapping("/delete/{userId}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
-        userService.deactivateUser(userId);
-        return new ResponseEntity<>("User account deleted successfully.", HttpStatus.OK);
+    @PostMapping("/{customerId}/reviews")
+    public ResponseEntity<Reviews> writeReview(
+            @PathVariable Long customerId,
+            @RequestParam Long packageId,
+            @RequestParam String content) {
+
+        // Ensure the customer has subscribed to the service
+        boolean isSubscribed = bookingService.getBookingsByCustomerId(customerId).stream()
+                .anyMatch(booking -> booking.getPkg().getId().equals(packageId));
+
+        if (!isSubscribed) {
+            return ResponseEntity.status(403).body(null); // Forbidden if not subscribed
+        }
+
+        Reviews newReview = reviewsService.addReview(customerId, packageId, content);
+        return ResponseEntity.status(201).body(newReview);
     }
 }

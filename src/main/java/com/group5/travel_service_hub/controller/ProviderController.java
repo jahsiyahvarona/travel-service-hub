@@ -1,200 +1,253 @@
 package com.group5.travel_service_hub.controller;
+import com.group5.travel_service_hub.entity.Package;
 
 import com.group5.travel_service_hub.entity.*;
-import com.group5.travel_service_hub.entity.Package;
-import com.group5.travel_service_hub.service.LikeDislikeService;
-import com.group5.travel_service_hub.service.PackageService;
-import com.group5.travel_service_hub.service.ProviderService;
-import com.group5.travel_service_hub.service.UserService;
-import jakarta.servlet.http.HttpSession;
+import com.group5.travel_service_hub.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.bind.annotation.GetMapping;
 
-import java.security.Principal;
-import java.util.*;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Controller for managing Provider-related operations.
+ * REST Controller for managing Provider-related operations.
  */
-@Controller
-@RequestMapping("/provider")
+@RestController
+@RequestMapping("/providers")
 public class ProviderController {
 
     @Autowired
-    private ProviderService providerService;
+    private UserService userService;
+
     @Autowired
     private PackageService packageService;
+
     @Autowired
-    private UserService userService;
+    private BookingService bookingService;
+
+    @Autowired
+    private ReviewsService reviewsService;
+
     @Autowired
     private LikeDislikeService likeDislikeService;
-
+    @Autowired
+    private ReportService reportService;
 
     /**
-     * Handles the creation of a new package.----------------no
+     * Create a new Provider profile.
      *
-     * @param principal          The authenticated provider.
-     * @param pkg                The Package entity.
-     * @param packageImage       The uploaded image file.
-     * @param redirectAttributes Redirect attributes for passing messages.
-     * @return Redirects to the list of packages.
+     * @param provider The Provider entity.
+     * @return The created Provider object.
      */
-    @PostMapping("/packages")
-    public String createPackage(
-            Principal principal,
-            @ModelAttribute Package pkg,
-            @RequestParam("packageImage") MultipartFile packageImage,
-            RedirectAttributes redirectAttributes) {
-        User user = userService.findByUsername(principal.getName());
-
-        // Check if the user has the PROVIDER role
-        if (user.getRole() != Role.PROVIDER) {
-            redirectAttributes.addFlashAttribute("error", "Access denied: Only providers can create packages.");
-            return "redirect:/providers/packages";
-        }
-
-        try {
-            // Handle image upload
-            if (!packageImage.isEmpty()) {
-                String imageUrl = providerService.saveImage(packageImage);
-                pkg.setImageUrl(imageUrl);
-            }
-
-            providerService.createPackage(user.getId(), pkg);
-            redirectAttributes.addFlashAttribute("success", "Package created successfully.");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Failed to create package: " + e.getMessage());
-        }
-        return "redirect:/providers/packages";
+    @PostMapping("")
+    public ResponseEntity<User> createProviderProfile(@RequestBody User provider) {
+        provider.setRole(Role.PROVIDER);
+        User createdProvider = userService.registerUser(provider);
+        return ResponseEntity.ok(createdProvider);
     }
 
     /**
-     * Provides package data as JSON for editing.
+     * Get Provider profile by providerId.
      *
-     * @param principal The authenticated provider.
-     * @param packageId The ID of the package.
-     * @return The Package object.
+     * @param providerId The ID of the provider.
+     * @return The Provider object.
      */
-    @GetMapping("/packages/{packageId}/data")
-    public @ResponseBody Package getPackageData(
-            Principal principal,
-            @PathVariable Long packageId) {
-        User user = userService.findByUsername(principal.getName());
-
-        // Check if the user has the PROVIDER role
-        if (user.getRole() != Role.PROVIDER) {
-            throw new SecurityException("Access denied: Only providers can access package data.");
-        }
-
-        Package pkg = providerService.getPackageById(packageId);
-
-        // Check if the package belongs to the provider
-        if (!pkg.getProviderDetails().getId().equals(user.getId())) {
-            throw new SecurityException("Unauthorized to access this package.");
-        }
-
-        return pkg;
+    @GetMapping("/{providerId}")
+    public ResponseEntity<User> getProviderProfile(@PathVariable Long providerId) {
+        User provider = userService.findById(providerId);
+        return ResponseEntity.ok(provider);
     }
 
     /**
-     * Handles the updating of an existing package.
+     * Update Provider profile.
      *
-     * @param principal          The authenticated provider.
-     * @param packageId          The ID of the package to update.
-     * @param pkg                The Package entity containing updated details.
-     * @param packageImage       The uploaded image file.
-     * @param redirectAttributes Redirect attributes for passing messages.
-     * @return Redirects to the list of packages.
+     * @param providerId The ID of the provider.
+     * @param provider   The updated Provider details.
+     * @return The updated Provider object.
      */
-    @PostMapping("/packages/{packageId}/update")
-    public String updatePackage(
-            Principal principal,
+    @PutMapping("/{providerId}")
+    public ResponseEntity<User> updateProviderProfile(
+            @PathVariable Long providerId,
+            @RequestBody User provider) {
+        User updatedProvider = userService.updateProfile(providerId, provider);
+        return ResponseEntity.ok(updatedProvider);
+    }
+
+    /**
+     * Delete Provider profile.
+     *
+     * @param providerId The ID of the provider.
+     * @return A confirmation message.
+     */
+    @DeleteMapping("/{providerId}")
+    public ResponseEntity<String> deleteProviderProfile(@PathVariable Long providerId) {
+        userService.deactivateUser(providerId);
+        return ResponseEntity.ok("Provider profile deactivated successfully.");
+    }
+
+    /**
+     * Create a new Package (Service).
+     *
+     * @param providerId The ID of the provider.
+     * @param pkg        The Package entity.
+     * @return The created Package object.
+     */
+    @PostMapping("/{providerId}/packages")
+    public ResponseEntity<Package> createPackage(
+            @PathVariable Long providerId,
+            @RequestBody Package pkg) {
+        User provider = userService.findById(providerId);
+        pkg.setProviderDetails(provider);
+        packageService.createPackage(pkg);
+        return ResponseEntity.ok(pkg);
+    }
+
+    /**
+     * Update an existing Package.
+     *
+     * @param providerId The ID of the provider.
+     * @param packageId  The ID of the package to update.
+     * @param pkg        The updated Package details.
+     * @return The updated Package object.
+     */
+    @PutMapping("/{providerId}/packages/{packageId}")
+    public ResponseEntity<Package> updatePackage(
+            @PathVariable Long providerId,
             @PathVariable Long packageId,
-            @ModelAttribute Package pkg,
-            @RequestParam("packageImage") MultipartFile packageImage,
-            RedirectAttributes redirectAttributes) {
-        User user = userService.findByUsername(principal.getName());
-
-        // Check if the user has the PROVIDER role
-        if (user.getRole() != Role.PROVIDER) {
-            redirectAttributes.addFlashAttribute("error", "Access denied: Only providers can update packages.");
-            return "redirect:/providers/packages";
+            @RequestBody Package pkg) {
+        Package existingPackage = packageService.getPackageById(packageId)
+                .orElseThrow(() -> new IllegalArgumentException("Package not found."));
+        if (!existingPackage.getProviderDetails().getId().equals(providerId)) {
+            return ResponseEntity.status(403).build();
         }
-
-        try {
-            // Handle image upload
-            if (!packageImage.isEmpty()) {
-                String imageUrl = providerService.saveImage(packageImage);
-                pkg.setImageUrl(imageUrl);
-            }
-
-            providerService.updatePackage(user.getId(), packageId, pkg);
-            redirectAttributes.addFlashAttribute("success", "Package updated successfully.");
-        } catch (SecurityException e) {
-            redirectAttributes.addFlashAttribute("error", "Unauthorized to update this package.");
-        } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", "Package not found.");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Failed))))) to update package: " + e.getMessage());
-        }
-        return "redirect:/providers/packages";
+        pkg.setId(packageId);
+        pkg.setProviderDetails(existingPackage.getProviderDetails());
+        packageService.updatePackage(pkg);
+        return ResponseEntity.ok(pkg);
     }
 
-
-
-
-
-
-    // Mapping for Profile Page
-    @GetMapping("/profile")
-    public String profile(Model model) {
-        return "frontendCode/ProviderUI/Profile"; // Ensure you have a profile.html file
+    /**
+     * Delete a Package.
+     *
+     * @param providerId The ID of the provider.
+     * @param packageId  The ID of the package to delete.
+     * @return A confirmation message.
+     */
+    @DeleteMapping("/{providerId}/packages/{packageId}")
+    public ResponseEntity<String> deletePackage(
+            @PathVariable Long providerId,
+            @PathVariable Long packageId) {
+        User provider = userService.findById(providerId);
+        packageService.deletePackage(provider, packageId);
+        return ResponseEntity.ok("Package deleted successfully.");
     }
 
-    // Mapping for Reply to Reviews Page
-    @GetMapping("/replyToReviews")
-    public String replyToReviews(Model model) {
-        return "frontendCode/ProviderUI/RelyToReviews"; // Ensure you have a replyToReviews.html file
+    /**
+     * Get all Packages for a Provider.
+     *
+     * @param providerId The ID of the provider.
+     * @return A list of Package objects.
+     */
+    @GetMapping("/{providerId}/packages")
+    public ResponseEntity<List<Package>> getPackagesByProvider(@PathVariable Long providerId) {
+        List<Package> packages = packageService.getAllPackagesByProvider(providerId);
+        return ResponseEntity.ok(packages);
     }
-    // Mapping for Manage Bookings Page
-    @GetMapping("/manageBookings")
-    public String manageBookings(Model model) {
-        return "frontendCode/ProviderUI/manageBookings"; // Ensure you have a manageBookings.html file
-    }
-    @GetMapping("/managePackages")
-    public String getPackagesByProvider(Model model, HttpSession session) {
 
-        // Retrieve the logged-in user from the session
-        User loggedInUser = (User) session.getAttribute("loggedInUser");
-        if (loggedInUser == null) {
-            return "redirect:/login"; // Redirect to login if user is not found in the session
-        }
+    /**
+     * View customer statistics (likes, dislikes, bookings) for services
+     * by this Provider.
+     *
+     * @param providerId The ID of the provider.
+     * @return A list of statistics for each package.
+     */
+    @GetMapping("/{providerId}/statistics")
+    public ResponseEntity<List<Map<String, Object>>> getCustomerStatistics(
+            @PathVariable Long providerId) {
 
-        String username = loggedInUser.getUsername();
-        User user = userService.findByUsername(username);
+        List<Package> packages = packageService
+                .getAllPackagesByProvider(providerId);
 
-        // Get packages for the provider and sort by name or ID
-        List<Package> packages = packageService.getAllPackagesByProvider(user.getId());
-        packages.sort(Comparator.comparing(Package::getName));
+        List<Map<String, Object>> statisticsList = new ArrayList<>();
 
-        // Create a map to store package, like count, and dislike count
-        Map<Package, Map<String, Integer>> packageLikeDislikeMap = new LinkedHashMap<>();
         for (Package pkg : packages) {
-            int likeCount = Math.toIntExact(likeDislikeService.countLikes(pkg.getId()));
-            int dislikeCount = Math.toIntExact(likeDislikeService.countDislikes(pkg.getId()));
-            Map<String, Integer> counts = new HashMap<>();
-            counts.put("likes", likeCount);
-            counts.put("dislikes", dislikeCount);
-            packageLikeDislikeMap.put(pkg, counts);
+            Long likes = likeDislikeService.countLikes(pkg.getId());
+            Long dislikes = likeDislikeService.countDislikes(pkg.getId());
+            int bookingsCount = bookingService
+                    .getBookingsByPackageId(pkg.getId()).size();
+
+            Map<String, Object> stats = new HashMap<>();
+            stats.put("packageId", pkg.getId());
+            stats.put("packageName", pkg.getName());
+            stats.put("likes", likes);
+            stats.put("dislikes", dislikes);
+            stats.put("bookingsCount", bookingsCount);
+
+            statisticsList.add(stats);
         }
 
-        model.addAttribute("packageLikeDislikeMap", packageLikeDislikeMap);
+        return ResponseEntity.ok(statisticsList);
+    }
 
-        return "frontendCode/ProviderUI/managePackages"; // Name of your Thymeleaf template
+    /**
+     * Get reviews for this Provider.
+     *
+     * @param providerId The ID of the provider.
+     * @return A list of Review objects.
+     */
+    @GetMapping("/{providerId}/reviews")
+    public ResponseEntity<List<Reviews>> getReviewsByProvider(@PathVariable Long providerId) {
+        List<Package> packages = packageService.getAllPackagesByProvider(providerId);
+        List<Reviews> reviews = packages.stream()
+                .flatMap(pkg -> reviewsService.getReviewsByPackage(pkg.getId()).stream())
+                .toList();
+        return ResponseEntity.ok(reviews);
     }
+
+    /**
+     * Get all Bookings for a Provider.
+     *
+     * @param providerId The ID of the provider.
+     * @return A list of Booking objects for the provider's packages.
+     */
+    @GetMapping("/{providerId}/bookings")
+    public ResponseEntity<List<Booking>> getBookingsByProvider(@PathVariable Long providerId) {
+        // Retrieve all packages for the provider
+        List<Package> providerPackages = packageService.getAllPackagesByProvider(providerId);
+
+        // Collect bookings for each package
+        List<Booking> providerBookings = new ArrayList<>();
+        for (Package pkg : providerPackages) {
+            providerBookings.addAll(bookingService.getBookingsByPackageId(pkg.getId()));
+        }
+
+        return ResponseEntity.ok(providerBookings);
     }
+    /**
+     * Create a new report on a review.
+     *
+     * @param reporterId The ID of the user reporting the review.
+     * @param reviewId   The ID of the review being reported.
+     * @param report     The report details (reason).
+     * @return The created Report object.
+     */
+    @PostMapping("/newReport/{reviewId}/users/{reporterId}")
+    public ResponseEntity<Report> createReviewReport(
+            @PathVariable Long reporterId,
+            @PathVariable Long reviewId,
+            @RequestBody Report report) {
+
+        User reporter = userService.findById(reporterId);
+        report.setStatus(ReportStatus.PENDING); // Set initial status to PENDING
+        report.setTimestamp(LocalDateTime.now()); // Set the current timestamp
+
+        reportService.createReport(reporter, report, null, reviewId);
+
+        return ResponseEntity.ok(report);
+    }
+}
