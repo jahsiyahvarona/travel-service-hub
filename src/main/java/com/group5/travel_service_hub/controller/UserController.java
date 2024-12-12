@@ -164,7 +164,7 @@ public class UserController {
         String loggedInUsername = loggedInUser.getUsername();
         User user = userService.findByUsername(loggedInUsername);
 
-        if (user.getRole() != Role.PROVIDER && user.getRole() != Role.SYSADMIN) {
+        if (user.getRole() != Role.PROVIDER && user.getRole() != Role.SYSADMIN && user.getRole() != Role.CUSTOMER) {
             redirectAttributes.addFlashAttribute("error", "Access denied: Only providers can update packages.");
             return "redirect:/provider/profile";
         }

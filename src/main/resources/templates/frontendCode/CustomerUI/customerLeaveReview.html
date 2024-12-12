@@ -1,36 +1,53 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leave a review · Travel Services Hub</title>
-
-    <link th:href="@{/CSS/bootstrap_theme/bootstrap.css}" rel="stylesheet" type="text/css">
-    <link th:href="@{/CSS/dashboard.css}" rel="stylesheet">
-    <link href="/CSS/bootstrap_theme/bootstrap.css" rel="stylesheet" type="text/css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Manage Your Reviews · Travel Services Hub</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="/CSS/dashboard.css" rel="stylesheet">
     <link href="/CSS/BellDropdown.css" rel="stylesheet">
     <style>
-        .bordered-img {
-          border: 2px solid #0abf53;
-          padding: 2px;
-          border-radius: 10%;
+
+        /* Custom Close Edit Button */
+
+        .btn-close-edit {
+            background-color: #0abf53; /* Gray color */
+            color: white;
+            border: none;
+            transition: background-color 0.3s ease;
         }
 
+        /* Custom Styles */
         .btn-custom {
-          background-color: #0abf53;
-          color: white;
-          border: none;
+            background-color: #0abf53;
+            color: white;
+            border: none;
         }
-
         .btn-custom:hover {
-          background-color: #089e45;
+            background-color: #089e45;
+        }
+        .review-card {
+            margin-bottom: 20px;
+        }
+        .profile-pic {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+        .edit-form {
+            margin-top: 15px;
+            display: none;
         }
     </style>
 </head>
 <body>
 <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">Leave a review</a>
+    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">Manage Your Reviews</a>
+    <!-- Sidebar Toggle Button for Mobile -->
     <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
             data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false"
             aria-label="Toggle navigation">
@@ -40,7 +57,6 @@
     <img src="/images/logo.png" alt="Company Logo" class="mx-auto d-block" style="height: 100px; width: auto;">
     <!-- Navbar Items -->
     <ul class="navbar-nav px-3">
-        <!-- In your navbar HTML file -->
         <li class="nav-item dropdown text-nowrap">
             <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button"
                data-bs-toggle="dropdown" aria-expanded="false">
@@ -69,7 +85,6 @@
                     </a>
                 </li>
                 <li><hr class="dropdown-divider"></li>
-
             </ul>
         </li>
         <!-- Sign Out Link -->
@@ -78,33 +93,31 @@
         </li>
     </ul>
 </header>
-
 <div class="container-fluid">
     <div class="row">
+        <!-- Sidebar -->
         <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
             <div class="position-sticky pt-3">
                 <ul class="nav flex-column">
+                    <!-- Manage Reviews Link -->
                     <li class="nav-item">
-                        <a class="nav-link active" th:href="@{/CostumerDashboard}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home">
-                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        <a class="nav-link active" th:href="@{/customer/my-reviews}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                 fill="none" stroke="currentColor"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                 class="feather feather-message-square">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                             </svg>
-                            Dashboard
+                            My Reviews
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link " th:href="@{/CostumerDashboard}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home">
-                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                            </svg>
-                            Dashboard
-                        </a>
-                    </li>
+                    <!-- Additional Sidebar Links -->
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/customer/packages}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layers">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                 fill="none" stroke="currentColor"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                 class="feather feather-layers">
                                 <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
                                 <polyline points="2 17 12 22 22 17"></polyline>
                                 <polyline points="2 12 12 17 22 12"></polyline>
@@ -114,7 +127,10 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/customer/bookings}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                 fill="none" stroke="currentColor"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                 class="feather feather-calendar">
                                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                                 <line x1="16" y1="2" x2="16" y2="6"></line>
                                 <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -124,16 +140,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" th:href="@{/customer/reviews}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square">
-                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                            </svg>
-                            Leave Review
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" th:href="@{/customer/profile}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                 fill="none" stroke="currentColor"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                 class="feather feather-user">
                                 <path d="M20.5 18.5a6 6 0 0 0-9 0"></path>
                                 <circle cx="12" cy="7" r="4"></circle>
                             </svg>
@@ -143,34 +154,117 @@
                 </ul>
             </div>
         </nav>
-
+        <!-- Main Content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <h1 class="h2">Packages You've Booked</h1>
+            <!-- Flash Messages -->
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <span th:text="${successMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
 
-            <div class="row">
-                <div th:if="${bookedPackagesEmpty}" class="col-12">
-                    <div class="alert alert-info text-center" role="alert">
-                        You haven't booked any packages yet.
+            <h1 class="h2 mb-4">Manage Your Reviews</h1>
+
+            <!-- Create Review Section -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Write a New Review</h5>
+                    <div th:if="${!canReview}" class="alert alert-info" role="alert">
+                        You have reviewed all your booked packages. <a th:href="@{/customer/packages}" class="alert-link">Book more packages</a> to share your experiences!
+                    </div>
+                    <div th:if="${canReview}">
+                        <form th:action="@{/customer/reviews/submit}" method="post">
+
+                            <div class="mb-3">
+                                <label for="packageSelect" class="form-label">Select Package:</label>
+                                <select class="form-select" name="packageId" id="packageSelect" required>
+                                    <option value="" disabled selected>Select a package</option>
+                                    <option th:each="pkg : ${packagesToReview}"
+                                            th:value="${pkg.id}"
+                                            th:text="${pkg.name}">Package Name</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="reviewContent" class="form-label">Your Review:</label>
+                                <textarea class="form-control" name="reviewContent" id="reviewContent" rows="5" placeholder="Share your experience..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-custom">Submit Review</button>
+                        </form>
                     </div>
                 </div>
+            </div>
 
-                <!-- Booked Packages Section -->
-                <div class="col-md-4 mb-4" th:each="pkg : ${bookedPackages}">
-                    <div class="card h-100 shadow-sm fixed-card">
-                        <img th:src="${pkg.pkg.imageUrl}" class="package-image" alt="Package Image">
+            <!-- List of Reviews -->
+            <div th:if="${#lists.isEmpty(myReviews)}" class="alert alert-info" role="alert">
+                You haven't written any reviews yet. <a th:href="@{/customer/packages}" class="alert-link">Browse packages</a> to share your experiences!
+            </div>
+
+            <div class="row" th:unless="${#lists.isEmpty(myReviews)}">
+                <div class="col-12" th:each="review : ${myReviews}">
+                    <div class="card mb-4 shadow-sm review-card">
                         <div class="card-body">
-                            <h5 class="card-title" th:text="${pkg.pkg.name}">Package Name</h5>
-                            <p class="card-text" th:text="${pkg.pkg.description}">Package Description</p>
-
-                            <!-- Review Form -->
-                            <form th:action="@{/customer/reviews/submit}" method="post" class="review-section">
-                                <input type="hidden" name="packageId" th:value="${pkg.id}">
-                                <div class="mb-3">
-                                    <label for="reviewContent" class="form-label">Leave a Review:</label>
-                                    <textarea class="form-control" name="reviewContent" id="reviewContent" rows="3" placeholder="Share your experience..." required></textarea>
+                            <div class="d-flex align-items-center mb-3">
+                                <!-- Package Image -->
+                                <img th:src="${review.pkg.imageUrl}" alt="Package Image" class="profile-pic">
+                                <div>
+                                    <h5 class="card-title mb-0" th:text="${review.pkg.name}">Package Name</h5>
+                                    <small class="text-muted" th:text="${#temporals.format(review.timestamp, 'dd MMM yyyy HH:mm')}">Review Date</small>
                                 </div>
-                                <button type="submit" class="btn btn-custom">Submit Review</button>
-                            </form>
+                            </div>
+                            <p class="card-text" th:text="${review.content}">Review Content</p>
+
+                            <!-- Provider Reply (If Any) -->
+                            <div th:if="${review.replyContent}" class="alert alert-success">
+                                <strong>Provider's Reply:</strong>
+                                <p th:text="${review.replyContent}">Provider Reply Content</p>
+                                <small class="text-muted" th:text="${#temporals.format(review.replyTimestamp, 'dd MMM yyyy HH:mm')}">Reply Date</small>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-flex justify-content-end">
+                                <button class="btn btn-sm btn-custom me-2" type="button" th:attr="data-review-id=${review.id}" onclick="toggleEditForm(this)">Edit</button>
+                                <button class="btn btn-sm btn-danger" type="button" data-bs-toggle="modal" th:data-bs-target="'#deleteReviewModal' + ${review.id}">
+                                    Delete
+                                </button>
+                            </div>
+
+                            <!-- Edit Review Form -->
+                            <div class="edit-form" th:id="'editForm' + ${review.id}">
+                                <form th:action="@{/customer/reviews/{reviewId}/edit(reviewId=${review.id})}" method="post">
+
+                                    <div class="mb-3">
+                                        <label for="editContent" class="form-label">Edit Your Review:</label>
+                                        <textarea class="form-control" name="reviewContent" id="editContent" rows="4" required th:text="${review.content}"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-success btn-sm me-2">Save</button>
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="toggleEditForm(this)">Cancel</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delete Review Modal -->
+                    <div class="modal fade" th:id="'deleteReviewModal' + ${review.id}" tabindex="-1" aria-labelledby="deleteReviewModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form th:action="@{/customer/reviews/{reviewId}/delete(reviewId=${review.id})}" method="post">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" th:text="'Delete Review for ' + ${review.pkg.name}">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete your review for <strong th:text="${review.pkg.name}">Package Name</strong>?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </div>
+
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -178,8 +272,7 @@
         </main>
     </div>
 </div>
-
-<!-- Sign Out Modal -->
+<!-- Sign Out Confirmation Modal -->
 <div class="modal fade" id="signOutModal" tabindex="-1" aria-labelledby="signOutModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content modal-content-custom">
@@ -187,7 +280,9 @@
                 <h5 class="modal-title" id="signOutModalLabel">Confirm Sign Out</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">Are you sure you want to sign out?</div>
+            <div class="modal-body">
+                Are you sure you want to sign out?
+            </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
                 <button type="button" class="btn btn-danger" id="confirmSignOutButton">Yes</button>
@@ -195,18 +290,41 @@
         </div>
     </div>
 </div>
-
+<!-- Bootstrap JS and Feather Icons -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    function showSignOutModal() {
-        var signOutModal = new bootstrap.Modal(document.getElementById('signOutModal'));
-        signOutModal.show();
-    }
-    // Sign Out Button Handler
-    document.getElementById('confirmSignOutButton').addEventListener('click', function () {
-        // Redirect to the sign-out page
-        window.location.href = "/LoginChoice";
+<script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    document.addEventListener('DOMContentLoaded', function () {
+        feather.replace();
+
+        // Handle Sign Out Modal
+        window.showSignOutModal = function() {
+            var signOutModal = new bootstrap.Modal(document.getElementById('signOutModal'));
+            signOutModal.show();
+        }
+
+        document.getElementById('confirmSignOutButton').addEventListener('click', function () {
+            // Redirect to the sign-out page
+            window.location.href = "/LoginChoice";
+        });
+
+        // Function to toggle the visibility of the edit form
+        window.toggleEditForm = function(button) {
+            var cardBody = button.closest('.card-body');
+            var editForm = cardBody.querySelector('.edit-form');
+            if (editForm.style.display === 'none' || editForm.style.display === '') {
+                editForm.style.display = 'block';
+                button.textContent = 'Close Edit';
+                // Scroll to the edit form
+                editForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                editForm.style.display = 'none';
+                button.textContent = 'Edit';
+            }
+        }
     });
+    /*]]>*/
 </script>
 </body>
 </html>
