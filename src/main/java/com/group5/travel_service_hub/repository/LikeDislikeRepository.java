@@ -4,6 +4,8 @@ import com.group5.travel_service_hub.entity.LikeDislike;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -39,4 +41,6 @@ public interface LikeDislikeRepository extends JpaRepository<LikeDislike, Long> 
     Long countByPkgIdAndIsLikeFalse(Long pkgId);
 
     Optional<LikeDislike> findByPkgIdAndUserId(Long pkgId, Long userId);
+
+    List<LikeDislike> findByUserId(Long userId);
 }
