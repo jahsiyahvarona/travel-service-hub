@@ -60,6 +60,17 @@ public class Reviews {
         this.timestamp = timestamp;
     }
 
+    public enum ReviewStatus {
+        ACTIVE,
+        FLAGGED,
+        DELETED
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ReviewStatus status = ReviewStatus.ACTIVE;
+
+
 
 
 

@@ -3,7 +3,7 @@ package com.group5.travel_service_hub.repository;
 import com.group5.travel_service_hub.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
+import java.util.List;
 /**
  * Repository interface for User entity.
  */
@@ -41,4 +41,29 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return True if a user with the given email exists, else false.
      */
     boolean existsByEmail(String email);
+
+    //Methods for SysAdmin Functionality
+
+    /**
+     * @param role filter the roles of the users such as customer, provider and sysadmin
+     * @return List of users with specified role
+     */
+
+    List<User> findByRole(String role);
+
+    /**
+     * Find users by their account status
+     *
+     * @param accountStats The account status to filer such as active or banned.
+     * @return List of users with the specified account status
+     */
+    List<User> findByAccountStats(String accountStats);
+
+    /**
+     * Find users that are banned.
+     *
+     * @param banned checks whether the user is banned or not
+     * @return List of users who match the banned status
+     */
+    List<User> findByBanned(boolean banned);
 }

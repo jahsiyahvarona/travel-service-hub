@@ -2,6 +2,10 @@ package com.group5.travel_service_hub.service;
 import com.group5.travel_service_hub.entity.Package;
 import com.group5.travel_service_hub.entity.*;
 import com.group5.travel_service_hub.repository.*;
+import com.group5.travel_service_hub.repository.UserRepository;
+import com.group5.travel_service_hub.repository.PackageRepository;
+import com.group5.travel_service_hub.repository.BookingRepository;
+import com.group5.travel_service_hub.repository.ReportRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -227,4 +231,46 @@ public class SysAdminService {
     public void unsuspendUser(Long userId) {
         userService.activateUser(userId);
     }
+
+
+    // Update the user's account status (Suspended, Active, etc.)
+    @Transactional
+    public void updateUserAccountStatus(Long userId, String status) {
+        User user = getUserById(userId);
+        // Assuming you have an 'accountStatus' field in User
+        user.setAccountStatus(status);
+        userRepository.save(user);
+    }
+
+    public List<Statistic> getAppStatistics() {
+        // Get the total counts for users, packages, bookings, and reports
+        long totalUsers = userRepository.count();
+        long totalPackages = packageRepository.count();
+        long totalBookings = bookingRepository.count();
+        long totalReports = reportRepository.count();
+
+        // Create a Statistic object to hold the data
+        Statistic stats = new Statistic(totalUsers, totalPackages, totalBookings, totalReports);
+
+        // Return the statistic wrapped in a list
+        return List.of(stats);
+    }
+
+
+    // Delete a review (similar to deleting a comment)
+    @Transactional
+    public void deleteReview(Long reviewId) {
+        Reviews review = ReviewsRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("Review not found."));
+        ReviewsRepository.delete(review);
+    }
+
+    public void updateUserStatus(Long userId, AccountStatus newStatus) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        user.setAccountStatus(String.valueOf(newStatus));
+        userRepository.save(user);
+    }
+
+
+
 }

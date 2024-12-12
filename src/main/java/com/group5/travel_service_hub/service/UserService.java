@@ -5,9 +5,14 @@ import com.group5.travel_service_hub.entity.User;
 import com.group5.travel_service_hub.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -359,4 +364,46 @@ public class UserService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
     }
+
+
+
+
+    //SysAdmin
+    /**
+     * Deletes a user by ID.
+     *
+     * @param userId The ID of the user to delete.
+     */
+    @Transactional
+    public void deleteUser(Long userId) {
+        userRepository.deleteById(userId);
+    }
+
+    /**
+     * Updates the account status of a user.
+     *
+     * @param userId The ID of the user.
+     * @param status The new account status (e.g., "active", "banned").
+     * @return The updated user.
+     */
+    @Transactional
+    public User updateAccountStatus(Long userId, String status) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+
+        user.setAccountStatus(status);
+        return userRepository.save(user);
+    }
+
+
+    public List<User> getAllBannedUsers(){
+        return userRepository.findByBanned(true);
+    }
+
+    public List<User> getUsersByAccountStats(String status){
+        return userRepository.findByAccountStats(status);
+    }
+
 }
+
+

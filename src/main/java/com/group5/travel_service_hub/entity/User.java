@@ -1,5 +1,7 @@
 package com.group5.travel_service_hub.entity;
 import jakarta.persistence.*;
+
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,6 +34,20 @@ public class User {
 
     @Column(nullable = false)
     private boolean banned = false;
+
+    public void setAccountStatus(String status) {
+    }
+
+    //sysadmin
+    public enum Role{
+        ACTIVE,
+        SUSPENDED,
+        BANNED
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AccountStatus accountStatus;
 
     private String profilePic; // URL or path to the profile picture
 
@@ -149,4 +165,5 @@ public class User {
     public void setBanned(boolean banned) {
         this.banned = banned;
     }
+
 }
