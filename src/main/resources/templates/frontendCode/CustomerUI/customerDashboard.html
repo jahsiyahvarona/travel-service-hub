@@ -146,90 +146,67 @@
                 </ul>
             </div>
         </nav>
-
         <!-- Main Content Area -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <h1 class="h2">Welcome, Customer</h1>
+            <h1 class="h2" th:text="'Welcome, ' + ${userName}">Welcome, Customer</h1>
             <div class="row">
                 <!-- Total Bookings -->
                 <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-header text-center">
-                            <h4 class="my-0 fw-normal">Total Bookings</h4>
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h4>Total Bookings</h4>
                         </div>
-                        <div class="card-body d-flex align-items-center justify-content-center">
-                            <h1 class="display-1" style="color: #0abf53;" th:text="${totalBookings}">Total Bookings Amount</h1>
+                        <div class="card-body">
+                            <h1 th:text="${totalBookings}">0</h1>
                         </div>
                     </div>
                 </div>
 
                 <!-- Total Spending -->
                 <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-header text-center">
-                            <h4 class="my-0 fw-normal">Total Spending</h4>
-                        </div>
-                        <div class="card-body d-flex align-items-center justify-content-center">
-                            <h1 class="display-1" style="color: #0abf53;" th:text="'$' + ${totalSpending}">Total Spending Amount</h1>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Favorite Package (Most Liked Package) -->
-                <div class="col-md-4 mb-4">
                     <div class="card shadow-sm">
                         <div class="card-header">
-                            <h4 class="my-0 fw-normal">Most Liked Package</h4>
+                            <h4>Total Spending</h4>
                         </div>
-                        <div class="card-body d-flex flex-column">
-                            <div style="min-height: 128px;" th:if="${likesCount != null && likesCount > 0}">
-                                <h5 class="card-title pricing-card-title" th:text="${mostLikedPackage.name}">Package Name</h5>
-                                <ul class="list-unstyled mt-3 mb-4">
-                                    <li><strong>Likes:</strong> <span th:text="${likesCount}">0</span></li>
-                                    <li><strong>Bookings:</strong> <span th:text="${mostLikedPackage.getBookings().size()}">0</span></li>
-                                    <li><strong>Status:</strong> <span th:text="'Active'">Active</span></li>
-                                </ul>
-                            </div>
-                            <div style="min-height: 128px;" th:if="${likesCount == null || likesCount == 0}" class="mt-auto mb-auto text-center">
-                                <h5 class="card-title pricing-card-title">No Favorite Package</h5>
-                            </div>
+                        <div class="card-body">
+                            <h1 th:text="'$' + ${totalSpending}">$0</h1>
                         </div>
                     </div>
                 </div>
 
-                <!-- Recommended Trips -->
-                <div class="card mb-4 shadow-sm">
-                    <div class="card-header">
-                        <h4>Recommended Trips</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6" th:if="${firstRecommendedPackage != null}">
-                                <div class="card h-100">
-                                    <img th:src="@{/images/${firstRecommendedPackage.image}}" class="card-img-top bordered-img" alt="First Recommended Package">
-                                    <div class="card-body">
-                                        <h5 class="card-title" th:text="${firstRecommendedPackage.name}">First Recommended Package</h5>
-                                        <p class="card-text" th:text="${firstRecommendedPackage.description}">Description</p>
-                                        <p><strong>Price:</strong> <span th:text="'$' + ${firstRecommendedPackage.price}">Price</span></p>
-                                        <a th:href="@{/packages/${firstRecommendedPackage.id}}" class="btn btn-custom">View Details</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6" th:if="${secondRecommendedPackage != null}">
-                                <div class="card h-100">
-                                    <img th:src="@{/images/${secondRecommendedPackage.image}}" class="card-img-top bordered-img" alt="Second Recommended Package">
-                                    <div class="card-body">
-                                        <h5 class="card-title" th:text="${secondRecommendedPackage.name}">Second Recommended Package</h5>
-                                        <p class="card-text" th:text="${secondRecommendedPackage.description}">Description</p>
-                                        <p><strong>Price:</strong> <span th:text="'$' + ${secondRecommendedPackage.price}">Price</span></p>
-                                        <a th:href="@{/packages/${secondRecommendedPackage.id}}" class="btn btn-custom">View Details</a>
-                                    </div>
-                                </div>
-                            </div>
+                <!-- Favorite Package -->
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow
+                    -sm">
+                        <div class="card-header">
+                            <h4>Favorite Package</h4>
+                        </div>
+                        <div class="card-body">
+                            <h1 th:text="${favoritePackage}">N/A</h1>
                         </div>
                     </div>
                 </div>
-        </main>
+            </div>
+
+            <!-- Upcoming Confirmed Booking -->
+            <div class="col-md-12 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h4>Upcoming Confirmed Booking</h4>
+                    </div>
+                    <div class="card-body" th:if="${nextBooking != null}">
+                        <h5 class="card-title" th:text="${nextBooking.pkg.name}">Package Name</h5>
+                        <p><strong>Start Date:</strong> <span th:text="${nextBooking.startDate}">Start Date</span></p>
+                        <p><strong>End Date:</strong> <span th:text="${nextBooking.endDate}">End Date</span></p>
+                        <p><strong>Status:</strong> <span th:text="${nextBooking.status}">Status</span></p>
+                    </div>
+                    <div class="card-body text-center" th:if="${nextBooking == null}">
+                        <h5>No confirmed bookings yet!</h5>
+                        <a href="/customer/packages" class="btn btn-custom">Explore Packages</a>
+                    </div>
+                </div>
+            </div>
+    </main>
     </div>
 </div>
 
@@ -259,9 +236,7 @@
         var signOutModal = new bootstrap.Modal(document.getElementById('signOutModal'));
         signOutModal.show();
     }
-    // Sign Out Button Handler
     document.getElementById('confirmSignOutButton').addEventListener('click', function () {
-        // Redirect to the sign-out page
         window.location.href = "/LoginChoice";
     });
 </script>

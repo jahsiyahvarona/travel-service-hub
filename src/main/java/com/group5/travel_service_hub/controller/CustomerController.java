@@ -2,6 +2,7 @@ package com.group5.travel_service_hub.controller;
 
 import com.group5.travel_service_hub.entity.*;
 import com.group5.travel_service_hub.entity.Package;
+import com.group5.travel_service_hub.repository.BookingRepository;
 import com.group5.travel_service_hub.repository.CityRepository;
 import com.group5.travel_service_hub.repository.LikeDislikeRepository;
 import com.group5.travel_service_hub.repository.PackageRepository;
@@ -18,9 +19,7 @@ import com.group5.travel_service_hub.service.LikeDislikeService;
 
 
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -31,10 +30,16 @@ public class CustomerController {
     private CityRepository cityRepository;
 
     @Autowired
+    private BookingRepository bookingRepository; // Repository for booking-related data
+
+    @Autowired
     private LikeDislikeService likeDislikeService;
 
     @Autowired
     private ReviewsService reviewsService;
+
+    @Autowired
+    private PackageRepository packageRepository; // Repository for package-related data
 
     @Autowired
     private NotificationService notificationService;
@@ -122,6 +127,21 @@ public class CustomerController {
         model.addAttribute("unreadNotificationsCount", unreadNotificationsCount);
 
         return "frontendCode/CustomerUI/customerViewPackages";
+    }
+
+
+
+    private long calculateTotalBookings(List<Booking> bookings) {
+        return bookings.size();
+    }
+
+    private Package determineFavoritePackage(List<Booking> bookings) {
+        return bookings.stream()
+                .collect(Collectors.groupingBy(Booking::getPkg, Collectors.counting()))
+                .entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
     }
 
     /**
