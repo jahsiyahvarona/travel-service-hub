@@ -19,7 +19,7 @@ make this all in the formate for readme. do it in one code block like markdown: 
 
 
 ## **Features**
-> **Providers**
+ **Providers**
 >  - Create and modify profiles
 >  - Add and manage services with searchable criteria
 >  - Reply to customer reviews
